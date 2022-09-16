@@ -13,17 +13,18 @@ for linha in linhas:
     vertice_a = linha[0]
     vertice_b = linha[1].strip("\n")
 
-    dic[vertice_a] = []
     if vertice_a != passado:
+        dic[vertice_a] = []
         i += 1
-        vertices.append(vertice_a)
-        matriz.append([])
-        matriz[i].append(vertice_b)
+        dic[vertice_a].append(vertice_b)
+        # matriz.append([])
+        # matriz[i].append(vertice_b)
     else:
-        matriz[i].append(vertice_b)
+        dic[vertice_a].append(vertice_b)
+        #matriz[i].append(vertice_b)
     passado = vertice_a
 
-print(matriz , vertices)
+print(dic , vertices)
 
 for vertice in vertices:
     print("   ", vertice, end="")
