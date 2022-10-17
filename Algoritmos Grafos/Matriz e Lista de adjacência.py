@@ -1,65 +1,74 @@
-def montar_grafo(arquivo):
-    vertices = []
-    grafo = dict()
-    passado = -1
-    i = -1
+class Grafo:
+    def __init__(self, arquivo):
+        self.vertices = []
+        self.grafo = dict()
+        self.matriz = []
+        self.i = 0
+        self.arquivo = open(arquivo)
+        self.grafo_atual = 0
+        self.visitados = []
+        self.caminho = []
 
-    linhas = arq_grafo.readlines()
-    
-    for linha in linhas:
-        linha = linha.split(",")
-        vertice_a = linha[0]
-        vertice_b = linha[1].strip("\n")
+        self.tem = False
 
-        if vertice_a in grafo.keys():
-            grafo[vertice_a].append(vertice_b)
-        else:
-            vertices.append(vertice_a)
-            grafo[vertice_a] = [vertice_b]
+        self.montar_grafo()
 
-    vertices.sort()
-    print(grafo, vertices)
-    return grafo, vertices
+    def montar_grafo(self):
+        linhas = self.arquivo.readlines()
+        
+        for linha in linhas:
+            linha = linha.split(",")
+            vertice_a = linha[0]
+            vertice_b = linha[1].strip("\n")
 
+            if vertice_a in self.grafo.keys():
+                self.grafo[vertice_a].append(vertice_b)
+                if vertice_b not in self.grafo.keys():
+                    self.vertices.append(vertice_b)
+                    self.grafo[vertice_b] = []
+            else:
+                self.vertices.append(vertice_a)
+                self.grafo[vertice_a] = [vertice_b]
 
-def printar_matriz(grafo, vertices_ordem):  
-    matriz = []
+        self.vertices.sort()
 
-    print("   ", end="")
-    for vertice in vertices_ordem:  # primeira linha
-        print(vertice, end="  ")
-        matriz.append(grafo[vertice])
-    print("")
-
-    for linha in vertices_ordem:    #resto das linhas
-        print(linha, end="  ")
-        for coluna in vertices_ordem:
-            print(f"{grafo[linha].count(coluna)}  ", end="")
+    def printar_matriz(self):  
+        print("   ", end="")
+        for vertice in self.vertices:  # primeira linha
+            print(vertice, end="  ")
+            self.matriz.append(self.grafo[vertice])
         print("")
 
+        for linha in self.vertices:    #resto das linhas
+            print(linha, end="  ")
+            for coluna in self.vertices:
+                print(f"{self.grafo[linha].count(coluna)}  ", end="")
+            print("")
 
-arq_grafo = open("Algoritmos Grafos\grafo.txt", "r")
+    def tem_caminho(self, g_inicio, g_final):
+        vertice_a = g_inicio        # vertice principal, do qual sai o loop
+        for vertice in self.grafo[g_inicio]:
+            if vertice not in self.visitados and self.tem == False:
+                self.caminho.append(f"{vertice_a} -> {vertice}")
+                self.visitados.append(vertice) 
+                g_inicio = vertice
 
-grafo, vertices = montar_grafo(arq_grafo)
-printar_matriz(grafo, vertices)
+                if g_inicio == g_final:
+                    self.tem = True
+                    return
 
-arq_grafo.close()
-
-def tem_caminho(g_inicio, g_final, i):  #arrumar
-    if len(grafo[g_inicio]) == i+1:
-        i = 0
-
-    print("g_inicio:", g_inicio, "indice:", i)
-    print(grafo[g_inicio][i])
-
-    g_inicio = grafo[g_inicio][i]
-
-    if g_inicio == g_final:
-        return True
-
-    i += 1
-    return tem_caminho(g_inicio, g_final, i)
+                self.tem_caminho(g_inicio, g_final)
 
 
-i = 0
-print(tem_caminho("1","9",i))
+arq_grafo = "IC/Algoritmos Grafos/grafo.txt"
+
+grafo = Grafo(arq_grafo)
+grafo.printar_matriz()
+print(grafo.grafo)
+grafo.tem_caminho("9", "5")
+print(grafo.visitados)
+print(grafo.tem)
+print(grafo.caminho)
+
+# print(grafo.grafo)
+# print(grafo.matriz)
