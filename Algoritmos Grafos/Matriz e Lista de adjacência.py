@@ -2,15 +2,11 @@ class Grafo:
     def __init__(self, arquivo):
         self.vertices = []
         self.grafo = dict()
-        self.matriz = []
-        self.i = 0
         self.arquivo = open(arquivo)
-        self.grafo_atual = 0
         self.visitados = []
         self.caminho = []
-
         self.tem = False
-
+        
         self.montar_grafo()
 
     def montar_grafo(self):
@@ -36,7 +32,6 @@ class Grafo:
         print("   ", end="")
         for vertice in self.vertices:  # primeira linha
             print(vertice, end="  ")
-            self.matriz.append(self.grafo[vertice])
         print("")
 
         for linha in self.vertices:    #resto das linhas
@@ -48,7 +43,10 @@ class Grafo:
     def tem_caminho(self, g_inicio, g_final):
         vertice_a = g_inicio        # vertice principal, do qual sai o loop
         for vertice in self.grafo[g_inicio]:
-            if vertice not in self.visitados and self.tem == False:
+            if self.tem == True:
+                break
+
+            if vertice not in self.visitados:
                 self.caminho.append(f"{vertice_a} -> {vertice}")
                 self.visitados.append(vertice) 
                 g_inicio = vertice
@@ -60,15 +58,11 @@ class Grafo:
                 self.tem_caminho(g_inicio, g_final)
 
 
-arq_grafo = "IC/Algoritmos Grafos/grafo.txt"
+
+arq_grafo = "Algoritmos Grafos/grafo.txt"
 
 grafo = Grafo(arq_grafo)
 grafo.printar_matriz()
 print(grafo.grafo)
-grafo.tem_caminho("9", "5")
-print(grafo.visitados)
-print(grafo.tem)
+grafo.tem_caminho("2", "2")
 print(grafo.caminho)
-
-# print(grafo.grafo)
-# print(grafo.matriz)
