@@ -1,5 +1,7 @@
 from random import randint
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Grafo:
     def __init__(self, arquivo):
@@ -12,16 +14,23 @@ class Grafo:
         
         self.montar_grafo()
 
-        self.t = 0
-
-        self.S = 1000
-        self.I = 10
+        self.S = 30000
+        self.I = 400
         self.R = 0
-        
-        self.X = randint(1, 30)
+        self.X = randint(0, self.S)
 
-        self.taxa_virulencia = 0.55
-        self.taxa_recuperaçao = 0.1
+        self.todos = []
+        self.s = []
+        self.i = []
+        self.r = []
+        self.t = []
+
+        self.taxa_virulencia = 29/200
+        self.taxa_recuperaçao = 91/200
+
+        #self.taxa_virulencia = 0.55
+        #self.taxa_recuperaçao = 0.1
+
         #self.taxa_distanciamento = 0
 
     def montar_grafo(self):
@@ -79,21 +88,37 @@ class Grafo:
             print(f"Contatos Adequados: {self.X} \nNovos Infectados: {v}")
             self.I = self.I - e + v
             self.S = self.S - v
-            self.X = randint(1, int(0.2*self.S))
+            self.X = randint(0, self.S)                 #*(1, int(0.2)*self.S)
             self.info()
             print("")
+
+            # self.s.append()
+            # self.i.append()
+            # self.r.append()
+            self.todos.append([self.S, self.I, self.R])
+            self.t.append(i)
         
     def info(self):
         print(f"I: {(self.I)} \nS: {(self.S)} \nR: {(self.R)}")
         #print(f"Valores Reais:\nI: {self.I} \nS: {self.S} \nR: {self.R}")
         print(f"Total: {round(self.I) + round(self.S) + round(self.R)}")
 
+    def criar_grafico(self):
+        #fig, ax = plt.subplots()
+        x = [1, 2, 3]
+        y = np.array([[1, 2], [3, 4], [5, 6]])
+        plt.gca().set_prop_cycle('color', ['green', 'yellow', 'blue'])
+        plt.plot(self.t, self.todos)
+        #ax.plot(self.s, self.t)
 
-arq_grafo = "Algoritmos Grafos/grafo.txt"
+        plt.show()
+
+arq_grafo = "IC/Algoritmos Grafos/grafo.txt"
 
 grafo = Grafo(arq_grafo)
 grafo.printar_matriz()
 print(grafo.grafo)
 grafo.info()
-grafo.avançar_t(50)
+grafo.avançar_t(200)  #50
 #grafo.info()
+grafo.criar_grafico()
