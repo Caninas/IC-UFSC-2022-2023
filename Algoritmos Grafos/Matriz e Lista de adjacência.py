@@ -113,6 +113,8 @@ class Grafo:
 
         plt.show()
 
+
+# colocar __iter__ , __len__
 arq_grafo = "IC/Algoritmos Grafos/grafo.txt"
 
 grafo = Grafo(arq_grafo)
