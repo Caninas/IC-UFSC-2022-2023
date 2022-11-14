@@ -136,6 +136,9 @@ class Grafo:
 
 arq_grafo = "IC Iniciação Científica\Algoritmos Grafos\grafo.txt"
 
+# colocar __iter__ , __len__
+arq_grafo = "IC/Algoritmos Grafos/grafo.txt"
+
 grafo = Grafo(arq_grafo)
 grafo.printar_matriz()
 # print(grafo.grafo)
