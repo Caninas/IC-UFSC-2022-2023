@@ -2,6 +2,7 @@ from random import randint
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 
 class Grafo:
     def __init__(self, arquivo):
@@ -49,6 +50,9 @@ class Grafo:
                     self.vertices.append(vertice_b)
                     self.grafo[vertice_b] = []
 
+        # for chave, itens in self.grafo.items():
+        #     self.grafo[chave] = sorted(itens)
+        print(self.grafo)
         self.vertices.sort()
 
     def printar_matriz(self):  
@@ -112,13 +116,36 @@ class Grafo:
         #ax.plot(self.s, self.t)
 
         plt.show()
+    
+    def caminhar_DFS(self, g_inicio):
+        vertice_a = g_inicio        # vertice principal, do qual sai o loop
+        self.visitados.append(vertice_a)
+        for vertice in self.grafo[g_inicio]:
+            if vertice not in self.visitados:
+                self.caminho.append(f"{vertice}")
+                g_inicio = vertice
 
-arq_grafo = "IC/Algoritmos Grafos/grafo.txt"
+                self.caminhar_DFS(g_inicio)
+
+    def caminhar_DFS_post(self, g_inicio):
+        self.visitados.append(g_inicio)
+        for vertice in self.grafo[g_inicio]:
+            if vertice not in self.visitados:
+                self.caminhar_DFS(vertice)
+        self.caminho.append(f"{g_inicio}")
+
+arq_grafo = "IC Iniciação Científica\Algoritmos Grafos\grafo.txt"
 
 grafo = Grafo(arq_grafo)
 grafo.printar_matriz()
-print(grafo.grafo)
-grafo.info()
-grafo.avançar_t(200)  #50
+# print(grafo.grafo)
+# grafo.info()
+# grafo.avançar_t(200)  #50
 #grafo.info()
-grafo.criar_grafico()
+#grafo.criar_grafico()
+# grafo.caminhar_DFS("0")
+# print(grafo.visitados)
+# print(grafo.caminho)
+grafo.caminhar_DFS_post("0")
+print(grafo.visitados)
+print(grafo.caminho)
