@@ -4,6 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
+# NetworkX
+
+
 class Grafo:
     def __init__(self, arquivo):
         self.vertices = []
