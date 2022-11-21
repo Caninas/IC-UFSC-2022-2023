@@ -6,7 +6,6 @@ from collections import OrderedDict
 
 # NetworkX
 
-
 class Grafo:
     def __init__(self, arquivo):
         self.vertices = []
