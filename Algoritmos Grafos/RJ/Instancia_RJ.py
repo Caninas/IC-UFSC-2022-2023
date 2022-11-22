@@ -120,5 +120,5 @@ G.add_edge(rocinha, gavea)
 #pos = nx.rescale_layout_dict(pos)
 nx.draw(G, with_labels=True, font_weight='bold')# pos,
 
-#nx.draw_shell(G, nlist=[range(5, 10), range(5)], with_labels=True, font_weight='bold')
+nx.draw 
 plt.show()
