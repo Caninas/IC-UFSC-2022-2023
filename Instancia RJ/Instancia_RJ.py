@@ -1,198 +1,238 @@
+import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-from unidecode import unidecode
+from math import floor, ceil
+from random import randint, random
 
-# exportar para graphviz
-# pintar cada zona
+from Txt import Txt
 
-# organizar bairros: numero nome(sem espaços)
-# script le linha, corta espaços antes e depois e separa espaços - 0 numero, de 1 para frente bairro
-# guardar em dict pra depois?
+#? exportar para graphviz
+#? pintar cada zona
 
-# organizar adjacencias por numero
-# script le primeiro numero, acha obj1 correspondente 
-# e para cada subsequente, acha obj2 correspondente G.add_edge(obj1, obj2)
-# se combinação (obj2, obj1) já existe (guardar em lista) não criar
+#? G = nx.complete_graph(5)
+#? PG = nx.nx_pydot.to_pydot(G)
+#? H = nx.nx_pydot.from_pydot(PG)
 
-# G = nx.complete_graph(5)
-# PG = nx.nx_pydot.to_pydot(G)
-# H = nx.nx_pydot.from_pydot(PG)
+class Modelo:
+    # arquivo no formato | int(id), adjs(sep=", ")/prop1(name), prop2(populaçao), prop3(beta)... |
+    def __init__(self, arq_final):
+        self.arquivo = open(arq_final, "r", encoding="utf-8")
 
-class Bairro:
-    def __init__(self, cod, nome):
-        self.cod = cod
-        self.nome = nome
+        # tempo atual
+        self.t = 0
 
-        self.S = 3000
-        self.I = 300
-        self.R = 0
-        self.X = 0
-        
-        #self.taxa_virulencia = 29/200
-        #self.taxa_recuperaçao = 91/200
+        # variaveis para a construçao do grafico posteriormente
+        self.tempos = []
+        self.SIRs = []
 
-        #self.taxa_distanciamento = 0
 
-    def __repr__(self):
-        return f"{self.nome}"#\nS: {self.S}\nI: {self.I}\nR: {self.R}"
+        # variaveis globais, se aplicam a todos os vértices
+        # retiradas da pagina 8 e 9 do artigo do modelo
 
-class TextTransform:
-    def __init__(self, arq, arq_adj):
-        self.arquivo = open(arq, "r", encoding="utf8")
-        self.arquivo_adj  = open(arq_adj, "r", encoding="utf8")
+        self.frac_infect_inicial = 2/15     # 400/3000
 
-    def NumCidades(self):
-        instancias_cidades = ""
-        node_cidades = ""
-        lista_cidades = []
-        dict_cidades = {}
-        
+        self.v = 91/200    # taxa_virulencia
+        self.e = 29/200    # taxa_recuperaçao
+
+        self.alpha = 2/5        # fraçao de pessoas que respeitam o distanciamento, fator de distanciamento
+                                # aplicado por vertice ou globalmente
+
+        self.lambdaS = 2/5       # fraçao de pessoas que respeitam distanciamento mas precisam sair (podem ser infectados)
+        self.lambdaI = 1/10      
+        self.lambdaR = 3/5
+
+        # diz se o SIR que não respeita distanciamento esta ou nao em seu vertice original
+        self.juntos = True
+        self.grafo = self.GerarGrafo()
+
+
+    def GerarGrafo(self):
+        g = nx.Graph()
+
         for linha in self.arquivo:
-            linha = linha.strip()
-
-            if linha != "":
-                num, bairro = linha.split(" ", maxsplit=1)
-                num = int(num)
-
-                nome = unidecode(bairro.lower()).replace(" ", "_")
-
-                dict_cidades[num] = nome
-
-                lista_cidades.append((num, bairro))
-
-                instancias_cidades += f"{nome} = Bairro({num}, '{bairro}')\n"
-                node_cidades += f"G.add_node({nome})\n"
-
-        return instancias_cidades
-
-    def AdjCidades(self):
-        cidades_adjs = []
-        cidades_ja_visitadas = set()
-
-        for i, linha in enumerate(self.arquivo_adj):
-            linha = linha.strip()
-
+            adj, propriedades = linha.strip().split("/")
+            nome, *adj = adj.split(", ")
+            numero, populaçao, beta = propriedades.split(", ")
+            populaçao = int(populaçao)
             
-            if linha != "":
-                num_bairro = linha.split(" ", maxsplit=1)[0]
-                num_bairro = int(num_bairro)
+            adj = [(nome, v) for v in adj] + [(v, nome) for v in adj]
 
-                if num_bairro not in cidades_ja_visitadas:
-                    cidades_ja_visitadas.add(num_bairro)
+            I = floor(populaçao * self.frac_infect_inicial)
+            S = populaçao - I
 
-                    adjs = [int(x) for x in linha.split(" ")[1:]]
-                    for cidade in adjs:
-                        if cidade in cidades_ja_visitadas:
-                            adjs.remove(cidade)
+            Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
+            Iponto = floor(self.alpha * I)
 
+            S2pontos = S - Sponto               # pessoas que nao respeitam (podem sair do vertice)
+            I2pontos = I - Iponto
 
-                    cidades_adjs.append((num_bairro, adjs))
+            g.add_node(nome, 
+                id=int(numero), 
+                populaçao=int(populaçao),
+                SIR_t0={"S": S, "I": I, "R": 0},
+                SIRd={"S": Sponto, "I": Iponto, "R": 0},
+                SIRdd={"S": S2pontos, "I": I2pontos, "R": 0},
+                SIRddd={},       # SIR ESTRANGEIRO (SIRdd de outros) #
+                SIRdddantes={},
+                quant_vizinhos=len(adj),
+                beta=float(beta))
+                
+            g.add_edges_from(adj)
 
-            print(cidades_adjs)
+        return g
 
+    def PrintarGrafo(self):
+        plt.figure(figsize=(10,8))
 
-G = nx.Graph()
+        nx.draw(self.grafo, with_labels=True, font_weight='bold', font_size=6, node_size=500, clip_on=True)
 
-# flamengo = Bairro(15, "Flamengo")
-# gloria = Bairro(16, "Gloria")
-# laranjeiras = Bairro(17, "Laranjeiras")
-# catete = Bairro(18, "Catete")
-# cosme_velho = Bairro(19, "Cosme Velho")
-# botafogo = Bairro(20, "Botafogo")
-# humaita = Bairro(21, "HumaitÁ")
-# urca = Bairro(22, "Urca")
-# leme = Bairro(23, "Leme")
-# copacabana = Bairro(24, "Copacabana")
-# ipanema = Bairro(25, "Ipanema")
-# leblon = Bairro(26, "Leblon")
-# lagoa = Bairro(27, "Lagoa")
-# jardim_botanico = Bairro(28, "Jardim Botânico")
-# gavea = Bairro(29, "Gávea")
-# vidigal = Bairro(30, "Vidigal")
-# sao_conrado = Bairro(31, "Sao Conrado")
-# rocinha = Bairro(154, "Rocinha")
+        plt.show()
 
-G.add_node(Bairro(15, "Flamengo"))
-G.add_node(Bairro(16, "Gloria"))
-#G.add_edge(15, 16)
-print(G.node["Flamengo"])
-# G.add_node(laranjeiras)
-# G.add_node(catete)
-# G.add_node(cosme_velho)
-# G.add_node(botafogo)
-# G.add_node(humaita)
-# G.add_node(urca)
-# G.add_node(leme)
-# G.add_node(copacabana)
-# G.add_node(ipanema)
-# G.add_node(leblon)
-# G.add_node(lagoa)
-# G.add_node(leblon)
-# G.add_node(jardim_botanico)
-# G.add_node(gavea)
-# G.add_node(vidigal)
-# G.add_node(sao_conrado)
-# G.add_node(rocinha)
+    def PrintarEstadoVertice(self, vertice):
+        print(f"{vertice}: {self.grafo.nodes[vertice]}")
+    
+    def PrintarEstadoGrafo(self):
+        plt.gca().set_prop_cycle('color', ['red', 'green', 'blue'])
+        plt.plot(self.tempos, self.SIRs)
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        self.juntos = True
+        for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
+            nome, atributos = node
+
+            for vizinho in self.grafo.edges(nome):
+                nodevizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
+                atributos["SIRdd"]["S"] += nodevizinho["S"]
+                atributos["SIRdd"]["I"] +=  nodevizinho["I"]
+                atributos["SIRdd"]["R"] += nodevizinho["R"]
+                self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
+
+        for vertice in self.grafo.nodes():
+            self.PrintarEstadoVertice(vertice)
+
+        plt.show()
 
 
-# G.add_edge(catete, gloria)
-# G.add_edge(catete, flamengo)
-# G.add_edge(catete, laranjeiras)
+    def AvançarTempo(self, t):
+        # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambdaS*))
+        i = 0
+        if self.t == 0 or self.juntos == True:                                             # distribuiçao inicial de pessoas
+            self.juntos = False
+            for node in list(self.grafo.nodes(data=True)):          # posso atribuir direto no node
+                nome, atributos = node
+
+                S2pontossaindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                I2pontossaindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                R2pontossaindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                atributos["SIRdd"]["S"] -= S2pontossaindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["I"] -= I2pontossaindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["R"] -= R2pontossaindo * len(self.grafo.edges(nome))
+
+                for vizinho in self.grafo.edges(nome):
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S2pontossaindo, "I": I2pontossaindo, "R": R2pontossaindo}
+
+        for tempo in range(t):
+            self.tempos.append(tempo)
+            for node in list(self.grafo.nodes(data=True)):
+                # x = tempo
+                # y = [S, I, R]
+                nome, atributos = node
+
+                atributos["SIRdddantes"]["S"] = atributos["SIRdddantes"]["I"] = atributos["SIRdddantes"]["R"] = 0
+
+                for vizinho in atributos["SIRddd"].values():
+                    atributos["SIRdddantes"]["S"] += vizinho["S"]
+                    atributos["SIRdddantes"]["I"] += vizinho["I"]
+                    atributos["SIRdddantes"]["R"] += vizinho["R"]
 
 
-# G.add_edge(laranjeiras, flamengo)
-# G.add_edge(laranjeiras, cosme_velho)
-# G.add_edge(laranjeiras, botafogo)
+            self.SIRs.append([])
+            somaSIR = [0, 0, 0]
+            for node in list(self.grafo.nodes(data=True)):          # posso atribuir direto no node
+                nome, atributos = node
 
-# G.add_edge(botafogo, flamengo)
-# G.add_edge(botafogo, humaita)
-# G.add_edge(botafogo, urca)
-# G.add_edge(botafogo, copacabana)
+                # guardando valores SIR para usar no grafico
+                somaSIR[0] += atributos["SIRd"]["S"] + atributos["SIRdd"]["S"] + atributos["SIRdddantes"]["S"]
+                somaSIR[1] += atributos["SIRd"]["I"] + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]
+                somaSIR[2] += atributos["SIRd"]["R"] + atributos["SIRdd"]["R"] + atributos["SIRdddantes"]["R"]
+                
+                #! Calculo Xponto + Sdd que fica (Ypi = Ypi -> i)
 
-# G.add_edge(urca, botafogo)
+                Nponto = floor(self.lambdaS * atributos["SIRd"]["S"]) + floor(self.lambdaI * atributos["SIRd"]["I"]) + floor(self.lambdaR * atributos["SIRd"]["R"])
+                N2pontos = atributos["SIRdd"]["S"] + atributos["SIRdd"]["I"] + atributos["SIRdd"]["R"]
+                N3pontos = atributos["SIRdddantes"]["S"] + atributos["SIRdddantes"]["I"] + atributos["SIRdddantes"]["R"]
 
-# G.add_edge(humaita, lagoa)
-# G.add_edge(humaita, jardim_botanico)
+                # prob de acontecer um encontro de Sd / Sdd com Infectados no geral (Ypi = Ypi -> i)
+                Yponto = (floor(self.lambdaI * atributos["SIRd"]["I"]) + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]) / ((Nponto + N2pontos + N3pontos) - 1)
+                
+                Xponto = 0          # numero de encontros de S com I no vertice i
+                X2pontosii = 0
 
-# G.add_edge(copacabana, leme)
-# G.add_edge(copacabana, lagoa)
-# G.add_edge(copacabana, ipanema)
+                # range S bonito 1 ponto
+                for i in range(floor(self.lambdaS * atributos["SIRd"]["S"])):    # calculo do numero de encontros na pop de suscetiveis que respeitam mas tem q sair
+                    Xponto += random() < Yponto                                 # baseado na probabilidade de Yponto
 
-# G.add_edge(lagoa, jardim_botanico)
-# G.add_edge(lagoa, ipanema)
-# G.add_edge(lagoa, leblon)
-# G.add_edge(lagoa, gavea)
-
-# G.add_edge(jardim_botanico, gavea)
-
-# G.add_edge(leblon, ipanema)
-# G.add_edge(leblon, gavea)
-# G.add_edge(leblon, vidigal)
-
-# G.add_edge(vidigal, rocinha)
-# G.add_edge(vidigal, gavea)
-
-# G.add_edge(rocinha, sao_conrado)
-# G.add_edge(rocinha, gavea)
-
-# pos = {flamengo: np.array((0, 0)), gloria: np.array((0, 0)), laranjeiras: np.array((0, 0)),
-#         catete: np.array((0, 0)), cosme_velho: np.array((0, 0)), botafogo: np.array((0, 0)),
-#         humaita: np.array((0, 0)), urca: np.array((0, 0)), leme: np.array((0, 0)),
-#         copacabana: np.array((0, 0)), ipanema: np.array((0, 0)), leblon: np.array((0, 0)),
-#         lagoa: np.array((0, 0)), jardim_botanico: np.array((0, 0)), gavea: np.array((0, 0)),
-#         vidigal: np.array((0, 0)), sao_conrado: np.array((0, 0)), rocinha: np.array((0, 0))}
-
-#pos = nx.rescale_layout_dict(pos)
-
-plt.figure(figsize=(10,8))
-
-nx.draw(G, with_labels=True, font_weight='bold', font_size=6, node_size=2000, clip_on=True)# pos,
-
-plt.show()
+                # X2pontos = X2pontosii + X2pontosij (somatorio Y2pontosii(=Yponto) + somario dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
+                for i in range(atributos["SIRdd"]["S"]):                    # calculo do numero de encontros na pop de suscetiveis que nao respeitam e restam no vertice
+                    X2pontosii += random() < Yponto                         # baseado na probabilidade de Yponto
 
 
+                # Cada grupo do SIR (respeitam, nao respeitam, vizinhos) tem probabilidades unicas (3 loops acima)
 
-#tt = TextTransform(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Algoritmos Grafos\RJ\bairros apenas.txt", r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Algoritmos Grafos\RJ\adjacencias.txt")
+                # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
+                # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
+                for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
+                    X2pontosij = 0
 
-#print(tt.AdjCidades())
+                    for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
+                        X2pontosij += random() < Yponto                                            # baseado na probabilidade de Y2pontos
+                        
+                    recuperados_novosddd = ceil(self.e * vizinho["I"])
+
+                    vizinho["S"] = vizinho["S"] - floor(self.v * X2pontosij)
+                    vizinho["I"] = vizinho["I"] - recuperados_novosddd + floor(self.v * X2pontosij)
+                    vizinho["R"] = vizinho["R"] + recuperados_novosddd
+        
+                # SIR t+1 SIRponto e SIR2pontos
+                recuperados_novosd = ceil(self.e * atributos["SIRd"]["I"])
+                recuperados_novosdd = ceil(self.e * atributos["SIRdd"]["I"])
+                
+                if (nome == "Bangu"):
+                    i += 1
+                    print("tempo=",self.t)
+                    print(recuperados_novosd, recuperados_novosdd, floor(self.v * Xponto))
+
+                atributos["SIRd"]["S"] = atributos["SIRd"]["S"] - floor(self.v * Xponto)              # X = quantidade total de encontros, v*X pessoas suscetiveis de fato infectadas
+                atributos["SIRdd"]["S"] = atributos["SIRdd"]["S"] - floor(self.v * X2pontosii)
+
+                atributos["SIRd"]["I"] = atributos["SIRd"]["I"] - recuperados_novosd + floor(self.v * Xponto)
+                atributos["SIRdd"]["I"] = atributos["SIRdd"]["I"] - recuperados_novosdd + floor(self.v * X2pontosii)
+
+                atributos["SIRd"]["R"] = atributos["SIRd"]["R"] + recuperados_novosd
+                atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novosdd
+
+            self.SIRs[tempo] = [somaSIR[0], somaSIR[1], somaSIR[2]]
+            self.t += 1
+
+
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+
+adjacencias = "./txts/adjacencias.txt"
+nomes = "./txts/bairros apenas.txt"
+populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
+arquivo_final = "./txts/arquivo_final.txt"
+
+# txt = Txt(adjacencias, nomes, arquivo_final, populaçao)
+# txt.gerar_arquivo_destino()
+
+plt.xlim(left=0, right=199)
+
+m = Modelo(arquivo_final)
+m.GerarGrafo()
+m.PrintarEstadoVertice("Bangu")
+m.AvançarTempo(200)
+m.PrintarEstadoVertice("Bangu")
+m.PrintarEstadoGrafo()
+#m.PrintarGrafo()

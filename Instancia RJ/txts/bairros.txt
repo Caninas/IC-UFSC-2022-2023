@@ -1,3 +1,9 @@
+Área de Planejamento 1
+
+Região de Planejamento 1.1 - Centro
+
+IRA - Portuária
+
 001 Saúde
 
 002 Gamboa
@@ -6,9 +12,13 @@
 
 004 Caju
 
+II RA - Centro
+
 005 Centro
 
 161 Lapa
+
+III RA-Rio Comprido
 
 006 Catumbi
 
@@ -19,7 +29,9 @@
 009 Estácio
 
 
-010 Imperial de São Cristóvão
+VII RA-São Cristóvão
+
+010 São Cristóvão
 
 
 
@@ -28,20 +40,36 @@
 012 Benfica
 
 
+
+
+
 158 Vasco da Gama
 
 
+
+XXI RA- Ilha de Paquetá
+
 013 Paquetá
 
+
+
+XXIII RA-Santa Teresa
 
 014 Santa Teresa
 
 
 
 
+
+
+Região de Planejamento 2.1 - Zona Sul
+
+IV RA- Botafogo
+
 015 Flamengo
 
 016 Glória
+
 
 
 017 Laranjeiras
@@ -53,15 +81,22 @@
 019 Cosme Velho
 
 
+
 020 Botafogo
 
 021 Humaitá
 
 022 Urca
 
+V RA
+
+- Copacabana
+
 023 Leme
 
 024 Copacabana
+
+VI RA - Lagoa
 
 025 Ipanema
 
@@ -78,9 +113,15 @@
 031 São Conrado
 
 
+XXVII RA- Rocinha
+
 154 Rocinha
 
 
+
+Região de Planejamento 2.2 - Tijuca
+
+VIII RA-Tijuca
 
 032 Praça da Bandeira
 
@@ -90,7 +131,7 @@
 
 034 Alto da Boa Vista
 
-
+IX RA-Vila Isabel
 
 035 Maracanã
 
@@ -100,6 +141,10 @@
 
 038 Grajaú
 
+
+Região de Planejamento 3.1 - Ramos
+
+X RA-Ramos
 
 039 Manguinhos
 
@@ -112,8 +157,15 @@
 
 
 
-157 Mare
+XXX RA- Maré
 
+157 Maré
+
+
+
+Região de Planejamento 3.2 - Méier
+
+XIII RA - Méier
 
 051 Jacaré
 
@@ -143,6 +195,7 @@
 066 Engenho de Dentro
 
 
+
 067 Água Santa
 
 068 Encantado
@@ -151,12 +204,25 @@
 
 
 
+
+
 070 Abolição
 
 071 Pilares
 
 
+
+
+
+XXVIII RA-Jacarezinho
+
 155 Jacarezinho
+
+
+
+Região de Planejamento 3.3 - Madureira
+
+XIV RA - Irajá
 
 
 072 Vila Kosmos
@@ -174,6 +240,8 @@
 077 Colégio
 
 
+
+XV RA-Madureira
 
 078 Campinho
 
@@ -209,6 +277,8 @@
 090 Marechal Hermes
 
 
+XII RA- Inhaúma
+
 050 Higienópolis
 
 
@@ -228,21 +298,34 @@
 056 Tomás Coelho
 
 
+
+XXIX RA - Complexo do Alemão
+
 156 Complexo do Alemão
 
+Região de Planejamento 3.5 - Penha
+
+XI RA-Penha
 
 043 Penha
+
 
 
 044 Penha Circular
 
 
-045 Braz de Pina
 
+045 Brás de Pina
+
+
+
+XXXI RA - Vigário Geral
 
 046 Cordovil
 
 047 Parada de Lucas
+
+
 
 
 
@@ -251,6 +334,14 @@
 049 Jardim América
 
 
+
+
+
+
+
+Região de Planejamento 3.6 - Pavuna
+
+XXII RA-Anchieta
 
 106 Guadalupe
 
@@ -261,17 +352,26 @@
 109 Ricardo de Albuquerque
 
 
+
+XXV RA- Pavuna
+
 110 Coelho Neto
 
 111 Acari
 
 112 Barros Filho
 
-113 Costa Barros
+113 Costa BarroS
 
 114 Pavuna 
 
-159 Parque Columbia
+159 Parque Colúmbia
+
+
+
+Região de Planejamento 3.7 - Ilha do Governador
+
+XX RA-Ilha do Govemador
 
 091 Ribeira
 
@@ -287,7 +387,7 @@
 
 097 Bancários
 
-098 Freguesia
+098 Freguesia (Ilha do Gov.)
 
 099 Jardim Guanabara
 
@@ -301,10 +401,14 @@
 
 104 Galeão
 
-105 Cidade Universitária
+105 Cidade Universitária (Fundão)
 
+
+
+Região de Planejamento 4.1 - Jacarepaguá XVI RA - Jacarepaguá
 
 115 Jacarepaguá
+
 
 
 116 Anil
@@ -314,7 +418,8 @@
 119 Curicica
 
 
-120 Freguesia de Jacarepaguá
+120 Freguesia (Jacarepaguá) 
+
 
 
 121 Pechincha
@@ -327,8 +432,14 @@
 
 125 Vila Valqueire
 
+XXXIV RA - Cidade de Deus
+
 118 Cidade de Deus
 
+
+Região de Planejamento 4.2 - Barra da Tijuca
+
+XXIV RA - Barra da Tijuca
 
 126 Joá
 
@@ -341,9 +452,11 @@
 
 
 
+
 129 Camorim 
 
 130 Vargem Pequena
+
 
 
 
@@ -355,6 +468,16 @@
 
 133 Grumari
 
+
+
+
+
+
+
+
+Região de Planejamento 5.1 - Bangu
+
+XVII RA-Bangu
 
 140 Padre Miguel
 
@@ -372,13 +495,13 @@
 
 163 Jabour
 
+XXXIII RA - Realengo
 
 134 Deodoro
 
 
 
 135 Vila Militar
-
 
 136 Campo dos Afonsos
 
@@ -390,11 +513,23 @@
 
 138 Magalhães Bastos
 
+
+
 139 Realengo
+
+
+
+Região de Planejamento 5.2 - Campo Grande
+
+XVIII RA - Campo Grande
 
 143 Santíssimo
 
+
+
 144 Campo Grande
+
+
 
 145 Senador Vasconcelos
 
@@ -403,6 +538,9 @@
 147 Cosmos
 
 
+Região de Planejamento 5.3 - Santa Cruz
+
+XIX RA - Santa Cruz
 
 148 Paciência
 
@@ -412,8 +550,57 @@
 150 Sepetiba
 
 
+Região de Planejamento 5.4 - Guaratiba XXVI RA-Guaratiba
+
 151 Guaratiba
 
 152 Barra de Guaratiba
 
 153 Pedra de Guaratiba
+
+
+
+
+Regioes de Planejamento
+
+1.1 - Centro
+
+21 Zona Sul
+
+22-Tijuca
+
+aratiba
+
+m
+
+3.1 Ramos
+
+3.2 - Méier
+
+3.3 Madureira
+
+3.4- Inhaúma
+
+3.5- Penha
+
+3.6 Pavuna
+
+3.7 Ilha do Governador
+
+4.1 Jacarepaguá
+
+4.2 Barra da Tijuca
+
+5.1 - Bangu
+
+5.2 Campo Grande 5.3 Santa Cruz
+
+5.4- Guaratiba
+
+Região Administrativa
+
+Fonte: Plano Diretor da Cidade do Rio de Janeiro
+
+Lei Complementar nº 111/2011
+
+02:46 27/11/2022
