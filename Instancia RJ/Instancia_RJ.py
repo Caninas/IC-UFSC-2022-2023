@@ -75,9 +75,7 @@ class Modelo:
                 SIRdd={"S": S2pontos, "I": I2pontos, "R": 0},
                 SIRddd={},       # SIR ESTRANGEIRO (SIRdd de outros) #
                 SIRdddantes={},
-                quant_vizinhos=len(adj),
                 beta=float(beta))
-                
             g.add_edges_from(adj)
 
         return g
@@ -92,24 +90,34 @@ class Modelo:
     def PrintarEstadoVertice(self, vertice):
         print(f"{vertice}: {self.grafo.nodes[vertice]}")
     
-    def PrintarEstadoGrafo(self):
-        plt.gca().set_prop_cycle('color', ['red', 'green', 'blue'])
+    def PrintarGraficoSIRxT(self):
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+
+        plt.xlim(left=0, right=self.t-1)
+        plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
         plt.plot(self.tempos, self.SIRs)
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        self.juntos = True
-        for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
-            nome, atributos = node
 
-            for vizinho in self.grafo.edges(nome):
-                nodevizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
-                atributos["SIRdd"]["S"] += nodevizinho["S"]
-                atributos["SIRdd"]["I"] +=  nodevizinho["I"]
-                atributos["SIRdd"]["R"] += nodevizinho["R"]
-                self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
+        ax.legend(["S", "I", "R"], loc='center right', bbox_to_anchor=(1.1, 0.5))
+        ax.set_xlabel('Tempo')
+        ax.set_ylabel('Pessoas')    
 
-        for vertice in self.grafo.nodes():
-            self.PrintarEstadoVertice(vertice)
+        # self.juntos = True
+        # for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
+        #     nome, atributos = node
+
+        #     for vizinho in self.grafo.edges(nome):
+        #         nodevizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
+        #         atributos["SIRdd"]["S"] += nodevizinho["S"]
+        #         atributos["SIRdd"]["I"] +=  nodevizinho["I"]
+        #         atributos["SIRdd"]["R"] += nodevizinho["R"]
+        #         self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
+
+        # print console todos os vertices
+        # for vertice in self.grafo.nodes():
+        #     self.PrintarEstadoVertice(vertice)
 
         plt.show()
 
@@ -119,7 +127,7 @@ class Modelo:
         i = 0
         if self.t == 0 or self.juntos == True:                                             # distribuiçao inicial de pessoas
             self.juntos = False
-            for node in list(self.grafo.nodes(data=True)):          # posso atribuir direto no node
+            for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
 
                 S2pontossaindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
@@ -150,7 +158,8 @@ class Modelo:
 
             self.SIRs.append([])
             somaSIR = [0, 0, 0]
-            for node in list(self.grafo.nodes(data=True)):          # posso atribuir direto no node
+
+            for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
 
                 # guardando valores SIR para usar no grafico
@@ -179,7 +188,7 @@ class Modelo:
                     X2pontosii += random() < Yponto                         # baseado na probabilidade de Yponto
 
 
-                # Cada grupo do SIR (respeitam, nao respeitam, vizinhos) tem probabilidades unicas (3 loops acima)
+                # Cada grupo do SIR (respeitam, nao respeitam, vizinhos) tem probabilidades unicas (2 loops acima)
 
                 # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
                 # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
@@ -227,12 +236,9 @@ arquivo_final = "./txts/arquivo_final.txt"
 # txt = Txt(adjacencias, nomes, arquivo_final, populaçao)
 # txt.gerar_arquivo_destino()
 
-plt.xlim(left=0, right=199)
 
 m = Modelo(arquivo_final)
 m.GerarGrafo()
-m.PrintarEstadoVertice("Bangu")
 m.AvançarTempo(200)
-m.PrintarEstadoVertice("Bangu")
-m.PrintarEstadoGrafo()
+m.PrintarGraficoSIRxT()
 #m.PrintarGrafo()
