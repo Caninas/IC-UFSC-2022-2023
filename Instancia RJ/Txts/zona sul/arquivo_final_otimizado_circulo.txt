@@ -1,18 +1,18 @@
 Flamengo, Glória, Botafogo, Catete, Laranjeiras/15, 50043, 0.2
-Glória, Flamengo, Catete/16, 9661, 0.3333333333333333
+Glória, Flamengo, Catete, Rocinha/16, 9661, 0.3333333333333333
 Laranjeiras, Botafogo, Flamengo, Cosme Velho, Catete/17, 45554, 0.2
-Catete, Glória, Flamengo, Laranjeiras/18, 24057, 0.25
-Cosme Velho, Laranjeiras/19, 7178, 0.5
+Catete, Glória, Flamengo, Cosme Velho/18, 24057, 0.25
+Cosme Velho, Laranjeiras, Urca, Catete/19, 7178, 0.5
 Botafogo, Laranjeiras, Urca, Humaitá, Flamengo, Copacabana/20, 82890, 0.16666666666666666
 Humaitá, Botafogo, Lagoa, Jardim Botânico/21, 13285, 0.25
-Urca, Botafogo/22, 7061, 0.5
-Leme, Copacabana, São Conrado/23, 14799, 0.5
-Copacabana, Botafogo, Ipanema, Lagoa, Leme/24, 146392, 0.2
+Urca, Botafogo, Leme, Cosme Velho/22, 7061, 0.5
+Leme, Copacabana, São Conrado, Urca/23, 14799, 0.5
+Copacabana, Botafogo, Ipanema, Leme/24, 146392, 0.2
 Ipanema, Copacabana, Lagoa, Leblon/25, 42743, 0.25
-Leblon, Vidigal, Gávea, Ipanema, Lagoa/26, 46044, 0.2
-Lagoa, Jardim Botânico, Gávea, Humaitá, Copacabana, Leblon, Ipanema/27, 21198, 0.14285714285714285
-Jardim Botânico, Lagoa, Humaitá, Gávea/28, 18009, 0.2
-Gávea, Jardim Botânico, Lagoa, Leblon, Vidigal, Rocinha/29, 16003, 0.16666666666666666
-Vidigal, Gávea, Leblon, Rocinha, São Conrado/30, 12797, 0.2
-São Conrado, Vidigal, Rocinha, Leme/31, 10980, 0.3333333333333333
-Rocinha, Vidigal, Gávea, São Conrado/154, 69356, 0.25
+Leblon, Vidigal, Ipanema/26, 46044, 0.2
+Lagoa, Gávea, Humaitá, Ipanema/27, 21198, 0.14285714285714285
+Jardim Botânico, Humaitá/28, 18009, 0.2
+Gávea, Lagoa, Rocinha/29, 16003, 0.16666666666666666
+Vidigal, Leblon, São Conrado/30, 12797, 0.2
+São Conrado, Vidigal, Leme/31, 10980, 0.3333333333333333
+Rocinha, Gávea, Glória/154, 69356, 0.25

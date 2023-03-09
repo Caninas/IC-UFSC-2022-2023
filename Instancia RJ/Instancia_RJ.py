@@ -227,14 +227,14 @@ class Modelo:
             self.t += 1
 
 
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"D:\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"D:\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
 # "./txts/otimizado/adjacencias.txt"
 arquivo_adjacencias = "./txts/zona sul/adjacencias_zona_sul.txt"
-arquivo_final = "./txts/zona sul/arquivo_final.txt"
+arquivo_final = "./txts/zona sul/arquivo_final_otimizado_circulo.txt"
 arquivo_ID_nomes = "./txts/relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -249,24 +249,24 @@ m = Modelo(arquivo_final)
 m.gerar_grafo()
 #print(m.grafo.nodes())
 m.avançar_tempo(200)
-
-m.printar_grafico_SIRxT()
+print(m.pico_infectados)
+#m.printar_grafico_SIRxT()
 
 #m.printar_grafo()
 
 
-# pico_infec.write(f"Normal\n")
-# for i in range(50):
-#     m = Modelo(arquivo_final)
-#     m.gerar_grafo()
-#     m.avançar_tempo(75)
-#     pico_infec.write(f"{str(m.pico_infectados)}\n")
+pico_infec.write(f"Normal\n")
+for i in range(50):
+    m = Modelo(arquivo_final)
+    m.gerar_grafo()
+    m.avançar_tempo(75)
+    pico_infec.write(f"{str(m.pico_infectados)}\n")
 
-# pico_infec.write(f"\nOtimizado\n")
-# arquivo_final = "./txts/otimizado/arquivo_final.txt"
+pico_infec.write(f"\nOtimizado\n")
+arquivo_final = "./txts/otimizado/arquivo_final.txt"
 
-# for i in range(50):
-#     m = Modelo(arquivo_final)
-#     m.gerar_grafo()
-#     m.avançar_tempo(75)
-#     pico_infec.write(f"{str(m.pico_infectados)}\n")
+for i in range(50):
+    m = Modelo(arquivo_final)
+    m.gerar_grafo()
+    m.avançar_tempo(75)
+    pico_infec.write(f"{str(m.pico_infectados)}\n")
