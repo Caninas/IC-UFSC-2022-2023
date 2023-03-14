@@ -2,6 +2,7 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy import array
 from math import floor, ceil
 from random import randint, random
 
@@ -44,6 +45,10 @@ class Modelo:
 
         # diz se o SIR que não respeita distanciamento esta ou nao em seu vertice original
         self.juntos = True
+        self.isolados = False
+
+        self.array_top_populaçao = []
+
         self.grafo = self.gerar_grafo()
 
 
@@ -81,14 +86,30 @@ class Modelo:
         return g
 
     def printar_grafo(self):
-        plt.figure(figsize=(10,8))
+        # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
+        # pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Glória': array([0.809017  , 0.58778526]), 'Catete': array([0.30901698, 0.95105655]),
+        # 'Laranjeiras': array([-0.30901702,  0.95105649]), 'Cosme Velho': array([-0.80901699,  0.58778526]), 'Urca': array([-9.99999988e-01, -7.27200340e-08]),
+        # 'Leme': array([-0.80901693, -0.58778529]), 'São Conrado': array([-0.30901711, -0.95105646]), 'Vidigal': array([ 0.30901713, -0.95105646]),
+        # 'Leblon': array([ 0.80901694, -0.58778529]),
+        # 'Gávea': (0, -0.2), 'Flamengo': (0, 0.4), 'Botafogo': (-0.5, 0.2), 'Humaitá': (0.25, 0.1), 'Copacabana': (-0.2, -0.5),
+        # 'Lagoa': (0.4, -0.25), 'Jardim Botânico': (0.6, 0.6), 'Rocinha': (0.7, 0.1)}
 
+        plt.figure(figsize=(10,8))
+        #nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
         nx.draw(self.grafo, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
         plt.show()
 
     def printar_estado_vertice(self, vertice):
         print(f"{vertice}: {self.grafo.nodes[vertice]}")
+    
+    def printar_estados_vertices(self):
+        for vertice in self.grafo.nodes:
+            print(f"{vertice}: SIR_t0: {self.grafo.nodes[vertice]['SIR_t0']}\n"
+                f"        SIRd:  {self.grafo.nodes[vertice]['SIRd']}\n"
+                f"        SIRdd:  {self.grafo.nodes[vertice]['SIRdd']}\n"
+                f"        SIRddd:  {self.grafo.nodes[vertice]['SIRddd']}")
+
     
     def printar_grafico_SIRxT(self):
         fig = plt.figure(1)
@@ -103,6 +124,8 @@ class Modelo:
         ax.legend(["S", "I", "R"], loc='center right', bbox_to_anchor=(1.1, 0.5))
         ax.set_xlabel('Tempo')
         ax.set_ylabel('Pessoas')    
+
+        plt.show()
 
         # self.juntos = True
         # for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
@@ -119,8 +142,107 @@ class Modelo:
         # for vertice in self.grafo.nodes():
         #     self.printar_estado_vertice(vertice)
 
-        plt.show()
 
+    def mergesort(self, array):
+        if len(array) > 1:
+            m = len(array)//2
+            esquerda = array[:m]
+            direita = array[m:]
+
+            self.mergesort(esquerda)
+            self.mergesort(direita)
+            
+            i = 0
+            j = 0
+            k = 0
+
+            while i < len(esquerda) and j < len(direita):
+                if esquerda[i] > direita[j]:
+                    array[k]=esquerda[i]
+                    i=i+1
+                else:
+                    array[k]=direita[j]
+                    j=j+1
+                k=k+1
+
+            while i < len(esquerda):
+                array[k]=esquerda[i]
+                i=i+1
+                k=k+1
+
+            while j < len(direita):
+                array[k]=direita[j]
+                j=j+1
+                k=k+1
+
+
+    def isolar_vertices_mais_populosos(self):
+        if not self.array_top_populaçao:
+            pop = {}
+
+            self.quantidade_bairros_selecionados = round(0.4 * len(self.grafo.nodes))
+
+            for vertice in self.grafo.nodes(data=True):
+                pop[vertice[1]["populaçao"]] = vertice[0]
+
+                self.array_top_populaçao.append(vertice[1]["populaçao"])
+            
+            self.mergesort(self.array_top_populaçao)
+            
+            for i in range(len(self.array_top_populaçao)):
+                self.array_top_populaçao[i] = pop[self.array_top_populaçao[i]]
+
+        if not self.isolados and not self.juntos:
+            print("Isolando vértices!")
+            for bairro in self.array_top_populaçao:
+                for vizinho, populaçao_de_fora in self.grafo.nodes[bairro]["SIRddd"].items():   # mandar a pop de outros de dentro para fora
+                    self.grafo.nodes[vizinho]["SIRdd"]["S"] += populaçao_de_fora["S"]
+                    populaçao_de_fora["S"] = 0
+
+                    self.grafo.nodes[vizinho]["SIRdd"]["I"] += populaçao_de_fora["I"]
+                    populaçao_de_fora["I"] = 0
+
+                    self.grafo.nodes[vizinho]["SIRdd"]["R"] += populaçao_de_fora["R"]
+                    populaçao_de_fora["R"] = 0
+
+
+                for vizinho in self.grafo.edges(bairro):            # receber pop de fora de volta
+                    self.grafo.nodes[bairro]["SIRdd"]["S"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["S"]
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["S"] = 0
+
+                    self.grafo.nodes[bairro]["SIRdd"]["I"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["I"]
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["I"] = 0
+
+                    self.grafo.nodes[bairro]["SIRdd"]["R"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["R"]
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["R"] = 0
+
+            self.isolados = True
+
+        else:
+            if self.juntos:
+                print("População ainda não se movimentou!")
+                return
+            
+            print("Tirando isolamento!")
+
+            for bairro in self.array_top_populaçao:
+                nome = bairro
+                atributos = self.grafo.nodes[nome]
+
+                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+
+                for vizinho in self.grafo.edges(nome):
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+
+            self.isolados = False
+
+        #self.printar_estados_vertices()
 
     def avançar_tempo(self, t):
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
@@ -128,7 +250,6 @@ class Modelo:
             self.juntos = False
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
-
                 S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
                 I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
                 R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
@@ -143,7 +264,7 @@ class Modelo:
         for tempo in range(t):
             print("tempo=", self.t)
 
-            self.tempos.append(tempo+1)
+            self.tempos.append(self.t)
 
             for node in list(self.grafo.nodes(data=True)):
                 # x = tempo
@@ -219,27 +340,25 @@ class Modelo:
                 atributos["SIRd"]["R"] = atributos["SIRd"]["R"] + recuperados_novos_d
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
-            self.SIRs[tempo] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
+            self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
 
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.pico_infectados = soma_SIR[1]
 
+            #print(self.grafo.nodes["Flamengo"])
             self.t += 1
 
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"D:\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
 # "./txts/otimizado/adjacencias.txt"
 arquivo_adjacencias = "./txts/zona sul/adjacencias_zona_sul.txt"
-arquivo_final = "./txts/zona sul/arquivo_final_otimizado_circulo.txt"
+arquivo_final = "./txts/normal (real)/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
-
-# arquivo_pico_infectados = "./txts/pico_infectados.txt"
-# pico_infec = open(arquivo_pico_infectados, "w")
 
 #txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
 #txt.gerar_arquivo_destino()
@@ -247,26 +366,51 @@ tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls
 
 m = Modelo(arquivo_final)
 m.gerar_grafo()
-#print(m.grafo.nodes())
+m.avançar_tempo(4)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
+m.avançar_tempo(2)
+m.isolar_vertices_mais_populosos()
 m.avançar_tempo(200)
+# print(len(m.grafo.edges))
 print(m.pico_infectados)
-#m.printar_grafico_SIRxT()
-
-#m.printar_grafo()
+m.printar_grafo()
 
 
-pico_infec.write(f"Normal\n")
-for i in range(50):
-    m = Modelo(arquivo_final)
-    m.gerar_grafo()
-    m.avançar_tempo(75)
-    pico_infec.write(f"{str(m.pico_infectados)}\n")
+m.printar_grafico_SIRxT()
 
-pico_infec.write(f"\nOtimizado\n")
-arquivo_final = "./txts/otimizado/arquivo_final.txt"
 
-for i in range(50):
-    m = Modelo(arquivo_final)
-    m.gerar_grafo()
-    m.avançar_tempo(75)
-    pico_infec.write(f"{str(m.pico_infectados)}\n")
+# arquivo_pico_infectados = "./txts/pico_infectados.txt"
+# pico_infec = open(arquivo_pico_infectados, "w")
+
+# pico_infec.write(f"Normal\n")
+# for i in range(50):
+#     m = Modelo(arquivo_final)
+#     m.gerar_grafo()
+#     m.avançar_tempo(75)
+#     pico_infec.write(f"{str(m.pico_infectados)}\n")
+
+
+# pico_infec.write(f"\nOtimizado\n")
+# arquivo_final = "./txts/zona sul/arquivo_final_otimizado_circulo.txt"
+
+# for i in range(50):
+#     m = Modelo(arquivo_final)
+#     m.gerar_grafo()
+#     m.avançar_tempo(75)
+#     pico_infec.write(f"{str(m.pico_infectados)}\n")
