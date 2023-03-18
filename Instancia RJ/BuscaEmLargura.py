@@ -1,5 +1,5 @@
 import networkx as nx
-
+import pydot
 import matplotlib.pyplot as plt
 
 def busca(g, inicio):
@@ -11,40 +11,67 @@ def busca(g, inicio):
 
     while len(fila):
         v = fila.pop(0)
-        print(v)
+        #print(g.edges(v))
         for vizinho in g.edges(v):
+            vizinho = vizinho[1]
             if vizinho not in visitados:
-                vizinho = vizinho[1]
                 visitados.add(vizinho)
-                print("vizinho:", vizinho)
+                #print("vizinho:", vizinho)
                 fila.append(vizinho)
                 anterior[vizinho] = v
 
     return anterior
 
+def caminho(raiz, destino):
+    arra = []
+    while destino != raiz:
+        arra.insert(0, destino)
+        destino = anterior[destino]
+    arra.insert(0, raiz)
+    print(arra)
 
-g = nx.DiGraph()
+adj_rj = open(r"Instancia RJ\Txts\normal (real)\adjacencias.txt", "r", encoding="utf-8")
+
+g = nx.Graph()
 arestas = [("a", "b"), ("b", "c"), ("a", "d")]
+for linha in adj_rj:
+    vertice, adj = linha.split(" ", maxsplit=1)
+    adj = adj.strip().split(" ")
+    #print(vertice, adj)
+    if adj[0] != "":
+        arestas = [(int(vertice), int(x)) for x in adj]
+        g.add_edges_from(arestas)
 
-g.add_edges_from(arestas)
+#print(g.edges())
+raiz = 1
+anterior = busca(g, raiz)
 
-print(g.edges("a"))
-anterior = busca(g, "a")
+caminho(raiz, 148)
 
-print(anterior)
+j = nx.Graph()
+adjacencias = open("adjacencias.txt", "w", encoding="utf-8")
 
-j = nx.DiGraph()
-for vertice, ant in anterior.items():   #recriar grafo a partir de anterior
+adj = {}
+for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
+    try:
+        adj[ant].append(vertice)
+    except:
+        adj[ant] = [vertice]
+    adjacencias.write(f"{ant}, {vertice}\n")
     j.add_edge(ant, vertice)
 
+#print(adj)
 
 
 
-plt.figure(figsize=(10,8))
-nx.draw(g, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-plt.show()
-plt.figure(figsize=(10,8))
-nx.draw(j, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+# plt.figure(figsize=(10,8))
+# nx.draw(g, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-plt.show()
+# plt.show()
+
+# pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot")
+# plt.figure(figsize=(10,8))
+# nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+# plt.show()
