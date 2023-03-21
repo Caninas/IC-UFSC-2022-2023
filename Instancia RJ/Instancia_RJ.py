@@ -348,6 +348,30 @@ class Modelo:
             #print(self.grafo.nodes["Flamengo"])
             self.t += 1
 
+    def printar_grafico_arvore(tipo_arvore):
+        # self.picos_infectados_arvores = {"largura": [], "profundidade": []}  (eixo y)
+        # self.indice 1-159 (eixo x)
+        if tipo_arvore in {"largura", "profundidade"} or self.picos_infectados_arvores: 
+            eixo_x = [for indice in range(1, len(self.picos_infectados_arvores[tipo_arvore]) + 1)]
+            eixo_y = self.picos_infectados_arvores[tipo_arvore]
+
+            fig = plt.figure(1)
+            ax = fig.add_subplot(111)
+
+            plt.xlim(left=eixo_x[0], right=eixo_x[-1])
+            #plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
+            plt.plot(eixo_x, eixo_y)
+            plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+
+            #ax.legend(["Arvores"], loc='center right', bbox_to_anchor=(1.1, 0.5))
+            ax.set_xlabel('Arvore')
+            ax.set_ylabel('Pico de Infectados')    
+
+            plt.show()
+        else:
+            print("Tipo de árvore inválida") if self.picos_infectados_arvores /
+            else print("É necessário rodar o modelo sobre as árvores primeiro")
 
 #os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
