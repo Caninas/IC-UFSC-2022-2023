@@ -1,6 +1,7 @@
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
+import pydot
 import numpy as np
 from numpy import array
 from math import floor, ceil
@@ -263,7 +264,6 @@ class Modelo:
 
         for tempo in range(t):
             print("tempo=", self.t)
-
             self.tempos.append(self.t)
 
             for node in list(self.grafo.nodes(data=True)):
@@ -348,6 +348,54 @@ class Modelo:
             #print(self.grafo.nodes["Flamengo"])
             self.t += 1
 
+    def busca_em_largura(self, inicio):
+        fila = []
+        visitados = set()
+        anterior = {}
+
+        fila.append(inicio)
+
+        while len(fila):
+            v = fila.pop(0)
+            for vizinho in self.grafo.edges(v):
+                vizinho = vizinho[1]
+                if vizinho not in visitados:
+                    visitados.add(vizinho)
+                    fila.append(vizinho)
+                    anterior[vizinho] = v
+
+        return anterior
+
+    def gerar_grafos_arvore_largura(self):
+        g = self.grafo.nodes
+        self.grafo.remove_edges_from(list(self.grafo.edges()))
+
+        for inicio in g:
+            anterior = self.busca_em_largura(inicio)
+            #print(anterior)
+
+            j = nx.Graph()
+            adjacencias = open("adjacencias.txt", "w", encoding="utf-8")
+
+            adj = {}
+            for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
+                try:
+                    adj[ant].append(vertice)
+                except:
+                    adj[ant] = [vertice]
+                adjacencias.write(f"{ant}, {vertice}\n")
+                self.grafo.add_edge(ant, vertice)
+
+            self.t = 1
+            self.SIRs = []
+            self.avançar_tempo(100)
+            print(self.pico_infectados)
+            # pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot", root=inicio)
+
+            # plt.figure(figsize=(10,8))
+            # nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+            # plt.show()
 
 #os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
@@ -366,30 +414,14 @@ tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls
 
 m = Modelo(arquivo_final)
 m.gerar_grafo()
-m.avançar_tempo(4)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(2)
-m.isolar_vertices_mais_populosos()
-m.avançar_tempo(200)
-# print(len(m.grafo.edges))
+
+#m.gerar_grafos_arvore_largura()
+m.avançar_tempo(100)
+
+
+
 print(m.pico_infectados)
-m.printar_grafo()
+#m.printar_grafo()
 
 
 m.printar_grafico_SIRxT()

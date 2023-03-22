@@ -33,7 +33,7 @@ def caminho(raiz, destino):
 adj_rj = open(r"Instancia RJ\Txts\normal (real)\adjacencias.txt", "r", encoding="utf-8")
 
 g = nx.Graph()
-arestas = [("a", "b"), ("b", "c"), ("a", "d")]
+
 for linha in adj_rj:
     vertice, adj = linha.split(" ", maxsplit=1)
     adj = adj.strip().split(" ")
@@ -46,32 +46,38 @@ for linha in adj_rj:
 raiz = 1
 anterior = busca(g, raiz)
 
-caminho(raiz, 148)
+for inicio in range(1, 160):
+    anterior = busca(g, inicio)
 
-j = nx.Graph()
-adjacencias = open("adjacencias.txt", "w", encoding="utf-8")
+    #caminho(inicio, 148)
 
-adj = {}
-for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
-    try:
-        adj[ant].append(vertice)
-    except:
-        adj[ant] = [vertice]
-    adjacencias.write(f"{ant}, {vertice}\n")
-    j.add_edge(ant, vertice)
+    j = nx.Graph()
+    adjacencias = open("adjacencias.txt", "w", encoding="utf-8")
+
+    adj = {}
+    for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
+        try:
+            adj[ant].append(vertice)
+        except:
+            adj[ant] = [vertice]
+        adjacencias.write(f"{ant}, {vertice}\n")
+        j.add_edge(ant, vertice)
+    
+
+
+    # pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot")
+    # plt.figure(figsize=(10,8))
+    # nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+    # plt.show()
+
 
 #print(adj)
 
 
 
 
-# plt.figure(figsize=(10,8))
-# nx.draw(g, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+plt.figure(figsize=(10,8))
+nx.draw(g, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-# plt.show()
-
-# pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot")
-# plt.figure(figsize=(10,8))
-# nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
-
-# plt.show()
+plt.show()
