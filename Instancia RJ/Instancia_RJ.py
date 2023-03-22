@@ -16,11 +16,25 @@ from Txt import Txt
 #? PG = nx.nx_pydot.to_pydot(G)
 #? H = nx.nx_pydot.from_pydot(PG)
 
+# self.juntos = True
+# for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
+#     nome, atributos = node
+
+#     for vizinho in self.grafo.edges(nome):
+#         node_vizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
+#         atributos["SIRdd"]["S"] += node_vizinho["S"]
+#         atributos["SIRdd"]["I"] +=  node_vizinho["I"]
+#         atributos["SIRdd"]["R"] += node_vizinho["R"]
+#         self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
+
+
+
+
 class Modelo:
     # arquivo no formato | int(id), adjs(sep=", ")/prop1(name), prop2(populaçao), prop3(beta)... |
     def __init__(self, arq_final):
         self.arquivo = open(arq_final, "r", encoding="utf-8")
-
+        self.resultados_arvore_largura = open("./Resultados/resultados_arvore_largura.txt", "w", encoding="utf-8")
         # tempo atual
         self.t = 1
 
@@ -61,7 +75,7 @@ class Modelo:
             nome, *adj = adj.split(", ")
             numero, populaçao, beta = propriedades.split(", ")
             populaçao = int(populaçao)
-            
+
             adj = [(nome, v) for v in adj] + [(v, nome) for v in adj]
 
             I = floor(populaçao * self.frac_infect_inicial)
@@ -85,6 +99,31 @@ class Modelo:
             g.add_edges_from(adj)
 
         return g
+
+
+    def resetar_grafo(self):
+        for vertice in self.grafo.nodes:
+            populaçao = self.grafo.nodes[vertice]["populaçao"]
+            
+            I = floor(populaçao * self.frac_infect_inicial)
+            S = populaçao - I
+
+            Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
+            Iponto = floor(self.alpha * I)
+
+            S2pontos = S - Sponto               # pessoas que nao respeitam (podem sair do vertice)
+            I2pontos = I - Iponto
+
+            self.grafo.nodes[vertice]["SIRd"] = {"S": Sponto, "I": Iponto, "R": 0}
+            
+            self.grafo.nodes[vertice]["SIRdd"] = {"S": S2pontos, "I": I2pontos, "R": 0}
+            self.grafo.nodes[vertice]["SIRddd"] = {}
+            self.grafo.nodes[vertice]["SIRdddantes"] = {}
+            
+            self.SIRs = []
+            self.tempos = []
+            self.t = 1
+            self.pico_infectado = 0
 
     def printar_grafo(self):
         # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
@@ -127,17 +166,6 @@ class Modelo:
         ax.set_ylabel('Pessoas')    
 
         plt.show()
-
-        # self.juntos = True
-        # for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
-        #     nome, atributos = node
-
-        #     for vizinho in self.grafo.edges(nome):
-        #         node_vizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
-        #         atributos["SIRdd"]["S"] += node_vizinho["S"]
-        #         atributos["SIRdd"]["I"] +=  node_vizinho["I"]
-        #         atributos["SIRdd"]["R"] += node_vizinho["R"]
-        #         self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
 
         # print console todos os vertices
         # for vertice in self.grafo.nodes():
@@ -247,6 +275,7 @@ class Modelo:
 
     def avançar_tempo(self, t):
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
+
         if self.t == 0 or self.juntos == True:                                             # distribuiçao inicial de pessoas
             self.juntos = False
             for node in list(self.grafo.nodes(data=True)):
@@ -345,8 +374,9 @@ class Modelo:
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.pico_infectados = soma_SIR[1]
 
-            #print(self.grafo.nodes["Flamengo"])
+
             self.t += 1
+
 
     def busca_em_largura(self, inicio):
         fila = []
@@ -366,30 +396,36 @@ class Modelo:
 
         return anterior
 
-    def gerar_grafos_arvore_largura(self):
+    def gerar_grafos_arvore_largura(self, tempo, iteraçoes):
         g = self.grafo.nodes
         self.grafo.remove_edges_from(list(self.grafo.edges()))
-
+        menor_media = 99999999
         for inicio in g:
-            anterior = self.busca_em_largura(inicio)
-            #print(anterior)
+            soma = 0
+            for i in range(iteraçoes):
+                print("Inicio:", inicio, "/ Iteração:", i+1)
+                anterior = self.busca_em_largura(inicio)
 
-            j = nx.Graph()
-            adjacencias = open("adjacencias.txt", "w", encoding="utf-8")
+                adj = {}
 
-            adj = {}
-            for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
-                try:
-                    adj[ant].append(vertice)
-                except:
-                    adj[ant] = [vertice]
-                adjacencias.write(f"{ant}, {vertice}\n")
-                self.grafo.add_edge(ant, vertice)
+                for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
+                    try:
+                        adj[ant].append(vertice)
+                    except:
+                        adj[ant] = [vertice]
+                    self.grafo.add_edge(ant, vertice)
 
-            self.t = 1
-            self.SIRs = []
-            self.avançar_tempo(100)
-            print(self.pico_infectados)
+                self.avançar_tempo(tempo)
+                print(self.pico_infectados)
+                soma += self.pico_infectados
+                self.resetar_grafo()
+            
+            media = soma / (i + 1)
+            self.resultados_arvore_largura.write(f"Raiz: {inicio} - Pico: {media}\n")      
+
+            menor_media = media if media < menor_media else menor_media
+        
+        self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
             # pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot", root=inicio)
 
             # plt.figure(figsize=(10,8))
@@ -419,11 +455,11 @@ class Modelo:
 
             plt.show()
         else:
-            print("Tipo de árvore inválida") if self.picos_infectados_arvores /
+            print("Tipo de árvore inválida") if self.picos_infectados_arvores \
             else print("É necessário rodar o modelo sobre as árvores primeiro")
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -439,10 +475,8 @@ tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls
 
 m = Modelo(arquivo_final)
 m.gerar_grafo()
-
-#m.gerar_grafos_arvore_largura()
-m.avançar_tempo(100)
-
+#m.resetar_grafo()
+m.gerar_grafos_arvore_largura(30, 10)
 
 
 print(m.pico_infectados)
