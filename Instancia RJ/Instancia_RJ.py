@@ -6,6 +6,7 @@ import numpy as np
 from numpy import array
 from math import floor, ceil
 from random import randint, random
+import multiprocessing as mp
 
 from Txt import Txt
 
@@ -34,7 +35,6 @@ class Modelo:
     # arquivo no formato | int(id), adjs(sep=", ")/prop1(name), prop2(populaçao), prop3(beta)... |
     def __init__(self, arq_final):
         self.arquivo = open(arq_final, "r", encoding="utf-8")
-        self.resultados_arvore_largura = open("./Resultados/resultados_arvore_largura.txt", "w", encoding="utf-8")
         # tempo atual
         self.t = 1
 
@@ -397,23 +397,27 @@ class Modelo:
         return anterior
 
     def gerar_grafos_arvore_largura(self, tempo, iteraçoes):
+        self.resultados_arvore_largura = open("./Resultados/resultados_arvore_largura.txt", "w", encoding="utf-8")
+        
         g = self.grafo.nodes
         self.grafo.remove_edges_from(list(self.grafo.edges()))
+        
         menor_media = 99999999
         for inicio in g:
             soma = 0
+            anterior = self.busca_em_largura(inicio)
+
+            adj = {}
+
+            for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
+                try:
+                    adj[ant].append(vertice)
+                except:
+                    adj[ant] = [vertice]
+                self.grafo.add_edge(ant, vertice)
+
             for i in range(iteraçoes):
                 print("Inicio:", inicio, "/ Iteração:", i+1)
-                anterior = self.busca_em_largura(inicio)
-
-                adj = {}
-
-                for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
-                    try:
-                        adj[ant].append(vertice)
-                    except:
-                        adj[ant] = [vertice]
-                    self.grafo.add_edge(ant, vertice)
 
                 self.avançar_tempo(tempo)
                 print(self.pico_infectados)
@@ -426,12 +430,12 @@ class Modelo:
             menor_media = media if media < menor_media else menor_media
         
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
-            # pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot", root=inicio)
+        # pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot", root=inicio)
 
-            # plt.figure(figsize=(10,8))
-            # nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        # plt.figure(figsize=(10,8))
+        # nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-            # plt.show()
+        # plt.show()
             
     def printar_grafico_arvore(tipo_arvore):
         # self.picos_infectados_arvores = {"largura": [], "profundidade": []}  (eixo y)
@@ -477,7 +481,7 @@ m = Modelo(arquivo_final)
 m.gerar_grafo()
 #m.resetar_grafo()
 m.gerar_grafos_arvore_largura(30, 10)
-
+#m.avançar_tempo(30)
 
 print(m.pico_infectados)
 #m.printar_grafo()
