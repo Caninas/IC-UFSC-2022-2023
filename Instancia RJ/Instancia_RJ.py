@@ -64,7 +64,9 @@ class Modelo:
 
         self.array_top_populaçao = []
 
+
         self.grafo = self.gerar_grafo()
+        self.grafo_arvores = 0
 
 
     def gerar_grafo(self):
@@ -123,7 +125,8 @@ class Modelo:
             self.SIRs = []
             self.tempos = []
             self.t = 1
-            self.pico_infectado = 0
+            self.pico_infectados = 0
+            self.juntos = True
 
     def printar_grafo(self):
         # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
@@ -276,7 +279,7 @@ class Modelo:
     def avançar_tempo(self, t):
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
 
-        if self.t == 0 or self.juntos == True:                                             # distribuiçao inicial de pessoas
+        if self.t == 1 or self.juntos == True:                                             # distribuiçao inicial de pessoas
             self.juntos = False
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
@@ -292,7 +295,7 @@ class Modelo:
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
 
         for tempo in range(t):
-            print("tempo=", self.t)
+            #print("tempo=", self.t)
             self.tempos.append(self.t)
 
             for node in list(self.grafo.nodes(data=True)):
@@ -372,6 +375,7 @@ class Modelo:
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
 
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
+                self.tempo_pico = self.t
                 self.pico_infectados = soma_SIR[1]
 
 
@@ -384,10 +388,9 @@ class Modelo:
         anterior = {}
 
         fila.append(inicio)
-
         while len(fila):
             v = fila.pop(0)
-            for vizinho in self.grafo.edges(v):
+            for vizinho in self.grafo_original.edges(v):
                 vizinho = vizinho[1]
                 if vizinho not in visitados:
                     visitados.add(vizinho)
@@ -400,14 +403,19 @@ class Modelo:
         self.resultados_arvore_largura = open("./Resultados/resultados_arvore_largura.txt", "w", encoding="utf-8")
         
         g = self.grafo.nodes
-        self.grafo.remove_edges_from(list(self.grafo.edges()))
+        self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
+
         for inicio in g:
             soma = 0
+            tempo_pico = 0
+
             anterior = self.busca_em_largura(inicio)
 
             adj = {}
+
+            self.grafo.remove_edges_from(list(self.grafo.edges()))
 
             for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
                 try:
@@ -416,26 +424,31 @@ class Modelo:
                     adj[ant] = [vertice]
                 self.grafo.add_edge(ant, vertice)
 
+
             for i in range(iteraçoes):
                 print("Inicio:", inicio, "/ Iteração:", i+1)
 
                 self.avançar_tempo(tempo)
-                print(self.pico_infectados)
+                print("Pico:", self.pico_infectados)
+
                 soma += self.pico_infectados
+                tempo_pico += self.tempo_pico
+
                 self.resetar_grafo()
             
+            tempo_pico = tempo_pico / (i + 1)
             media = soma / (i + 1)
-            self.resultados_arvore_largura.write(f"Raiz: {inicio} - Pico: {media}\n")      
+            self.resultados_arvore_largura.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")      
 
             menor_media = media if media < menor_media else menor_media
         
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
-        # pos = nx.drawing.nx_pydot.graphviz_layout(j, prog="dot", root=inicio)
+            # pos = nx.drawing.nx_pydot.graphviz_layout(self.grafo, prog="dot", root=inicio)
 
-        # plt.figure(figsize=(10,8))
-        # nx.draw(j, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+            # plt.figure(figsize=(10,8))
+            # nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-        # plt.show()
+            # plt.show()
             
     def printar_grafico_arvore(tipo_arvore):
         # self.picos_infectados_arvores = {"largura": [], "profundidade": []}  (eixo y)
@@ -462,8 +475,113 @@ class Modelo:
             print("Tipo de árvore inválida") if self.picos_infectados_arvores \
             else print("É necessário rodar o modelo sobre as árvores primeiro")
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+    def busca_em_profundidade(self, v):
+
+        for vizinho in self.grafo_original.edges(v):
+            vizinho = vizinho[1]
+            if vizinho not in self.visitados:
+                self.visitados.add(vizinho)
+                self.anterior_profundidade[vizinho] = v
+                self.busca_em_profundidade(vizinho)
+
+        return
+
+    def gerar_grafos_arvore_profundidade(self, tempo, iteraçoes):
+        self.resultados_arvore_profundidade = open("./Resultados/resultados_arvore_profundidade.txt", "w", encoding="utf-8")
+        
+        g = self.grafo.nodes
+        self.grafo_original = self.grafo.copy()
+        
+        menor_media = 99999999
+
+        for inicio in g:
+            soma = 0
+            tempo_pico = 0
+
+            self.anterior_profundidade = {}
+            self.visitados = set()
+            self.busca_em_profundidade(inicio)
+            
+            adj = {}
+
+            self.grafo.remove_edges_from(list(self.grafo.edges()))
+
+            for vertice, ant in self.anterior_profundidade.items():   # recriar grafo a partir de anterior
+                try:
+                    adj[ant].append(vertice)
+                except:
+                    adj[ant] = [vertice]
+                self.grafo.add_edge(ant, vertice)
+
+
+            for i in range(iteraçoes):
+                print("Inicio:", inicio, "/ Iteração:", i+1)
+
+                self.avançar_tempo(tempo)
+                print("Pico:", self.pico_infectados)
+
+                soma += self.pico_infectados
+                tempo_pico += self.tempo_pico
+
+                self.resetar_grafo()
+            
+            tempo_pico = tempo_pico / (i + 1)
+            media = soma / (i + 1)
+            self.resultados_arvore_profundidade.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")      
+
+            menor_media = media if media < menor_media else menor_media
+        
+        self.resultados_arvore_profundidade.write(f"\nMenor média: {menor_media}")
+
+        # pos = nx.drawing.nx_pydot.graphviz_layout(self.grafo, prog="dot", root=inicio)
+
+        # plt.figure(figsize=(10,8))
+        # nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+        # plt.show()
+
+
+    def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
+        if tipo_arvore == "largura":
+            resultados = open("./resultados_arvore_largura_novo.txt", "r")
+            #plt.title('Pico de Infectados Árvore de Busca em Largura')
+        else:
+            resultados = open("./resultados_arvore_profundidade_1.txt", "r")
+            #plt.title('Pico de Infectados Árvore de Busca em Profundidade')
+
+        resultados_dict = [x for x in range(161)]
+
+
+        for linha in resultados:
+            linha = linha.strip()
+
+            if linha == "":
+                break
+
+            id, dia_pico, max_infect = linha.split(", ")
+
+            resultados_dict[int(id)] = int(float(max_infect))
+
+        resultados_dict[0] = 1651756        # resultado original
+        print(resultados_dict)
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+
+        plt.xlim(left=0, right=160)
+        plt.xticks([x for x in range(0, 161, 4)])
+        
+        plt.plot([x for x in range(161)], resultados_dict, "o")
+
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        plt.title('Pico de Infectados Árvore de Busca em Profundidade')
+        ax.set_xlabel('ID de Início da Árvore (0 - Grafo Real)')
+        ax.set_ylabel('Pico de Infectados')
+
+        plt.show()
+
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -478,16 +596,16 @@ tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls
 
 
 m = Modelo(arquivo_final)
-m.gerar_grafo()
 #m.resetar_grafo()
-m.gerar_grafos_arvore_largura(30, 10)
+#m.gerar_grafos_arvore_profundidade(25, 5)
 #m.avançar_tempo(30)
 
-print(m.pico_infectados)
+#print(m.pico_infectados)
+m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
 #m.printar_grafo()
 
 
-m.printar_grafico_SIRxT()
+#m.printar_grafico_SIRxT()
 
 
 # arquivo_pico_infectados = "./txts/pico_infectados.txt"
