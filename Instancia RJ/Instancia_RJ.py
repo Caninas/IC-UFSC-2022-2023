@@ -17,18 +17,6 @@ from Txt import Txt
 #? PG = nx.nx_pydot.to_pydot(G)
 #? H = nx.nx_pydot.from_pydot(PG)
 
-# self.juntos = True
-# for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
-#     nome, atributos = node
-
-#     for vizinho in self.grafo.edges(nome):
-#         node_vizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
-#         atributos["SIRdd"]["S"] += node_vizinho["S"]
-#         atributos["SIRdd"]["I"] +=  node_vizinho["I"]
-#         atributos["SIRdd"]["R"] += node_vizinho["R"]
-#         self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
-
-
 
 
 class Modelo:
@@ -46,7 +34,7 @@ class Modelo:
         # variaveis globais, se aplicam a todos os vértices
         # retiradas da pagina 8 e 9 do artigo do modelo
 
-        self.frac_infect_inicial = 2/15     # 400/3000
+        #self.frac_infect_inicial = 2/15     # 400/3000
 
         self.v = 91/200    # taxa_virulencia
         self.e = 29/200    # taxa_recuperaçao
@@ -80,7 +68,10 @@ class Modelo:
 
             adj = [(nome, v) for v in adj] + [(v, nome) for v in adj]
 
-            I = floor(populaçao * self.frac_infect_inicial)
+            if nome == "Flamengo":
+                I = 500
+            else:
+                I = 0
             S = populaçao - I
 
             Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
@@ -107,7 +98,10 @@ class Modelo:
         for vertice in self.grafo.nodes:
             populaçao = self.grafo.nodes[vertice]["populaçao"]
             
-            I = floor(populaçao * self.frac_infect_inicial)
+            if vertice == "Flamengo":
+                I = 500
+            else:
+                I = 0
             S = populaçao - I
 
             Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
@@ -295,7 +289,7 @@ class Modelo:
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
 
         for tempo in range(t):
-            #print("tempo=", self.t)
+            print(self.t)
             self.tempos.append(self.t)
 
             for node in list(self.grafo.nodes(data=True)):
@@ -428,7 +422,7 @@ class Modelo:
             for i in range(iteraçoes):
                 print("Inicio:", inicio, "/ Iteração:", i+1)
 
-                self.avançar_tempo(tempo)
+                self.avançar_tempo_movimentacao_dinamica(tempo)
                 print("Pico:", self.pico_infectados)
 
                 soma += self.pico_infectados
@@ -540,7 +534,6 @@ class Modelo:
 
         # plt.show()
 
-
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
             resultados = open("./resultados_arvore_largura_novo.txt", "r")
@@ -580,8 +573,125 @@ class Modelo:
 
         plt.show()
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+    def avançar_tempo_movimentacao_dinamica(self, t):
+        # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
+        for tempo in range(t):
+            print(self.t)
+            # distribuiçao de pessoas
+            for node in list(self.grafo.nodes(data=True)):
+                nome, atributos = node
+                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+
+                for vizinho in self.grafo.edges(nome):
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+
+
+            #print("tempo=", self.t)
+            self.tempos.append(self.t)
+
+            for node in list(self.grafo.nodes(data=True)):
+                # x = tempo
+                # y = [S, I, R]
+                nome, atributos = node
+
+                atributos["SIRdddantes"]["S"] = atributos["SIRdddantes"]["I"] = atributos["SIRdddantes"]["R"] = 0
+
+                for vizinho in atributos["SIRddd"].values():
+                    atributos["SIRdddantes"]["S"] += vizinho["S"]
+                    atributos["SIRdddantes"]["I"] += vizinho["I"]
+                    atributos["SIRdddantes"]["R"] += vizinho["R"]
+
+            #print(self.grafo.nodes["Botafogo"])
+
+            self.SIRs.append([])
+            soma_SIR = [0, 0, 0]
+
+            for node in list(self.grafo.nodes(data=True)):
+                nome, atributos = node
+
+                # guardando valores SIR para usar no grafico
+                soma_SIR[0] += atributos["SIRd"]["S"] + atributos["SIRdd"]["S"] + atributos["SIRdddantes"]["S"]
+                soma_SIR[1] += atributos["SIRd"]["I"] + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]
+                soma_SIR[2] += atributos["SIRd"]["R"] + atributos["SIRdd"]["R"] + atributos["SIRdddantes"]["R"]
+                
+                #! Calculo X_ponto + Sdd que fica (Ypi = Ypi -> i)
+
+                Nponto = floor(self.lambda_S * atributos["SIRd"]["S"]) + floor(self.lambda_I * atributos["SIRd"]["I"]) + floor(self.lambda_R * atributos["SIRd"]["R"])
+                N2pontos = atributos["SIRdd"]["S"] + atributos["SIRdd"]["I"] + atributos["SIRdd"]["R"]
+                N3pontos = atributos["SIRdddantes"]["S"] + atributos["SIRdddantes"]["I"] + atributos["SIRdddantes"]["R"]
+
+                # prob de acontecer um encontro de Sd / Sdd com Infectados no geral (Ypi = Ypi -> i)
+                Y_ponto = (floor(self.lambda_I * atributos["SIRd"]["I"]) + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]) / ((Nponto + N2pontos + N3pontos) - 1)
+                
+                X_ponto = 0          # numero de encontros de S com I no vertice i
+                X_2pontos_ii = 0
+
+                # range S bonito 1 ponto
+                for i in range(floor(self.lambda_S * atributos["SIRd"]["S"])):    # calculo do numero de encontros na pop de suscetiveis que respeitam mas tem q sair
+                    X_ponto += random() < Y_ponto                                 # baseado na probabilidade de Y_ponto
+
+                # X_2pontos = X_2pontos_ii + X_2pontos_ij (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
+                for i in range(atributos["SIRdd"]["S"]):                    # calculo do numero de encontros na pop de suscetiveis que nao respeitam e restam no vertice
+                    X_2pontos_ii += random() < Y_ponto                      # baseado na probabilidade de Y_ponto
+
+
+                # Cada grupo do SIR (respeitam, nao respeitam, vizinhos) tem probabilidades unicas (2 loops acima)
+
+                # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
+                # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
+                for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
+                    X_2pontos_ij = 0
+
+                    for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
+                        X_2pontos_ij += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
+                        
+                    recuperados_novos_ddd = ceil(self.e * vizinho["I"])
+
+                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ij)
+                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ij)
+                    vizinho["R"] = vizinho["R"] + recuperados_novos_ddd
+        
+                # SIR t+1 SIRponto e SIR2pontos
+                recuperados_novos_d = ceil(self.e * atributos["SIRd"]["I"])
+                recuperados_novos_dd = ceil(self.e * atributos["SIRdd"]["I"])
+
+                atributos["SIRd"]["S"] = atributos["SIRd"]["S"] - floor(self.v * X_ponto)              # X = quantidade total de encontros, v*X pessoas suscetiveis de fato infectadas
+                atributos["SIRdd"]["S"] = atributos["SIRdd"]["S"] - floor(self.v * X_2pontos_ii)
+
+                atributos["SIRd"]["I"] = atributos["SIRd"]["I"] - recuperados_novos_d + floor(self.v * X_ponto)
+                atributos["SIRdd"]["I"] = atributos["SIRdd"]["I"] - recuperados_novos_dd + floor(self.v * X_2pontos_ii)
+
+                atributos["SIRd"]["R"] = atributos["SIRd"]["R"] + recuperados_novos_d
+                atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
+
+            self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
+
+            if not any(i[1] > soma_SIR[1] for i in self.SIRs):
+                self.tempo_pico = self.t
+                self.pico_infectados = soma_SIR[1]
+
+
+            for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
+                nome, atributos = node
+
+                for vizinho in self.grafo.edges(nome):
+                    node_vizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
+                    atributos["SIRdd"]["S"] += node_vizinho["S"]
+                    atributos["SIRdd"]["I"] +=  node_vizinho["I"]
+                    atributos["SIRdd"]["R"] += node_vizinho["R"]
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
+
+
+            self.t += 1
+
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -596,16 +706,14 @@ tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls
 
 
 m = Modelo(arquivo_final)
-#m.resetar_grafo()
-#m.gerar_grafos_arvore_profundidade(25, 5)
-#m.avançar_tempo(30)
+m.gerar_grafos_arvore_largura(200, 3)
+
+#m.avançar_tempo_movimentacao_dinamica(200)
 
 #print(m.pico_infectados)
-m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
+m.printar_grafico_ID_MAXINFECT_arvore("largura")
 #m.printar_grafo()
-
-
-#m.printar_grafico_SIRxT()
+m.printar_grafico_SIRxT()
 
 
 # arquivo_pico_infectados = "./txts/pico_infectados.txt"
