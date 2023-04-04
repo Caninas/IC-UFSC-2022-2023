@@ -30,6 +30,7 @@ class Modelo:
         self.tempos = []
         self.SIRs = []
         self.pico_infectados = 0
+        self.inicio = ""
 
         # variaveis globais, se aplicam a todos os vértices
         # retiradas da pagina 8 e 9 do artigo do modelo
@@ -68,7 +69,7 @@ class Modelo:
 
             adj = [(nome, v) for v in adj] + [(v, nome) for v in adj]
 
-            if nome == "Flamengo":
+            if nome == self.inicio:
                 I = 500
             else:
                 I = 0
@@ -98,7 +99,7 @@ class Modelo:
         for vertice in self.grafo.nodes:
             populaçao = self.grafo.nodes[vertice]["populaçao"]
             
-            if vertice == "Flamengo":
+            if vertice == self.inicio:
                 I = 500
             else:
                 I = 0
@@ -402,6 +403,8 @@ class Modelo:
         menor_media = 99999999
 
         for inicio in g:
+            self.inicio = inicio
+            self.resetar_grafo()
             soma = 0
             tempo_pico = 0
 
@@ -489,6 +492,8 @@ class Modelo:
         menor_media = 99999999
 
         for inicio in g:
+            self.inicio = inicio
+            self.resetar_grafo()
             soma = 0
             tempo_pico = 0
 
@@ -511,7 +516,7 @@ class Modelo:
             for i in range(iteraçoes):
                 print("Inicio:", inicio, "/ Iteração:", i+1)
 
-                self.avançar_tempo(tempo)
+                self.avançar_tempo_movimentacao_dinamica(tempo)
                 print("Pico:", self.pico_infectados)
 
                 soma += self.pico_infectados
@@ -573,7 +578,7 @@ class Modelo:
 
         plt.show()
 
-    def avançar_tempo_movimentacao_dinamica(self, t):
+    def avançar_tempo_movimentacao_dinamica(self, t):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
         for tempo in range(t):
             print(self.t)
@@ -606,8 +611,6 @@ class Modelo:
                     atributos["SIRdddantes"]["S"] += vizinho["S"]
                     atributos["SIRdddantes"]["I"] += vizinho["I"]
                     atributos["SIRdddantes"]["R"] += vizinho["R"]
-
-            #print(self.grafo.nodes["Botafogo"])
 
             self.SIRs.append([])
             soma_SIR = [0, 0, 0]
@@ -690,8 +693,8 @@ class Modelo:
 
             self.t += 1
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -706,14 +709,18 @@ tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls
 
 
 m = Modelo(arquivo_final)
-m.gerar_grafos_arvore_largura(200, 3)
+m.inicio = "Flamengo"
+m.resetar_grafo()
+m.avançar_tempo_movimentacao_dinamica(200)
+print(m.pico_infectados)
+m.gerar_grafos_arvore_largura(200, 1)
 
 #m.avançar_tempo_movimentacao_dinamica(200)
 
-#print(m.pico_infectados)
+print(m.pico_infectados)
 m.printar_grafico_ID_MAXINFECT_arvore("largura")
 #m.printar_grafo()
-m.printar_grafico_SIRxT()
+#m.printar_grafico_SIRxT()
 
 
 # arquivo_pico_infectados = "./txts/pico_infectados.txt"
