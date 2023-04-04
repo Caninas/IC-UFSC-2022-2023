@@ -430,7 +430,7 @@ class Modelo:
 
                 soma += self.pico_infectados
                 tempo_pico += self.tempo_pico
-
+                #self.printar_grafico_SIRxT()
                 self.resetar_grafo()
             
             tempo_pico = tempo_pico / (i + 1)
@@ -693,8 +693,8 @@ class Modelo:
 
             self.t += 1
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -712,15 +712,15 @@ m = Modelo(arquivo_final)
 m.inicio = "Flamengo"
 m.resetar_grafo()
 m.avançar_tempo_movimentacao_dinamica(200)
-print(m.pico_infectados)
-m.gerar_grafos_arvore_largura(200, 1)
+#print(m.pico_infectados)
+#m.gerar_grafos_arvore_largura(200, 1)
 
 #m.avançar_tempo_movimentacao_dinamica(200)
 
 print(m.pico_infectados)
-m.printar_grafico_ID_MAXINFECT_arvore("largura")
+#m.printar_grafico_ID_MAXINFECT_arvore("largura")
 #m.printar_grafo()
-#m.printar_grafico_SIRxT()
+m.printar_grafico_SIRxT()
 
 
 # arquivo_pico_infectados = "./txts/pico_infectados.txt"
@@ -742,3 +742,7 @@ m.printar_grafico_ID_MAXINFECT_arvore("largura")
 #     m.gerar_grafo()
 #     m.avançar_tempo(75)
 #     pico_infec.write(f"{str(m.pico_infectados)}\n")
+
+
+
+# grafico pizza para cada vertice e tempo SIR cores azul vermelho verde
