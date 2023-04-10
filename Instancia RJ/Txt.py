@@ -5,6 +5,7 @@ import os
 class Txt:            # modela os dados no arquivo final (que sera lido)
     def __init__(self, adjacencias, nomes, destino, populaçao):
         self.adjacencias = open(adjacencias, "r", encoding="utf-8")
+        self.adjacencias2 = open("./txts/normal (real)/adjacencias - Copia.txt", "w", encoding="utf-8")
         self.nomes = open(nomes, "r", encoding="utf-8")
         self.destino = open(destino, "w", encoding="utf-8")
         self.tabela_populaçao = xlrd.open_workbook(populaçao).sheet_by_index(1) # index 1 - tabela 2010
@@ -138,6 +139,17 @@ class Txt:            # modela os dados no arquivo final (que sera lido)
 
         a.writelines(txt_a)
 
+    def somar_adjacencias_1(self):
+        texto = ""
+        for linha in self.adjacencias:                   # ler adjacencias e montar string final
+            linha = linha.strip()
+            
+            if linha != "":
+                linha = [str(int(x)+1) for x in linha.split(" ")]
+                texto += f"{' '.join(linha)}\n"
+        
+        self.adjacencias2.write(texto)
+
     def ajuste_arquivo_adjacencias(self):
         adjs = {}
 
@@ -177,6 +189,7 @@ class Txt:            # modela os dados no arquivo final (que sera lido)
             adj.write(f"{i+1} {' '.join(adjs[i+1])}\n")
 
 # os.chdir(r"D:\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 
 # # "./txts/normal (real)/adjacencias.txt"
 # # "./txts/otimizado/adjacencias.txt"
@@ -186,4 +199,4 @@ class Txt:            # modela os dados no arquivo final (que sera lido)
 # tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
 # t = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_destino, tabela_populaçao)
-# t.gerar_arquivo_destino()
+# t.somar_adjacencias_1()

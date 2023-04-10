@@ -7,6 +7,7 @@ from numpy import array
 from math import floor, ceil
 from random import randint, random
 import multiprocessing as mp
+import ast
 
 from Txt import Txt
 
@@ -30,12 +31,13 @@ class Modelo:
         self.tempos = []
         self.SIRs = []
         self.pico_infectados = 0
-        self.inicio = ""
+        self.vertice_de_inicio = "Flamengo"
+        self.SIRxTdeVertices = dict()
 
         # variaveis globais, se aplicam a todos os vértices
         # retiradas da pagina 8 e 9 do artigo do modelo
 
-        #self.frac_infect_inicial = 2/15     # 400/3000
+        self.frac_infect_inicial = 0.05   #2/15     # 400/3000
 
         self.v = 91/200    # taxa_virulencia
         self.e = 29/200    # taxa_recuperaçao
@@ -53,7 +55,6 @@ class Modelo:
 
         self.array_top_populaçao = []
 
-
         self.grafo = self.gerar_grafo()
         self.grafo_arvores = 0
 
@@ -69,8 +70,8 @@ class Modelo:
 
             adj = [(nome, v) for v in adj] + [(v, nome) for v in adj]
 
-            if nome == self.inicio:
-                I = 500
+            if nome == self.vertice_de_inicio:
+                I = floor(self.frac_infect_inicial * populaçao)
             else:
                 I = 0
             S = populaçao - I
@@ -99,8 +100,8 @@ class Modelo:
         for vertice in self.grafo.nodes:
             populaçao = self.grafo.nodes[vertice]["populaçao"]
             
-            if vertice == self.inicio:
-                I = 500
+            if vertice == self.vertice_de_inicio:
+                I = floor(self.frac_infect_inicial * populaçao)
             else:
                 I = 0
             S = populaçao - I
@@ -149,25 +150,32 @@ class Modelo:
                 f"        SIRddd:  {self.grafo.nodes[vertice]['SIRddd']}")
 
     
-    def printar_grafico_SIRxT(self):
-        fig = plt.figure(1)
+    def printar_grafico_SIRxT(self, x=None, y=None, path=None):
+        fig = plt.figure(1)#.set_fig
         ax = fig.add_subplot(111)
+        fig.set_size_inches([10, 7])
 
-        plt.xlim(left=self.tempos[0], right=self.t-1)
+
         plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
-        plt.plot(self.tempos, self.SIRs)
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
+        if path:
+            plt.xlim(left=1, right=len(x))
+            plt.plot(x, y)
+        else:
+            plt.xlim(left=self.tempos[0], right=self.t-1)
+            plt.plot(self.tempos, self.SIRs)
 
         ax.legend(["S", "I", "R"], loc='center right', bbox_to_anchor=(1.1, 0.5))
         ax.set_xlabel('Tempo')
-        ax.set_ylabel('Pessoas')    
+        ax.set_ylabel('Pessoas')
 
-        plt.show()
 
-        # print console todos os vertices
-        # for vertice in self.grafo.nodes():
-        #     self.printar_estado_vertice(vertice)
+        if not path:
+            plt.show()
+            return
+        else:
+            plt.savefig(path, format="png", bbox_inches='tight')
 
 
     def mergesort(self, array):
@@ -395,15 +403,16 @@ class Modelo:
         return anterior
 
     def gerar_grafos_arvore_largura(self, tempo, iteraçoes):
-        self.resultados_arvore_largura = open("./Resultados/resultados_arvore_largura.txt", "w", encoding="utf-8")
-        
+        self.resultados_arvore_largura = open(resultados_arvore_largura, "w", encoding="utf-8")
+        self.SIRxTdeVerticesTXT_largura = open(SIRxTdeVerticesTXT_largura, "w", encoding="utf-8")
+
         g = self.grafo.nodes
         self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
 
         for inicio in g:
-            self.inicio = inicio
+            self.vertice_de_inicio = inicio
             self.resetar_grafo()
             soma = 0
             tempo_pico = 0
@@ -430,13 +439,17 @@ class Modelo:
 
                 soma += self.pico_infectados
                 tempo_pico += self.tempo_pico
-                #self.printar_grafico_SIRxT()
+
                 self.resetar_grafo()
             
             tempo_pico = tempo_pico / (i + 1)
             media = soma / (i + 1)
-            self.resultados_arvore_largura.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")      
+            self.resultados_arvore_largura.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")   
 
+            self.SIRxTdeVerticesTXT_largura.write(f"{inicio}, ")
+
+            self.SIRxTdeVerticesTXT_largura.write(f"{self.SIRxTdeVertices}\n")
+                
             menor_media = media if media < menor_media else menor_media
         
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
@@ -484,7 +497,8 @@ class Modelo:
         return
 
     def gerar_grafos_arvore_profundidade(self, tempo, iteraçoes):
-        self.resultados_arvore_profundidade = open("./Resultados/resultados_arvore_profundidade.txt", "w", encoding="utf-8")
+        self.resultados_arvore_profundidade = open(resultados_arvore_profundidade, "w", encoding="utf-8")
+        self.SIRxTdeVerticesTXT_profundidade = open(SIRxTdeVerticesTXT_profundidade, "w", encoding="utf-8")
         
         g = self.grafo.nodes
         self.grafo_original = self.grafo.copy()
@@ -492,7 +506,7 @@ class Modelo:
         menor_media = 99999999
 
         for inicio in g:
-            self.inicio = inicio
+            self.vertice_de_inicio = inicio
             self.resetar_grafo()
             soma = 0
             tempo_pico = 0
@@ -522,22 +536,23 @@ class Modelo:
                 soma += self.pico_infectados
                 tempo_pico += self.tempo_pico
 
+
+
                 self.resetar_grafo()
             
             tempo_pico = tempo_pico / (i + 1)
             media = soma / (i + 1)
             self.resultados_arvore_profundidade.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")      
+            
+            self.SIRxTdeVerticesTXT_profundidade.write(f"{inicio}, ")
+
+            self.SIRxTdeVerticesTXT_profundidade.write(f"{self.SIRxTdeVertices}\n")
+                
 
             menor_media = media if media < menor_media else menor_media
         
         self.resultados_arvore_profundidade.write(f"\nMenor média: {menor_media}")
 
-        # pos = nx.drawing.nx_pydot.graphviz_layout(self.grafo, prog="dot", root=inicio)
-
-        # plt.figure(figsize=(10,8))
-        # nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
-
-        # plt.show()
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
@@ -585,6 +600,22 @@ class Modelo:
             # distribuiçao de pessoas
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
+
+                try:
+                    self.SIRxTdeVertices[nome][self.t] = [
+                        atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
+                        atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
+                        atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
+                    ]
+                except:
+                    self.SIRxTdeVertices[nome] = dict()
+                    self.SIRxTdeVertices[nome][self.t] = [
+                        atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
+                        atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
+                        atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
+                    ]
+
+
                 S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
                 I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
                 R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
@@ -592,6 +623,7 @@ class Modelo:
                 atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
                 atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
                 atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+
 
                 for vizinho in self.grafo.edges(nome):
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
@@ -693,38 +725,136 @@ class Modelo:
 
             self.t += 1
 
+    def printar_grafico_SIRxTdeVerticesPizza(self):
+        plt.style.use('_mpl-gallery-nogrid')
+
+
+        colors = ["blue", "#55eb3b", "red"]
+        for t in range(1, self.t):
+            print("imagem", t)
+            coluna = 0
+            linha = 0
+
+            fig, ax = plt.subplots(14, 12)
+            
+            for key, value in self.SIRxTdeVertices.items():
+                x = value[t]
+
+                fig.set_size_inches([40, 40])
+                ax[linha][coluna].set_title(key)
+                ax[linha][coluna].pie(x, colors=colors, radius=6, center=(4, 4),
+                    wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
+
+                ax[linha][coluna].get_xaxis().set_visible(False)
+                ax[linha][coluna].get_yaxis().set_visible(False)
+
+                if coluna + 1 < 12:
+                    coluna += 1
+                else:
+                    coluna = 0
+                    linha += 1
+    
+            plt.savefig(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\onDemand\tempo {t}.png", format="png")
+            plt.close()
+
+    def printar_grafico_SIRxTdeVerticesPizzaTXT(self, path, tipo):
+        self.SIRxTdeVerticesTXT = open(path, "r", encoding="utf-8")
+        for linha in self.SIRxTdeVerticesTXT:
+            inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
+            self.SIRxTdeVertices = ast.literal_eval(dicionario_dados)
+            
+            plt.style.use('_mpl-gallery-nogrid')
+            colors = ["blue", "#55eb3b", "red"]
+
+            os.mkdir(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}")
+            y_grafico = []
+            
+            for t in range(1, max(self.SIRxTdeVertices[inicio]) + 1):
+                y_grafico.append([0,0,0])
+                print(inicio, "imagem", t)
+                coluna = 0
+                linha = 0
+
+                fig, ax = plt.subplots(14, 12)
+                
+                for key, value in self.SIRxTdeVertices.items():
+                    x = value[t]
+                    y_grafico[t-1][0] += x[0]
+                    y_grafico[t-1][1] += x[1]
+                    y_grafico[t-1][2] += x[2]
+
+                    fig.set_size_inches([40, 40])
+                    ax[linha][coluna].set_title(key)
+                    ax[linha][coluna].pie(x, colors=colors, radius=6, center=(4, 4),
+                        wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
+
+                    ax[linha][coluna].get_xaxis().set_visible(False)
+                    ax[linha][coluna].get_yaxis().set_visible(False)
+
+                    if coluna + 1 < 12:
+                        coluna += 1
+                    else:
+                        coluna = 0
+                        linha += 1
+
+                plt.savefig(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}\tempo {t}.png", format="png")
+                plt.close()
+            
+            x_grafico = [x for x in range(1, max(self.SIRxTdeVertices[inicio]) + 1)]
+
+            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}\Grafico SIR.png")
+
+
 os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 #os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
+# "./txts/zona sul/adjacencias_zona_sul.txt"
 # "./txts/otimizado/adjacencias.txt"
-arquivo_adjacencias = "./txts/zona sul/adjacencias_zona_sul.txt"
+arquivo_adjacencias = "./txts/normal (real)/adjacencias.txt"
 arquivo_final = "./txts/normal (real)/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
-arquivo_ID_nomes = "./txts/relaçao ID - bairros.txt"
+arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
-#txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
-#txt.gerar_arquivo_destino()
+
+resultados_arvore_profundidade = "./Resultados/resultados_arvore_profundidade.txt"
+SIRxTdeVerticesTXT_profundidade = "./Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt"
+resultados_arvore_largura = "./Resultados/resultados_arvore_largura.txt"
+SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
+
+
+# txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
+# txt.gerar_arquivo_destino()
 
 
 m = Modelo(arquivo_final)
-m.inicio = "Flamengo"
-m.resetar_grafo()
-m.avançar_tempo_movimentacao_dinamica(200)
+
+#m.avançar_tempo_movimentacao_dinamica(100)
+#m.gerar_grafos_arvore_largura(200, 2) # FEITO
+#m.gerar_grafos_arvore_profundidade(200, 2)
+
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura")
+#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade")
+
+#m.printar_grafico_SIRxTdeVerticesPizza()
 #print(m.pico_infectados)
-#m.gerar_grafos_arvore_largura(200, 1)
 
-#m.avançar_tempo_movimentacao_dinamica(200)
+#m.avançar_tempo_movimentacao_dinamcica(200)
 
-print(m.pico_infectados)
+#print(m.pico_infectados)
 #m.printar_grafico_ID_MAXINFECT_arvore("largura")
 #m.printar_grafo()
-m.printar_grafico_SIRxT()
 
 
 # arquivo_pico_infectados = "./txts/pico_infectados.txt"
 # pico_infec = open(arquivo_pico_infectados, "w")
+
+
+
+
+
+
 
 # pico_infec.write(f"Normal\n")
 # for i in range(50):
@@ -742,7 +872,3 @@ m.printar_grafico_SIRxT()
 #     m.gerar_grafo()
 #     m.avançar_tempo(75)
 #     pico_infec.write(f"{str(m.pico_infectados)}\n")
-
-
-
-# grafico pizza para cada vertice e tempo SIR cores azul vermelho verde
