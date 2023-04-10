@@ -173,9 +173,13 @@ class Modelo:
 
         if not path:
             plt.show()
+            plt.close()
             return
         else:
+            inicio = path.split("\\")[-1]
+            plt.title(f'Raiz: {inicio.split(".png")[0]}')
             plt.savefig(path, format="png", bbox_inches='tight')
+            plt.close()
 
 
     def mergesort(self, array):
@@ -453,12 +457,7 @@ class Modelo:
             menor_media = media if media < menor_media else menor_media
         
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
-            # pos = nx.drawing.nx_pydot.graphviz_layout(self.grafo, prog="dot", root=inicio)
 
-            # plt.figure(figsize=(10,8))
-            # nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
-
-            # plt.show()
             
     def printar_grafico_arvore(tipo_arvore):
         # self.picos_infectados_arvores = {"largura": [], "profundidade": []}  (eixo y)
@@ -536,8 +535,6 @@ class Modelo:
                 soma += self.pico_infectados
                 tempo_pico += self.tempo_pico
 
-
-
                 self.resetar_grafo()
             
             tempo_pico = tempo_pico / (i + 1)
@@ -556,13 +553,13 @@ class Modelo:
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
-            resultados = open("./resultados_arvore_largura_novo.txt", "r")
+            resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
             #plt.title('Pico de Infectados Árvore de Busca em Largura')
         else:
-            resultados = open("./resultados_arvore_profundidade_1.txt", "r")
+            resultados = open("./Resultados/resultados_arvore_profundidade.txt", "r")
             #plt.title('Pico de Infectados Árvore de Busca em Profundidade')
 
-        resultados_dict = [x for x in range(161)]
+        resultados_dict = [x for x in range(160)]
 
 
         for linha in resultados:
@@ -575,15 +572,15 @@ class Modelo:
 
             resultados_dict[int(id)] = int(float(max_infect))
 
-        resultados_dict[0] = 1651756        # resultado original
-        print(resultados_dict)
+        resultados_dict[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
+        #print(resultados_dict)
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
 
-        plt.xlim(left=0, right=160)
-        plt.xticks([x for x in range(0, 161, 4)])
+        plt.xlim(left=0, right=161)
+        plt.xticks([x for x in range(0, 160, 4)])
         
-        plt.plot([x for x in range(161)], resultados_dict, "o")
+        plt.plot([x for x in range(160)], resultados_dict, "o")
 
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
@@ -763,19 +760,20 @@ class Modelo:
             inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
             self.SIRxTdeVertices = ast.literal_eval(dicionario_dados)
             
-            plt.style.use('_mpl-gallery-nogrid')
-            colors = ["blue", "#55eb3b", "red"]
+            #plt.style.use('_mpl-gallery-nogrid')
+            #colors = ["blue", "#55eb3b", "red"]
 
-            os.mkdir(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}")
+            #os.mkdir(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}")
             y_grafico = []
             
+            print(inicio, "imagem")
             for t in range(1, max(self.SIRxTdeVertices[inicio]) + 1):
                 y_grafico.append([0,0,0])
-                print(inicio, "imagem", t)
-                coluna = 0
-                linha = 0
+                #print(inicio, "imagem", t)
+                #coluna = 0
+                #linha = 0
 
-                fig, ax = plt.subplots(14, 12)
+                #fig, ax = plt.subplots(14, 12)
                 
                 for key, value in self.SIRxTdeVertices.items():
                     x = value[t]
@@ -783,27 +781,32 @@ class Modelo:
                     y_grafico[t-1][1] += x[1]
                     y_grafico[t-1][2] += x[2]
 
-                    fig.set_size_inches([40, 40])
-                    ax[linha][coluna].set_title(key)
-                    ax[linha][coluna].pie(x, colors=colors, radius=6, center=(4, 4),
-                        wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
+                    # fig.set_size_inches([40, 40])
+                    # ax[linha][coluna].set_title(key)
+                    # ax[linha][coluna].pie(x, colors=colors, radius=6, center=(4, 4),
+                    #     wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
 
-                    ax[linha][coluna].get_xaxis().set_visible(False)
-                    ax[linha][coluna].get_yaxis().set_visible(False)
+                    # ax[linha][coluna].get_xaxis().set_visible(False)
+                    # ax[linha][coluna].get_yaxis().set_visible(False)
 
-                    if coluna + 1 < 12:
-                        coluna += 1
-                    else:
-                        coluna = 0
-                        linha += 1
+                    # if coluna + 1 < 12:
+                    #     coluna += 1
+                    # else:
+                    #     coluna = 0
+                    #     linha += 1
 
-                plt.savefig(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}\tempo {t}.png", format="png")
-                plt.close()
+                # plt.savefig(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}\tempo {t}.png", format="png")
+                # plt.close()
             
             x_grafico = [x for x in range(1, max(self.SIRxTdeVertices[inicio]) + 1)]
+            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\Graficos SIRxT arvores profundidade\{inicio}.png")
 
-            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}\Grafico SIR.png")
+#? Escrever resultados etc
+# Rodas árvore profundidade
+# Gerar só gráfico SIRxT para cada um (profundidade)
 
+# Gerar gráfico de pico de cada árvore 
+# Salvar arquivos relevantes drive e separado
 
 os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 #os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
@@ -830,45 +833,11 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 m = Modelo(arquivo_final)
 
-#m.avançar_tempo_movimentacao_dinamica(100)
 #m.gerar_grafos_arvore_largura(200, 2) # FEITO
-#m.gerar_grafos_arvore_profundidade(200, 2)
+#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura")
+m.gerar_grafos_arvore_profundidade(200, 2)
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade")
-
-#m.printar_grafico_SIRxTdeVerticesPizza()
-#print(m.pico_infectados)
-
-#m.avançar_tempo_movimentacao_dinamcica(200)
+#m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
 
 #print(m.pico_infectados)
-#m.printar_grafico_ID_MAXINFECT_arvore("largura")
-#m.printar_grafo()
-
-
-# arquivo_pico_infectados = "./txts/pico_infectados.txt"
-# pico_infec = open(arquivo_pico_infectados, "w")
-
-
-
-
-
-
-
-# pico_infec.write(f"Normal\n")
-# for i in range(50):
-#     m = Modelo(arquivo_final)
-#     m.gerar_grafo()
-#     m.avançar_tempo(75)
-#     pico_infec.write(f"{str(m.pico_infectados)}\n")
-
-
-# pico_infec.write(f"\nOtimizado\n")
-# arquivo_final = "./txts/zona sul/arquivo_final_otimizado_circulo.txt"
-
-# for i in range(50):
-#     m = Modelo(arquivo_final)
-#     m.gerar_grafo()
-#     m.avançar_tempo(75)
-#     pico_infec.write(f"{str(m.pico_infectados)}\n")

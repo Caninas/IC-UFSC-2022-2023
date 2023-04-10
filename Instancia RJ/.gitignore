@@ -1,4 +1,4 @@
 __pycache__
-Resultados\SIR_vertice_por_tempo_LARGURA.txt
-Resultados\figs1
-Resultados\figs
+Resultados/*/
+Resultados/SIR_vertice_por_tempo_LARGURA.txt
+Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt
