@@ -808,8 +808,8 @@ class Modelo:
 # Gerar gráfico de pico de cada árvore 
 # Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -835,9 +835,9 @@ m = Modelo(arquivo_final)
 
 #m.gerar_grafos_arvore_largura(200, 2) # FEITO
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+#m.gerar_grafos_arvore_profundidade(200, 2) # FEITO
 
-m.gerar_grafos_arvore_profundidade(200, 2)
-#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade")
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade")
 #m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
 
 #print(m.pico_infectados)
