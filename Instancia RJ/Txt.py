@@ -189,7 +189,7 @@ class Txt:            # modela os dados no arquivo final (que sera lido)
             adj.write(f"{i+1} {' '.join(adjs[i+1])}\n")
 
 # os.chdir(r"D:\Programação\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+# os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 
 # # "./txts/normal (real)/adjacencias.txt"
 # # "./txts/otimizado/adjacencias.txt"

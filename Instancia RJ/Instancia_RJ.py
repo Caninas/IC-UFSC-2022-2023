@@ -2,6 +2,7 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import pydot
+from networkx.drawing.nx_pydot import graphviz_layout
 import numpy as np
 from numpy import array
 from math import floor, ceil
@@ -124,7 +125,7 @@ class Modelo:
             self.pico_infectados = 0
             self.juntos = True
 
-    def printar_grafo(self):
+    def printar_grafo(self, tipo=None):
         # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
         # pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Glória': array([0.809017  , 0.58778526]), 'Catete': array([0.30901698, 0.95105655]),
         # 'Laranjeiras': array([-0.30901702,  0.95105649]), 'Cosme Velho': array([-0.80901699,  0.58778526]), 'Urca': array([-9.99999988e-01, -7.27200340e-08]),
@@ -133,11 +134,34 @@ class Modelo:
         # 'Gávea': (0, -0.2), 'Flamengo': (0, 0.4), 'Botafogo': (-0.5, 0.2), 'Humaitá': (0.25, 0.1), 'Copacabana': (-0.2, -0.5),
         # 'Lagoa': (0.4, -0.25), 'Jardim Botânico': (0.6, 0.6), 'Rocinha': (0.7, 0.1)}
 
-        plt.figure(figsize=(10,8))
-        #nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
-        nx.draw(self.grafo, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        #T = nx.balanced_tree(2, 5)
 
-        plt.show()
+        mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
+        
+        self.grafo = nx.relabel_nodes(self.grafo, mapping)
+
+        for vertice in self.grafo.nodes(data=True):
+            del vertice[1]["id"]
+            del vertice[1]["populaçao"]
+            del vertice[1]["SIR_t0"]
+            del vertice[1]["SIRd"]
+            del vertice[1]["SIRdd"]
+            del vertice[1]["SIRddd"]
+            del vertice[1]["SIRdddantes"]
+            del vertice[1]["beta"]
+        
+        pos = graphviz_layout(self.grafo, prog="dot")
+
+        nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        plt.show()  
+
+
+        # plt.figure(figsize=(10,8))
+
+        # #nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        # nx.draw(self.grafo, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+        # plt.show()
 
     def printar_estado_vertice(self, vertice):
         print(f"{vertice}: {self.grafo.nodes[vertice]}")
@@ -432,7 +456,12 @@ class Modelo:
                     adj[ant].append(vertice)
                 except:
                     adj[ant] = [vertice]
+
                 self.grafo.add_edge(ant, vertice)
+
+
+            for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
+                vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
 
 
             for i in range(iteraçoes):
@@ -459,7 +488,7 @@ class Modelo:
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
 
             
-    def printar_grafico_arvore(tipo_arvore):
+    def printar_grafico_arvore(self, tipo_arvore):
         # self.picos_infectados_arvores = {"largura": [], "profundidade": []}  (eixo y)
         # self.indice 1-159 (eixo x)
         if tipo_arvore in {"largura", "profundidade"} or self.picos_infectados_arvores: 
@@ -503,7 +532,6 @@ class Modelo:
         self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
-
         for inicio in g:
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
@@ -523,8 +551,13 @@ class Modelo:
                     adj[ant].append(vertice)
                 except:
                     adj[ant] = [vertice]
+
                 self.grafo.add_edge(ant, vertice)
 
+
+            for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
+                vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
+            
 
             for i in range(iteraçoes):
                 print("Inicio:", inicio, "/ Iteração:", i+1)
@@ -544,7 +577,6 @@ class Modelo:
             self.SIRxTdeVerticesTXT_profundidade.write(f"{inicio}, ")
 
             self.SIRxTdeVerticesTXT_profundidade.write(f"{self.SIRxTdeVertices}\n")
-                
 
             menor_media = media if media < menor_media else menor_media
         
@@ -799,14 +831,10 @@ class Modelo:
                 # plt.close()
             
             x_grafico = [x for x in range(1, max(self.SIRxTdeVertices[inicio]) + 1)]
-            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\Graficos SIRxT arvores profundidade\{inicio}.png")
+            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Graficos SIRxT arvores {tipo}\{inicio}.png")
 
 #? Escrever resultados etc
-# Rodas árvore profundidade
-# Gerar só gráfico SIRxT para cada um (profundidade)
-
-# Gerar gráfico de pico de cada árvore 
-# Salvar arquivos relevantes drive e separado
+#? Salvar arquivos relevantes drive e separado
 
 #os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
@@ -833,11 +861,11 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 m = Modelo(arquivo_final)
 
-#m.gerar_grafos_arvore_largura(200, 2) # FEITO
-#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
-#m.gerar_grafos_arvore_profundidade(200, 2) # FEITO
+m.gerar_grafos_arvore_largura(200, 1) # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "profundidade") # FEITO
 
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade")
-#m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
+#m.printar_grafico_ID_MAXINFECT_arvore("largura")
 
 #print(m.pico_infectados)
