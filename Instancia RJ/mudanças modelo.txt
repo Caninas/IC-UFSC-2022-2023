@@ -1,0 +1,3 @@
+fixar probabilidade
+tirar floor
+comparar delta t =1
