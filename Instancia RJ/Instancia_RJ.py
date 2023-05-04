@@ -586,12 +586,12 @@ class Modelo:
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
             resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
-            #plt.title('Pico de Infectados Árvore de Busca em Largura')
+            titulo = 'Pico de Infectados Árvore de Busca em Largura'
         else:
             resultados = open("./Resultados/resultados_arvore_profundidade.txt", "r")
-            #plt.title('Pico de Infectados Árvore de Busca em Profundidade')
+            titulo = 'Pico de Infectados Árvore de Busca em Profundidade'
 
-        resultados_dict = [x for x in range(160)]
+        resultados_lista = [x for x in range(160)]
 
 
         for linha in resultados:
@@ -602,24 +602,30 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_dict[int(id)] = int(float(max_infect))
+            resultados_lista[int(id)] = int(float(max_infect))
 
-        resultados_dict[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
-        #print(resultados_dict)
+        resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
+        #print(resultados_lista)
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
 
         plt.xlim(left=0, right=161)
         plt.xticks([x for x in range(0, 160, 4)])
         
-        plt.plot([x for x in range(160)], resultados_dict, "o")
+        plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        resultados_lista.pop(0)
+        plt.plot([x for x in range(1, 160)], resultados_lista, "o", color="C0")    # valores arvores
 
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        plt.title('Pico de Infectados Árvore de Busca em Profundidade')
+        plt.title(titulo)
         ax.set_xlabel('ID de Início da Árvore (0 - Grafo Real)')
         ax.set_ylabel('Pico de Infectados')
 
+        fig.set_size_inches([13.3, 7.5])
+
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        #plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png", format="png")
         plt.show()
 
     def avançar_tempo_movimentacao_dinamica(self, t):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
@@ -757,34 +763,36 @@ class Modelo:
     def printar_grafico_SIRxTdeVerticesPizza(self):
         plt.style.use('_mpl-gallery-nogrid')
 
-
         colors = ["blue", "#55eb3b", "red"]
         for t in range(1, self.t):
             print("imagem", t)
             coluna = 0
             linha = 0
-
-            fig, ax = plt.subplots(14, 12)
+            index = 1
+            fig = plt.figure(num=1, clear=True)
+            fig.set_size_inches([40, 40])
             
             for key, value in self.SIRxTdeVertices.items():
                 x = value[t]
+                ax = plt.subplot(14, 12, index)
 
-                fig.set_size_inches([40, 40])
-                ax[linha][coluna].set_title(key)
-                ax[linha][coluna].pie(x, colors=colors, radius=6, center=(4, 4),
+                #[linha][coluna]
+                ax.set_title(key)
+                ax.pie(x, colors=colors, radius=6, center=(4, 4),
                     wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
 
-                ax[linha][coluna].get_xaxis().set_visible(False)
-                ax[linha][coluna].get_yaxis().set_visible(False)
+                ax.get_xaxis().set_visible(False)
+                ax.get_yaxis().set_visible(False)
 
+                index += 1
                 if coluna + 1 < 12:
                     coluna += 1
                 else:
                     coluna = 0
                     linha += 1
     
-            plt.savefig(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\onDemand\tempo {t}.png", format="png")
-            plt.close()
+            plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Grafico pizza grafo original\tempo {t}.png", format="png")
+            plt.close(fig="all")
 
     def printar_grafico_SIRxTdeVerticesPizzaTXT(self, path, tipo):
         self.SIRxTdeVerticesTXT = open(path, "r", encoding="utf-8")
@@ -861,10 +869,16 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 m = Modelo(arquivo_final)
 
-m.gerar_grafos_arvore_largura(200, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
-m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "profundidade") # FEITO
+#m.avançar_tempo_movimentacao_dinamica(200)
+
+#m.printar_grafico_SIRxT()
+
+#m.printar_grafico_SIRxTdeVerticesPizza()
+
+# m.gerar_grafos_arvore_largura(200, 1) # FEITO
+# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+# m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
+# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
 
 #m.printar_grafico_ID_MAXINFECT_arvore("largura")
 
