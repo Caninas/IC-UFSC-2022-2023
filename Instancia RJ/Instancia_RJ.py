@@ -186,7 +186,6 @@ class Modelo:
             plt.xlim(left=1, right=len(x))
             plt.plot(x, y)
         else:
-            print(self.tempos, self.SIRs)
             plt.xlim(left=self.tempos[0], right=self.tempos[-1])
             plt.plot(self.tempos, self.SIRs)
 
@@ -738,7 +737,7 @@ class Modelo:
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
-            print(self.SIRs)
+
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.tempo_pico = self.t
                 self.pico_infectados = soma_SIR[1]
@@ -977,8 +976,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -1006,8 +1005,12 @@ m = Modelo(arquivo_final)
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 #m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
-m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.1, 200)
+
+# m.avançar_tempo_movimentacao_dinamica(200)
+# print(m.pico_infectados)
+# m.printar_grafico_SIRxT()
+m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
+print(m.pico_infectados)
 m.printar_grafico_SIRxT()
 #m.printar_grafico_ID_MAXINFECT_arvore("largura")
 
-#print(m.pico_infectados)
