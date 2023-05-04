@@ -1,0 +1,17 @@
+Dinamico com arredondamentos t 200:
+pico - 808841 - 816398
+
+Dinamica dt 1 t 200 (sem arredondamentos)
+pico - 884410.6813204696
+
+Dinamica dt 0.5 t 200	(+21.178)
+pico - 905588.3797909941
+
+Dinamica dt 0.25 t 200	(+10.466)
+pico - 916054.110612095
+
+Dinamica dt 0.125 t 200	(+5.522)
+pico - 921576.7172785823
+
+Dinamica dt 0.0625 t 200  (+4.815)
+pico - 926391.9488563662
