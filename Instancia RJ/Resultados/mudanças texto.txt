@@ -1,4 +1,4 @@
-dar espaçlo esquerda grafico picos, evidenciar o ponto original
+OK dar espaçlo esquerda grafico picos, evidenciar o ponto original
 
 fazer um sobrepor grafico com tanto em profundidade e largura pra comparar no final
 
