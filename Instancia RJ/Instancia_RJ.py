@@ -474,16 +474,16 @@ class Modelo:
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
-            resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
-            titulo = 'Pico de Infectados Árvore de Busca em Largura'
+            resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
+            resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
         else:
             resultados = open("./Resultados/resultados_arvore_profundidade.txt", "r")
-            titulo = 'Pico de Infectados Árvore de Busca em Profundidade'
 
+        titulo = f'Picos de Infectados das Árvores de Busca em {tipo_arvore.title()}'
         resultados_lista = [x for x in range(160)]
 
 
-        for linha in resultados:
+        for linha in resultadosL:
             linha = linha.strip()
 
             if linha == "":
@@ -491,31 +491,52 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)] = int(float(max_infect))
+            resultados_lista[int(id)] = [int(float(max_infect))]
+
+        # resultadosP_lista = [x for x in range(160)]
+        # for linha in resultadosP:
+        #     linha = linha.strip()
+
+        #     if linha == "":
+        #         break
+
+        #     id, dia_pico, max_infect = linha.split(", ")
+
+        #     resultados_lista[int(id)].append(int(float(max_infect)))
 
         resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
-        #print(resultados_lista)
+
+
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
+        fig.set_size_inches([15, 7.5])
 
-        plt.xlim(left=0, right=161)
+        plt.xlim(left=-5, right=164)
         plt.xticks([x for x in range(0, 160, 4)])
+        plt.yticks([x for x in range(0, 900001, 100000)])
         
         plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         resultados_lista.pop(0)
-        plt.plot([x for x in range(1, 160)], resultados_lista, "o", color="C0")    # valores arvores
 
+        #plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
+        plt.gca().set_prop_cycle('color', ['0d66a3'])
+        plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
+        ax.legend(["Grafo Normal", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+
         plt.title(titulo)
-        ax.set_xlabel('ID de Início da Árvore (0 - Grafo Real)')
+        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
         ax.set_ylabel('Pico de Infectados')
 
-        fig.set_size_inches([13.3, 7.5])
+        #fig.set_size_inches([13.3, 7.5])
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-        #plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png", format="png")
-        plt.show()
+        
+        #C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} NOVA COR.png", format="png", dpi=300)
+        #plt.show()
 
     def avançar_tempo(self, t):
         #self.printar_estados_vertices()
@@ -976,8 +997,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
@@ -1009,8 +1030,11 @@ m = Modelo(arquivo_final)
 # m.avançar_tempo_movimentacao_dinamica(200)
 # print(m.pico_infectados)
 # m.printar_grafico_SIRxT()
-m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
-print(m.pico_infectados)
-m.printar_grafico_SIRxT()
-#m.printar_grafico_ID_MAXINFECT_arvore("largura")
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
+
+# print(m.pico_infectados)
+# m.printar_grafico_SIRxT()
+
+
+m.printar_grafico_ID_MAXINFECT_arvore("largura")
 
