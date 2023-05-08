@@ -5,7 +5,7 @@ OK colocar 3 momentos graficos pizza apos video explicando melhor cada vertice e
 OK COLOCAR TITULO EM CADA GRAFICO TEMPO 1, 50, 200
 
 escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
-livros dasgupta e papadimitriou vazirani cap 3 algo
+livros dasgupta e papadimitriou vazirani algorithms cap 3 
 
 Perguntar gerador grafo para colocar de exemplo
 
