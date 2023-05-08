@@ -1,0 +1,32 @@
+- Alvaro
+OK dar espaço esquerda grafico picos, evidenciar o ponto original
+OK fazer um sobrepor grafico com tanto em profundidade e largura pra comparar no final
+OK colocar 3 momentos graficos pizza apos video explicando melhor cada vertice e os momentos
+OK COLOCAR TITULO EM CADA GRAFICO TEMPO 1, 50, 200
+
+escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
+livros dasgupta e papadimitriou vazirani cap 3 algo
+
+Perguntar gerador grafo para colocar de exemplo
+
+rodar profundidade com 400+/600+ dias
+testar ate infectado chegar a 0
+gerar grafico do flamengo SIRT alongado e colocar do lado
+
+substituir grafico de picos profundidade com novos tempos
+
+arvore vizinha inserir aresta cria ciclo, remover original, testa para cada uma das que eu posso remover do ciclo
+
+
+
+- Priscila
+
+Comparar numeros finais com formula derivada de cada SIR para calcular o erro
+Trabalhar com grafo menor (pedir floripa)
+Problema menor para validar os erros
+
+Ok Ajeitar grafo zona sul com e sem botafogo pra direita
+
+Ok Mandar pdf da explicação das fórmulas, grafos
+
+Ok Explicar Y do X

@@ -135,24 +135,29 @@ class Modelo:
         # 'Lagoa': (0.4, -0.25), 'Jardim Botânico': (0.6, 0.6), 'Rocinha': (0.7, 0.1)}
 
         #T = nx.balanced_tree(2, 5)
+        #nx.spring_layout(self.grafo)
+        pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
+        print(pos)
+        if tipo:
+            mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
+            
+            self.grafo = nx.relabel_nodes(self.grafo, mapping)
 
-        mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
+            for vertice in self.grafo.nodes(data=True):
+                del vertice[1]["id"]
+                del vertice[1]["populaçao"]
+                del vertice[1]["SIR_t0"]
+                del vertice[1]["SIRd"]
+                del vertice[1]["SIRdd"]
+                del vertice[1]["SIRddd"]
+                del vertice[1]["SIRdddantes"]
+                del vertice[1]["beta"]
         
-        self.grafo = nx.relabel_nodes(self.grafo, mapping)
-
-        for vertice in self.grafo.nodes(data=True):
-            del vertice[1]["id"]
-            del vertice[1]["populaçao"]
-            del vertice[1]["SIR_t0"]
-            del vertice[1]["SIRd"]
-            del vertice[1]["SIRdd"]
-            del vertice[1]["SIRddd"]
-            del vertice[1]["SIRdddantes"]
-            del vertice[1]["beta"]
-        
-        pos = graphviz_layout(self.grafo, prog="dot")
+            pos = graphviz_layout(self.grafo, prog="dot")
 
         nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+
         plt.show()  
 
 
@@ -176,7 +181,7 @@ class Modelo:
     def printar_grafico_SIRxT(self, x=None, y=None, path=None):
         fig = plt.figure(1)#.set_fig
         ax = fig.add_subplot(111)
-        fig.set_size_inches([10, 7])
+        fig.set_size_inches([7.5, 5])
 
 
         plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
@@ -493,16 +498,16 @@ class Modelo:
 
             resultados_lista[int(id)] = [int(float(max_infect))]
 
-        # resultadosP_lista = [x for x in range(160)]
-        # for linha in resultadosP:
-        #     linha = linha.strip()
 
-        #     if linha == "":
-        #         break
+        for linha in resultadosP:
+            linha = linha.strip()
 
-        #     id, dia_pico, max_infect = linha.split(", ")
+            if linha == "":
+                break
 
-        #     resultados_lista[int(id)].append(int(float(max_infect)))
+            id, dia_pico, max_infect = linha.split(", ")
+
+            resultados_lista[int(id)].append(int(float(max_infect)))
 
         resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
 
@@ -518,24 +523,22 @@ class Modelo:
         plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         resultados_lista.pop(0)
 
-        #plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
-        plt.gca().set_prop_cycle('color', ['0d66a3'])
+        plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
+        #plt.gca().set_prop_cycle('color', ['0d66a3'])
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.legend(["Grafo Normal", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
-        ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        #ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
 
         plt.title(titulo)
         ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
         ax.set_ylabel('Pico de Infectados')
 
-        #fig.set_size_inches([13.3, 7.5])
-
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
         #C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} NOVA COR.png", format="png", dpi=300)
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} e Profundidade NOVA COR.png", format="png", dpi=300)
         #plt.show()
 
     def avançar_tempo(self, t):
@@ -602,7 +605,7 @@ class Modelo:
                 for i in range(floor(self.lambda_S * atributos["SIRd"]["S"])):    # calculo do numero de encontros na pop de suscetiveis que respeitam mas tem q sair
                     X_ponto += random() < Y_ponto                                 # baseado na probabilidade de Y_ponto
 
-                # X_2pontos = X_2pontos_ii + X_2pontos_ij (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
+                # X_2pontos = X_2pontos_ii + X_2pontos_ji (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
                 for i in range(atributos["SIRdd"]["S"]):                    # calculo do numero de encontros na pop de suscetiveis que nao respeitam e restam no vertice
                     X_2pontos_ii += random() < Y_ponto                      # baseado na probabilidade de Y_ponto
 
@@ -612,15 +615,15 @@ class Modelo:
                 # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
                 # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
                 for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
-                    X_2pontos_ij = 0
+                    X_2pontos_ji = 0
 
                     for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
-                        X_2pontos_ij += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
+                        X_2pontos_ji += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
                         
                     recuperados_novos_ddd = ceil(self.e * vizinho["I"])
 
-                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ij)
-                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ij)
+                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ji)
+                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ji)
                     vizinho["R"] = vizinho["R"] + recuperados_novos_ddd
         
                 # SIR t+1 SIRponto e SIR2pontos
@@ -723,7 +726,7 @@ class Modelo:
                 for i in range(floor(self.lambda_S * atributos["SIRd"]["S"])):    # calculo do numero de encontros na pop de suscetiveis que respeitam mas tem q sair
                     X_ponto += random() < Y_ponto                                 # baseado na probabilidade de Y_ponto
 
-                # X_2pontos = X_2pontos_ii + X_2pontos_ij (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
+                # X_2pontos = X_2pontos_ii + X_2pontos_ji (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
                 for i in range(atributos["SIRdd"]["S"]):                    # calculo do numero de encontros na pop de suscetiveis que nao respeitam e restam no vertice
                     X_2pontos_ii += random() < Y_ponto                      # baseado na probabilidade de Y_ponto
 
@@ -733,15 +736,15 @@ class Modelo:
                 # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
                 # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
                 for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
-                    X_2pontos_ij = 0
+                    X_2pontos_ji = 0
 
                     for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
-                        X_2pontos_ij += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
+                        X_2pontos_ji += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
                         
                     recuperados_novos_ddd = ceil(self.e * vizinho["I"])
 
-                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ij)
-                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ij)
+                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ji)
+                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ji)
                     vizinho["R"] = vizinho["R"] + recuperados_novos_ddd
         
                 # SIR t+1 SIRponto e SIR2pontos
@@ -782,34 +785,35 @@ class Modelo:
 
         colors = ["blue", "#55eb3b", "red"]
         for t in range(1, self.t):
-            print("imagem", t)
-            coluna = 0
-            linha = 0
-            index = 1
-            fig = plt.figure(num=1, clear=True)
-            fig.set_size_inches([40, 40])
-            
-            for key, value in self.SIRxTdeVertices.items():
-                x = value[t]
-                ax = plt.subplot(14, 12, index)
+            if t in [1, 50, 75, 200]:
+                print("imagem tempo", t)
+                coluna = 0
+                linha = 0
+                index = 1
+                fig = plt.figure(num=1, clear=True)
+                fig.set_size_inches([40, 40])
+                for key, value in self.SIRxTdeVertices.items():
+                    x = value[t]
+                    ax = plt.subplot(14, 12, index)
 
-                #[linha][coluna]
-                ax.set_title(key)
-                ax.pie(x, colors=colors, radius=6, center=(4, 4),
-                    wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
+                    #[linha][coluna]
+                    ax.set_title(key)
+                    ax.pie(x, colors=colors, radius=6, center=(4, 4),
+                        wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True)
 
-                ax.get_xaxis().set_visible(False)
-                ax.get_yaxis().set_visible(False)
+                    ax.get_xaxis().set_visible(False)
+                    ax.get_yaxis().set_visible(False)
 
-                index += 1
-                if coluna + 1 < 12:
-                    coluna += 1
-                else:
-                    coluna = 0
-                    linha += 1
-    
-            plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Grafico pizza grafo original\tempo {t}.png", format="png")
-            plt.close(fig="all")
+                    index += 1
+                    if coluna + 1 < 12:
+                        coluna += 1
+                    else:
+                        coluna = 0
+                        linha += 1
+                plt.text(x=0.5, y=1.005, s=f"Dia {t}", fontsize=70, ha="center", transform=fig.transFigure)
+                #plt.suptitle(, y=1.02, fontsize='xx-large')
+                plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Grafico pizza grafo dinamico flamengo\tempo {t}.png", format="png", bbox_inches="tight")
+                plt.close(fig="all")
 
     def printar_grafico_SIRxTdeVerticesPizzaTXT(self, path, tipo):
         self.SIRxTdeVerticesTXT = open(path, "r", encoding="utf-8")
@@ -939,7 +943,7 @@ class Modelo:
                 for i in range(floor(self.lambda_S * atributos["SIRd"]["S"])):    # calculo do numero de encontros na pop de suscetiveis que respeitam mas tem q sair
                     X_ponto += random() < Y_ponto                                 # baseado na probabilidade de Y_ponto
 
-                # X_2pontos = X_2pontos_ii + X_2pontos_ij (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
+                # X_2pontos = X_2pontos_ii + X_2pontos_ji (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
                 #? ADICIONADO FLOOR JA QUE S PODE SER FLOAT
                 for i in range(floor(atributos["SIRdd"]["S"])):                    # calculo do numero de encontros na pop de suscetiveis que nao respeitam e restam no vertice
                     X_2pontos_ii += random() < Y_ponto                      # baseado na probabilidade de Y_ponto
@@ -950,16 +954,16 @@ class Modelo:
                 # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
                 # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
                 for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
-                    X_2pontos_ij = 0
+                    X_2pontos_ji = 0
 
                     for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
-                        X_2pontos_ij += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
+                        X_2pontos_ji += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
                         
                     #? ALTERADO
                     recuperados_novos_ddd = deltaT * (self.e * vizinho["I"])
 
-                    vizinho["S"] = vizinho["S"] - deltaT * (self.v * X_2pontos_ij)
-                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + deltaT * (self.v * X_2pontos_ij)
+                    vizinho["S"] = vizinho["S"] - deltaT * (self.v * X_2pontos_ji)
+                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + deltaT * (self.v * X_2pontos_ji)
                     vizinho["R"] = vizinho["R"] + recuperados_novos_ddd
         
                 # SIR t+1 SIRponto e SIR2pontos
@@ -997,15 +1001,15 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/normal (real)/arquivo_final.txt"
 # "./txts/zona sul/adjacencias_zona_sul.txt"
 # "./txts/otimizado/adjacencias.txt"
-arquivo_adjacencias = "./txts/normal (real)/adjacencias.txt"
-arquivo_final = "./txts/normal (real)/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
+arquivo_adjacencias = "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
+arquivo_final = "./txts/zona sul modificada menor/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1016,25 +1020,26 @@ resultados_arvore_largura = "./Resultados/resultados_arvore_largura.txt"
 SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 
-# txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
-# txt.gerar_arquivo_destino()
+#txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
+#txt.gerar_arquivo_destino()
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
-
+m.printar_grafo()
 #m.gerar_grafos_arvore_largura(200, 1) # FEITO
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 #m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
 
-# m.avançar_tempo_movimentacao_dinamica(200)
+#m.avançar_tempo_movimentacao_dinamica(200)
 # print(m.pico_infectados)
-# m.printar_grafico_SIRxT()
+#m.printar_grafico_SIRxTdeVerticesPizza()
+#m.printar_grafico_SIRxT()
 # m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
 
 # print(m.pico_infectados)
 # m.printar_grafico_SIRxT()
 
 
-m.printar_grafico_ID_MAXINFECT_arvore("largura")
+#m.printar_grafico_ID_MAXINFECT_arvore("largura")
 

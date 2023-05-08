@@ -1,8 +1,0 @@
-ffmpeg
-juntar imagens em video
-
-analisar arquivo log arvores *profundidade e largura
-ver o porque de certas raizes nao espalharem no codigo e arquivo
-
-escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
-livros dasgupta e papadimitriou vazirani cap 3 algo
