@@ -56,8 +56,8 @@ class Modelo:
 
         self.array_top_populaçao = []
 
-        self.grafo = self.gerar_grafo()
-        self.grafo_arvores = 0
+        self.grafo = self.gerar_grafo()     # grafo utilizado atualmente
+        self.grafo_original = 0             # copia do grafo original, usado na criaçao de arvores
 
 
     def gerar_grafo(self):
@@ -98,7 +98,7 @@ class Modelo:
 
 
     def resetar_grafo(self):
-        for vertice in self.grafo.nodes:
+        for vertice in self.grafo:
             populaçao = self.grafo.nodes[vertice]["populaçao"]
             
             if vertice == self.vertice_de_inicio:
@@ -136,8 +136,9 @@ class Modelo:
 
         #T = nx.balanced_tree(2, 5)
         #nx.spring_layout(self.grafo)
-        pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
-        print(pos)
+        
+        #pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
+        #print(pos)
         if tipo:
             mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
             
@@ -308,7 +309,7 @@ class Modelo:
 
     def busca_em_largura(self, inicio):
         fila = []
-        visitados = set()
+        visitados = {inicio}
         anterior = {}
 
         fila.append(inicio)
@@ -327,29 +328,22 @@ class Modelo:
         self.resultados_arvore_largura = open(resultados_arvore_largura, "w", encoding="utf-8")
         self.SIRxTdeVerticesTXT_largura = open(SIRxTdeVerticesTXT_largura, "w", encoding="utf-8")
 
-        g = self.grafo.nodes
         self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
 
-        for inicio in g:
+        for inicio in self.grafo_original.nodes:
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
-            soma = 0
+            soma_pico = 0
             tempo_pico = 0
 
             anterior = self.busca_em_largura(inicio)
-
-            adj = {}
+            print(anterior)
 
             self.grafo.remove_edges_from(list(self.grafo.edges()))
 
             for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
-                try:
-                    adj[ant].append(vertice)
-                except:
-                    adj[ant] = [vertice]
-
                 self.grafo.add_edge(ant, vertice)
 
 
@@ -358,18 +352,20 @@ class Modelo:
 
 
             for i in range(iteraçoes):
+                
+                self.printar_grafo("arvore")
                 print("Inicio:", inicio, "/ Iteração:", i+1)
 
                 self.avançar_tempo_movimentacao_dinamica(tempo)
                 print("Pico:", self.pico_infectados)
 
-                soma += self.pico_infectados
+                soma_pico += self.pico_infectados
                 tempo_pico += self.tempo_pico
 
                 self.resetar_grafo()
             
             tempo_pico = tempo_pico / (i + 1)
-            media = soma / (i + 1)
+            media = soma_pico / (i + 1)
             self.resultados_arvore_largura.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")   
 
             self.SIRxTdeVerticesTXT_largura.write(f"{inicio}, ")
@@ -406,48 +402,35 @@ class Modelo:
             print("Tipo de árvore inválida") if self.picos_infectados_arvores \
             else print("É necessário rodar o modelo sobre as árvores primeiro")
 
-    def busca_em_profundidade(self, v):
-
+    def busca_em_profundidade(self, v, anterior, visitados):
+        visitados.add(v)
         for vizinho in self.grafo_original.edges(v):
             vizinho = vizinho[1]
-            if vizinho not in self.visitados:
-                self.visitados.add(vizinho)
-                self.anterior_profundidade[vizinho] = v
-                self.busca_em_profundidade(vizinho)
-
-        return
+            if vizinho not in visitados:
+                anterior[vizinho] = v
+                self.busca_em_profundidade(vizinho, anterior, visitados)
 
     def gerar_grafos_arvore_profundidade(self, tempo, iteraçoes):
-        #print(self.grafo.nodes())
         self.resultados_arvore_profundidade = open(resultados_arvore_profundidade, "w", encoding="utf-8")
         self.SIRxTdeVerticesTXT_profundidade = open(SIRxTdeVerticesTXT_profundidade, "w", encoding="utf-8")
         
-        g = self.grafo.nodes
         self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
-        for inicio in g:
+        for inicio in self.grafo_original.nodes:
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
-            soma = 0
+            soma_pico = 0
             tempo_pico = 0
 
-            self.anterior_profundidade = {}
-            self.visitados = set()
-            self.busca_em_profundidade(inicio)
-            
-            adj = {}
+            anterior = {}
+            visitados = set()
+            self.busca_em_profundidade(inicio, anterior, visitados)
 
             self.grafo.remove_edges_from(list(self.grafo.edges()))
 
-            for vertice, ant in self.anterior_profundidade.items():   # recriar grafo a partir de anterior
-                try:
-                    adj[ant].append(vertice)
-                except:
-                    adj[ant] = [vertice]
-
+            for vertice, ant in anterior.items():   # recriar grafo a partir de anterior
                 self.grafo.add_edge(ant, vertice)
-            print(len(self.grafo.edges()))
 
 
             for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
@@ -460,13 +443,13 @@ class Modelo:
                 self.avançar_tempo_movimentacao_dinamica(tempo)
                 print("Pico:", self.pico_infectados)
 
-                soma += self.pico_infectados
+                soma_pico += self.pico_infectados
                 tempo_pico += self.tempo_pico
 
                 self.resetar_grafo()
             
             tempo_pico = tempo_pico / (i + 1)
-            media = soma / (i + 1)
+            media = soma_pico / (i + 1)
             self.resultados_arvore_profundidade.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")      
             
             self.SIRxTdeVerticesTXT_profundidade.write(f"{inicio}, ")
@@ -1058,20 +1041,50 @@ class Modelo:
         plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Profundidade 400 dias.png", format="png", dpi=300)
         #plt.show()
 
+    def arvores_vizinhas(self, tipo_arvore):
+        self.grafo_arvore = self.grafo.copy()
+        
+        menor_media = 99999999
+        # criaçao das arvores
+        
+        for inicio in self.grafo.nodes:
+            self.vertice_de_inicio = inicio
+            self.resetar_grafo(True)
+            soma = 0
+            tempo_pico = 0
+
+            anterior_profundidade = {}
+            visitados = set()
+            self.busca_em_profundidade(inicio, anterior_profundidade, visitados)
+            
+            #adj = {}
+
+            self.grafo_arvore.remove_edges_from(list(self.grafo_arvore.edges()))
+
+            for vertice, ant in self.anterior_profundidade.items():   # recriar grafo a partir de anterior
+                # try:
+                #     adj[ant].append(vertice)
+                # except:
+                #     adj[ant] = [vertice]
+
+                self.grafo_arvore.add_edge(ant, vertice)
+
+            for vertice in self.grafo_arvore.nodes(data=True):                         # setar betas novamente
+                vertice[1]["beta"] = 1 / (len(self.grafo_arvore.edges(vertice[0])) + 1)
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
-# ""
+# "./txts/zona sul/arquivo_final.txt"
 # "./txts/zona sul/adjacencias_zona_sul.txt"
 # "./txts/otimizado/adjacencias.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
-arquivo_final = "./txts/normal (real)/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
+arquivo_final = "./txts/normal (real)/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1087,9 +1100,10 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
-m.printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois()
+#m.arvores_vizinhas("largura")
 #m.printar_grafo()
-# m.gerar_grafos_arvore_largura(400, 1) # FEITO
+m.gerar_grafos_arvore_largura(100, 1) # FEITO
+
 # m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 
 #m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
