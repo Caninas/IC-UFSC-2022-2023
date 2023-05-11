@@ -447,6 +447,7 @@ class Modelo:
                     adj[ant] = [vertice]
 
                 self.grafo.add_edge(ant, vertice)
+            print(len(self.grafo.edges()))
 
 
             for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
@@ -473,7 +474,6 @@ class Modelo:
             self.SIRxTdeVerticesTXT_profundidade.write(f"{self.SIRxTdeVertices}\n")
 
             menor_media = media if media < menor_media else menor_media
-        
         self.resultados_arvore_profundidade.write(f"\nMenor média: {menor_media}")
 
 
@@ -860,7 +860,7 @@ class Modelo:
                 # plt.close()
             
             x_grafico = [x for x in range(1, max(self.SIRxTdeVertices[inicio]) + 1)]
-            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\Graficos SIRxT arvores {tipo}\{inicio}.png")
+            self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Graficos SIRxT arvores {tipo}\{inicio}.png")
 
 
     def avançar_tempo_movimentacao_dinamica_nao_discreto(self, deltaT: float, t: int):
@@ -997,6 +997,67 @@ class Modelo:
                     atributos["SIRdd"]["R"] += node_vizinho["R"]
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
 
+    def printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois(self):
+        resultadosAntes = open("./Resultados/resultados_arvore_profundidade.txt", "r")
+        resultadosDepois = open("./Resultados/resultados arvores 400 dias/resultados_arvore_profundidade.txt", "r")
+
+        titulo = f'Picos de Infectados das Árvores de Busca em Profundidade'
+        resultados_lista = [x for x in range(160)]
+
+
+        for linha in resultadosAntes:
+            linha = linha.strip()
+
+            if linha == "":
+                break
+
+            id, dia_pico, max_infect = linha.split(", ")
+
+            resultados_lista[int(id)] = [int(float(max_infect))]
+
+
+        for linha in resultadosDepois:
+            linha = linha.strip()
+
+            if linha == "":
+                break
+
+            id, dia_pico, max_infect = linha.split(", ")
+
+            resultados_lista[int(id)].append(int(float(max_infect)))
+
+        resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original
+
+
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+        fig.set_size_inches([15, 7.5])
+
+        plt.xlim(left=-5, right=164)
+        plt.xticks([x for x in range(0, 160, 4)])
+        plt.yticks([x for x in range(0, 900001, 100000)])
+        
+        plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        resultados_lista.pop(0)
+
+        plt.gca().set_prop_cycle('color', ['brown', '0d66a3'])
+        #plt.gca().set_prop_cycle('color', ['0d66a3'])
+        plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        ax.legend(["Grafo Normal", "Antes", "Depois"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        #ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+
+        plt.title(titulo)
+        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
+        ax.set_ylabel('Pico de Infectados')
+
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        
+        #C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Profundidade 400 dias.png", format="png", dpi=300)
+        #plt.show()
+
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
@@ -1005,11 +1066,12 @@ class Modelo:
 os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
-# "./txts/normal (real)/arquivo_final.txt"
+# ""
 # "./txts/zona sul/adjacencias_zona_sul.txt"
 # "./txts/otimizado/adjacencias.txt"
+# "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
-arquivo_final = "./txts/zona sul modificada menor/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
+arquivo_final = "./txts/normal (real)/arquivo_final.txt"#"./txts/zona sul/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1025,13 +1087,14 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
-m.printar_grafo()
-#m.gerar_grafos_arvore_largura(200, 1) # FEITO
-#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
-#m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
+m.printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois()
+#m.printar_grafo()
+# m.gerar_grafos_arvore_largura(400, 1) # FEITO
+# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+
+#m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
 #m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
 
-#m.avançar_tempo_movimentacao_dinamica(200)
 # print(m.pico_infectados)
 #m.printar_grafico_SIRxTdeVerticesPizza()
 #m.printar_grafico_SIRxT()
