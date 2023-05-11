@@ -9,6 +9,7 @@ from math import floor, ceil
 from random import randint, random
 import multiprocessing as mp
 import ast
+import time
 
 from Txt import Txt
 
@@ -124,6 +125,16 @@ class Modelo:
             self.t = 1
             self.pico_infectados = 0
             self.juntos = True
+
+    def estimar_tempo_restante(self, percorrido, total):
+        if percorrido:
+            estimativa = ((time.perf_counter() - self.estimativa_tempo_inicial) / percorrido) * total
+        else:
+            self.estimativa_tempo_inicial = time.perf_counter()
+            estimativa = 0
+        print(f"Estimativa {estimativa/60:.2f} minutos | {total - percorrido} arvores restantes")
+
+
 
     def printar_grafo(self, tipo=None):
         # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
@@ -331,8 +342,12 @@ class Modelo:
         self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
-
+        arvore = 0
+        quant_arvores = len(self.grafo_original.nodes)
+        
         for inicio in self.grafo_original.nodes:
+            self.estimar_tempo_restante(arvore, quant_arvores)
+            arvore += 1
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
             soma_pico = 0
@@ -414,7 +429,11 @@ class Modelo:
         self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
+        arvore = 0
+        quant_arvores = len(self.grafo_original.nodes)
         for inicio in self.grafo_original.nodes:
+            self.estimar_tempo_restante(arvore, quant_arvores)
+            arvore += 1
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
             soma_pico = 0
@@ -1065,8 +1084,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1092,12 +1111,12 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 m = Modelo(arquivo_final)
 #m.arvores_vizinhas("largura")
 #m.printar_grafo()
-m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
 
-# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+m.gerar_grafos_arvore_largura(200, 1) # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 
-#m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
-#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
+m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
 
 # print(m.pico_infectados)
 #m.printar_grafico_SIRxTdeVerticesPizza()
