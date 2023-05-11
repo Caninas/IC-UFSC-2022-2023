@@ -387,6 +387,8 @@ class Modelo:
             menor_media = media if media < menor_media else menor_media
         
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
+        self.resultados_arvore_largura.close()
+        self.SIRxTdeVerticesTXT_largura.close()
 
             
     def printar_grafico_arvore(self, tipo_arvore):
@@ -474,7 +476,8 @@ class Modelo:
 
             menor_media = media if media < menor_media else menor_media
         self.resultados_arvore_profundidade.write(f"\nMenor média: {menor_media}")
-
+        self.resultados_arvore_profundidade.close()
+        self.SIRxTdeVerticesTXT_profundidade.close()
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
@@ -860,7 +863,7 @@ class Modelo:
             
             x_grafico = [x for x in range(1, max(self.SIRxTdeVertices[inicio]) + 1)]
             self.printar_grafico_SIRxT(x_grafico, y_grafico, fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Graficos SIRxT arvores {tipo}\{inicio}.png")
-
+        self.SIRxTdeVerticesTXT.close()
 
     def avançar_tempo_movimentacao_dinamica_nao_discreto(self, deltaT: float, t: int):
           # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
@@ -1114,9 +1117,18 @@ m = Modelo(arquivo_final)
 
 m.gerar_grafos_arvore_largura(200, 1) # FEITO
 m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+os.rename(SIRxTdeVerticesTXT_largura, "./Resultados/Graficos SIRxT arvores largura/SIR_vertice_por_tempo_LARGURA.txt")
+os.rename(resultados_arvore_largura, "./Resultados/Graficos SIRxT arvores largura/resultados_arvore_largura.txt")
+
+m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 200") # FEITO
+os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
+os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt")
 
 m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade") # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 400") # FEITO
+os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
+os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/resultados_arvore_profundidade.txt")
 
 # print(m.pico_infectados)
 #m.printar_grafico_SIRxTdeVerticesPizza()
