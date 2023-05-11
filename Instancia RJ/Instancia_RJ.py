@@ -339,7 +339,6 @@ class Modelo:
             tempo_pico = 0
 
             anterior = self.busca_em_largura(inicio)
-            print(anterior)
 
             self.grafo.remove_edges_from(list(self.grafo.edges()))
 
@@ -352,8 +351,6 @@ class Modelo:
 
 
             for i in range(iteraçoes):
-                
-                self.printar_grafo("arvore")
                 print("Inicio:", inicio, "/ Iteração:", i+1)
 
                 self.avançar_tempo_movimentacao_dinamica(tempo)
@@ -1056,17 +1053,10 @@ class Modelo:
             anterior_profundidade = {}
             visitados = set()
             self.busca_em_profundidade(inicio, anterior_profundidade, visitados)
-            
-            #adj = {}
 
             self.grafo_arvore.remove_edges_from(list(self.grafo_arvore.edges()))
 
             for vertice, ant in self.anterior_profundidade.items():   # recriar grafo a partir de anterior
-                # try:
-                #     adj[ant].append(vertice)
-                # except:
-                #     adj[ant] = [vertice]
-
                 self.grafo_arvore.add_edge(ant, vertice)
 
             for vertice in self.grafo_arvore.nodes(data=True):                         # setar betas novamente
@@ -1102,7 +1092,7 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 m = Modelo(arquivo_final)
 #m.arvores_vizinhas("largura")
 #m.printar_grafo()
-m.gerar_grafos_arvore_largura(100, 1) # FEITO
+m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
 
 # m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 
