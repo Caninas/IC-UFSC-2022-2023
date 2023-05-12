@@ -7,13 +7,13 @@ OK COLOCAR TITULO EM CADA GRAFICO TEMPO 1, 50, 200
 escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
 livros dasgupta e papadimitriou vazirani algorithms cap 3 
 
-Perguntar gerador grafo para colocar de exemplo
+OK Perguntar gerador grafo para colocar de exemplo
 
-rodar profundidade com 400+/600+ dias
-testar ate infectado chegar a 0
-gerar grafico do flamengo SIRT alongado e colocar do lado
+OK rodar profundidade com 400+/600+ dias
+OK testar ate infectado chegar a 0
+OK gerar grafico do flamengo SIRT alongado e colocar do lado
 
-substituir grafico de picos profundidade com novos tempos
+substituir grafico de picos profundidade com novos tempos? (PERGUNTAR)
 
 arvore vizinha inserir aresta cria ciclo, remover original, testa para cada uma das que eu posso remover do ciclo
 

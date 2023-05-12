@@ -128,13 +128,34 @@ class Modelo:
 
     def estimar_tempo_restante(self, percorrido, total):
         if percorrido:
-            estimativa = ((time.perf_counter() - self.estimativa_tempo_inicial) / percorrido) * total
+            estimativa = ((time.perf_counter() - self.estimativa_tempo_inicial) / percorrido) * (total - percorrido)
         else:
             self.estimativa_tempo_inicial = time.perf_counter()
             estimativa = 0
         print(f"Estimativa {estimativa/60:.2f} minutos | {total - percorrido} arvores restantes")
 
 
+    def salvar_grafo_arvore(self, path):
+        mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}            
+        g = nx.relabel_nodes(self.grafo, mapping)
+
+        for vertice in g.nodes(data=True):
+            del vertice[1]["id"]
+            del vertice[1]["populaçao"]
+            del vertice[1]["SIR_t0"]
+            del vertice[1]["SIRd"]
+            del vertice[1]["SIRdd"]
+            del vertice[1]["SIRddd"]
+            del vertice[1]["SIRdddantes"]
+            del vertice[1]["beta"]
+    
+        pos = graphviz_layout(g, prog="dot")
+
+        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+
+        fig = plt.figure(1)
+        fig.set_size_inches(30, 10)
+        plt.savefig(path, format="png", dpi=300)
 
     def printar_grafo(self, tipo=None):
         # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
@@ -1061,34 +1082,74 @@ class Modelo:
         #plt.show()
 
     def arvores_vizinhas(self, tipo_arvore):
-        self.grafo_arvore = self.grafo.copy()
+        self.grafo_original = self.grafo.copy()
         
         menor_media = 99999999
-        # criaçao das arvores
+        arvore = 0
+        quant_arvores = len(self.grafo_original.nodes)
         
-        for inicio in self.grafo.nodes:
+        for inicio in self.grafo_original.nodes:
+            self.estimar_tempo_restante(arvore, quant_arvores)
+            arvore += 1
             self.vertice_de_inicio = inicio
-            self.resetar_grafo(True)
-            soma = 0
+            self.resetar_grafo()
+            soma_pico = 0
             tempo_pico = 0
 
-            anterior_profundidade = {}
-            visitados = set()
-            self.busca_em_profundidade(inicio, anterior_profundidade, visitados)
+            anterior = {}
+            if tipo_arvore == "largura":
+                anterior = self.busca_em_largura(inicio)
+            else:
+                visitados = set()
+                self.busca_em_profundidade(inicio, anterior, visitados)
 
-            self.grafo_arvore.remove_edges_from(list(self.grafo_arvore.edges()))
+            self.grafo.remove_edges_from(list(self.grafo.edges()))
+            for vertice, ant in anterior.items():
+                self.grafo.add_edge(ant, vertice)
 
-            for vertice, ant in self.anterior_profundidade.items():   # recriar grafo a partir de anterior
-                self.grafo_arvore.add_edge(ant, vertice)
+            for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
+                vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
+        
 
-            for vertice in self.grafo_arvore.nodes(data=True):                         # setar betas novamente
-                vertice[1]["beta"] = 1 / (len(self.grafo_arvore.edges(vertice[0])) + 1)
+            #print(g.nodes(data=True))
+
+            grafo_complemento = nx.complement(self.grafo).edges()
+
+            for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
+                self.grafo.add_edge(v, u)
+                # achar ciclo
+                ciclo = []      
+
+                for indice in range(2, len(ciclo)):    # sem v, u
+                    x = ciclo[indice]
+                    y = ciclo[(indice + 1)%len(ciclo)]
+
+                    self.grafo.remove_edge(x, y)
+
+                    # atualizar betas de x e y, v e u
+                    # rodar modelo
+
+
+                    self.grafo.add_edge(x, y)
+
+            print(type(grafo_complemento["Copacabana", "Flamengo"]))
+            # self.grafo.remove_edges_from(list(self.grafo.edges()))
+            # self.grafo.add_edges_from(g.edges())
+            # print(len(self.grafo.edges()))
+            # print(self.grafo.nodes(data=True))
+            # self.resetar_grafo()
+            # print(self.grafo.nodes(data=True))
+
+
+            # salvar arvore original
+            self.salvar_grafo_arvore(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\dsdsaddas\{inicio}.png")
+
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1110,25 +1171,26 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
 #txt.gerar_arquivo_destino()
 
+
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final)
-#m.arvores_vizinhas("largura")
+# m = Modelo(arquivo_final)
+# m.arvores_vizinhas("largura")
 #m.printar_grafo()
 
-m.gerar_grafos_arvore_largura(200, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
-os.rename(SIRxTdeVerticesTXT_largura, "./Resultados/Graficos SIRxT arvores largura/SIR_vertice_por_tempo_LARGURA.txt")
-os.rename(resultados_arvore_largura, "./Resultados/Graficos SIRxT arvores largura/resultados_arvore_largura.txt")
+# m.gerar_grafos_arvore_largura(200, 1) # FEITO
+# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+# os.rename(SIRxTdeVerticesTXT_largura, "./Resultados/Graficos SIRxT arvores largura/SIR_vertice_por_tempo_LARGURA.txt")
+# os.rename(resultados_arvore_largura, "./Resultados/Graficos SIRxT arvores largura/resultados_arvore_largura.txt")
 
-m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 200") # FEITO
-os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
-os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt")
+# m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
+# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 200") # FEITO
+# os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
+# os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt")
 
-m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 400") # FEITO
-os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
-os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/resultados_arvore_profundidade.txt")
+# m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
+# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 400") # FEITO
+# os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
+# os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/resultados_arvore_profundidade.txt")
 
 # print(m.pico_infectados)
 #m.printar_grafico_SIRxTdeVerticesPizza()
