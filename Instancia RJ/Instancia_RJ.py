@@ -1118,6 +1118,12 @@ class Modelo:
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
                 self.grafo.add_edge(v, u)
                 # achar ciclo
+                # busca em profundidade com comparaçao atual == v
+                # ir salvando caminho até chegar no final, quando começar a voltar
+                # remover quando ele parar e entrar no if nao visitado
+                # a partir de onde parou +1 e começar montando dnv
+                
+                
                 ciclo = []      
 
                 for indice in range(2, len(ciclo)):    # sem v, u
@@ -1129,6 +1135,10 @@ class Modelo:
                     # atualizar betas de x e y, v e u
                     # rodar modelo
 
+                    # salvar SIRT (criar outro modelo com SIRT diferente pra cá e otimizado)
+                    # salvar resultado (id, dia, pico)
+                    
+                    # salvar grafico SIR (arvore com v, u sem x, y.png)
 
                     self.grafo.add_edge(x, y)
 
