@@ -174,9 +174,9 @@ class Modelo:
         if tipo:
             mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
             
-            self.grafo = nx.relabel_nodes(self.grafo, mapping)
+            g = nx.relabel_nodes(self.grafo, mapping)
 
-            for vertice in self.grafo.nodes(data=True):
+            for vertice in g.nodes(data=True):
                 del vertice[1]["id"]
                 del vertice[1]["populaçao"]
                 del vertice[1]["SIR_t0"]
@@ -186,9 +186,9 @@ class Modelo:
                 del vertice[1]["SIRdddantes"]
                 del vertice[1]["beta"]
         
-            pos = graphviz_layout(self.grafo, prog="dot")
+            pos = graphviz_layout(g, prog="dot")
 
-        nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
 
         plt.show()  
@@ -214,7 +214,7 @@ class Modelo:
     def printar_grafico_SIRxT(self, x=None, y=None, path=None):
         fig = plt.figure(1)#.set_fig
         ax = fig.add_subplot(111)
-        fig.set_size_inches([7.5, 5])
+        fig.set_size_inches([9, 6])
 
 
         plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
@@ -410,6 +410,7 @@ class Modelo:
         self.resultados_arvore_largura.write(f"\nMenor média: {menor_media}")
         self.resultados_arvore_largura.close()
         self.SIRxTdeVerticesTXT_largura.close()
+        self.grafo = self.grafo_original 
 
             
     def printar_grafico_arvore(self, tipo_arvore):
@@ -496,9 +497,11 @@ class Modelo:
             self.SIRxTdeVerticesTXT_profundidade.write(f"{self.SIRxTdeVertices}\n")
 
             menor_media = media if media < menor_media else menor_media
+
         self.resultados_arvore_profundidade.write(f"\nMenor média: {menor_media}")
         self.resultados_arvore_profundidade.close()
         self.SIRxTdeVerticesTXT_profundidade.close()
+        self.grafo = self.grafo_original 
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
@@ -561,7 +564,7 @@ class Modelo:
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
         #C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} e Profundidade NOVA COR.png", format="png", dpi=300)
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} e Profundidade NOVA COR3.png", format="png", dpi=300)
         #plt.show()
 
     def avançar_tempo(self, t):
@@ -1021,7 +1024,7 @@ class Modelo:
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
 
     def printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois(self):
-        resultadosAntes = open("./Resultados/resultados_arvore_profundidade.txt", "r")
+        resultadosAntes = open("./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt", "r")
         resultadosDepois = open("./Resultados/resultados arvores 400 dias/resultados_arvore_profundidade.txt", "r")
 
         titulo = f'Picos de Infectados das Árvores de Busca em Profundidade'
@@ -1116,25 +1119,65 @@ class Modelo:
             grafo_complemento = nx.complement(self.grafo).edges()
 
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
-                self.grafo.add_edge(v, u)
+                print("Criando", v, "-->", u)
+                anterior = {}
+                visitados = set()
+                self.encontrou_ciclo = False
+                ciclo = []
+
+                def busca_em_profundidade(k, anterior, visitados):          # achar ciclo
+                    visitados.add(k)
+                    for vizinho in self.grafo.edges(k):
+                        if not self.encontrou_ciclo:
+                            vizinho = vizinho[1]
+
+                            if vizinho not in visitados:
+                                anterior[vizinho] = k
+                                if vizinho == v:
+                                    print("Encontrou ciclo:", end="")
+                                    self.encontrou_ciclo = True
+                                    break
+                                busca_em_profundidade(vizinho, anterior, visitados)
+
+                busca_em_profundidade(u, anterior, visitados)
+
+                ciclo.append(v)
+                while True:                 # montar ciclo
+                    try:
+                        if anterior[ciclo[-1]] != v:
+                            ciclo.append(anterior[ciclo[-1]])
+                        else:
+                            raise Exception
+                    except:
+                        break
+
                 # achar ciclo
                 # busca em profundidade com comparaçao atual == v
                 # ir salvando caminho até chegar no final, quando começar a voltar
                 # remover quando ele parar e entrar no if nao visitado
                 # a partir de onde parou +1 e começar montando dnv
-                
-                
-                ciclo = []      
 
-                for indice in range(2, len(ciclo)):    # sem v, u
+                print(ciclo)
+                self.printar_grafo("arvore")
+                #continue
+                self.grafo.add_edge(v, u)
+
+                for vertice in [v, u]:          # atualizar betas com nova aresta
+                    self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
+
+                #? rodar modelo com ciclo?
+
+                for indice in range(0, len(ciclo) - 1):    # loop arestas do ciclo (tirando v, u)
                     x = ciclo[indice]
-                    y = ciclo[(indice + 1)%len(ciclo)]
+                    y = ciclo[indice + 1]
 
                     self.grafo.remove_edge(x, y)
 
-                    # atualizar betas de x e y, v e u
+                    for vertice in [x, y]:          # atualizar betas com nova aresta
+                        self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
+            
                     # rodar modelo
-
+                    self.avançar_tempo_movimentacao_dinamica_otimizado()
                     # salvar SIRT (criar outro modelo com SIRT diferente pra cá e otimizado)
                     # salvar resultado (id, dia, pico)
                     
@@ -1153,13 +1196,139 @@ class Modelo:
 
             # salvar arvore original
             self.salvar_grafo_arvore(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\dsdsaddas\{inicio}.png")
+        self.grafo = self.grafo_original 
 
+    def avançar_tempo_movimentacao_dinamica_otimizado(self, t):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
+        # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
+        for tempo in range(t):
+            print(self.t)
+            # distribuiçao de pessoas
+            for node in list(self.grafo.nodes(data=True)):
+                nome, atributos = node
+
+                try:
+                    self.SIRxTdeVertices[nome][self.t] = [
+                        atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
+                        atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
+                        atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
+                    ]
+                except:
+                    self.SIRxTdeVertices[nome] = dict()
+                    self.SIRxTdeVertices[nome][self.t] = [
+                        atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
+                        atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
+                        atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
+                    ]
+
+
+                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+
+
+                for vizinho in self.grafo.edges(nome):
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+
+
+            #print("tempo=", self.t)
+            self.tempos.append(self.t)
+
+            self.SIRs.append([])
+            soma_SIR = [0, 0, 0]
+
+            for node in list(self.grafo.nodes(data=True)):
+                nome, atributos = node
+
+                atributos["SIRdddantes"]["S"] = atributos["SIRdddantes"]["I"] = atributos["SIRdddantes"]["R"] = 0
+
+                for vizinho in atributos["SIRddd"].values():
+                    atributos["SIRdddantes"]["S"] += vizinho["S"]
+                    atributos["SIRdddantes"]["I"] += vizinho["I"]
+                    atributos["SIRdddantes"]["R"] += vizinho["R"]
+
+                # guardando valores SIR para usar no grafico
+                soma_SIR[0] += atributos["SIRd"]["S"] + atributos["SIRdd"]["S"] + atributos["SIRdddantes"]["S"]
+                soma_SIR[1] += atributos["SIRd"]["I"] + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]
+                soma_SIR[2] += atributos["SIRd"]["R"] + atributos["SIRdd"]["R"] + atributos["SIRdddantes"]["R"]
+                
+                #! Calculo X_ponto + Sdd que fica (Ypi = Ypi -> i)
+
+                Nponto = floor(self.lambda_S * atributos["SIRd"]["S"]) + floor(self.lambda_I * atributos["SIRd"]["I"]) + floor(self.lambda_R * atributos["SIRd"]["R"])
+                N2pontos = atributos["SIRdd"]["S"] + atributos["SIRdd"]["I"] + atributos["SIRdd"]["R"]
+                N3pontos = atributos["SIRdddantes"]["S"] + atributos["SIRdddantes"]["I"] + atributos["SIRdddantes"]["R"]
+
+                # prob de acontecer um encontro de Sd / Sdd com Infectados no geral (Ypi = Ypi -> i)
+                Y_ponto = (floor(self.lambda_I * atributos["SIRd"]["I"]) + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]) / ((Nponto + N2pontos + N3pontos) - 1)
+                
+                X_ponto = 0          # numero de encontros de S com I no vertice i
+                X_2pontos_ii = 0
+
+                # range S bonito 1 ponto
+                for i in range(floor(self.lambda_S * atributos["SIRd"]["S"])):    # calculo do numero de encontros na pop de suscetiveis que respeitam mas tem q sair
+                    X_ponto += random() < Y_ponto                                 # baseado na probabilidade de Y_ponto
+
+                # X_2pontos = X_2pontos_ii + X_2pontos_ji (somatorio Y_2pontos_ii(=Y_ponto) + somatorio dos que vieram dos vizinhos e, portanto, usam a probabilidade Y deste vertice)
+                for i in range(atributos["SIRdd"]["S"]):                    # calculo do numero de encontros na pop de suscetiveis que nao respeitam e restam no vertice
+                    X_2pontos_ii += random() < Y_ponto                      # baseado na probabilidade de Y_ponto
+
+
+                # Cada grupo do SIR (respeitam, nao respeitam, vizinhos) tem probabilidades unicas (2 loops acima)
+
+                # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
+                # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
+                for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
+                    X_2pontos_ji = 0
+
+                    for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
+                        X_2pontos_ji += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
+                        
+                    recuperados_novos_ddd = ceil(self.e * vizinho["I"])
+
+                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ji)
+                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ji)
+                    vizinho["R"] = vizinho["R"] + recuperados_novos_ddd
+        
+                # SIR t+1 SIRponto e SIR2pontos
+                recuperados_novos_d = ceil(self.e * atributos["SIRd"]["I"])
+                recuperados_novos_dd = ceil(self.e * atributos["SIRdd"]["I"])
+
+                atributos["SIRd"]["S"] = atributos["SIRd"]["S"] - floor(self.v * X_ponto)              # X = quantidade total de encontros, v*X pessoas suscetiveis de fato infectadas
+                atributos["SIRdd"]["S"] = atributos["SIRdd"]["S"] - floor(self.v * X_2pontos_ii)
+
+                atributos["SIRd"]["I"] = atributos["SIRd"]["I"] - recuperados_novos_d + floor(self.v * X_ponto)
+                atributos["SIRdd"]["I"] = atributos["SIRdd"]["I"] - recuperados_novos_dd + floor(self.v * X_2pontos_ii)
+
+                atributos["SIRd"]["R"] = atributos["SIRd"]["R"] + recuperados_novos_d
+                atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
+
+            self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
+
+            if not any(i[1] > soma_SIR[1] for i in self.SIRs):
+                self.tempo_pico = self.t
+                self.pico_infectados = soma_SIR[1]
+
+
+            for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
+                nome, atributos = node
+
+                for vizinho in self.grafo.edges(nome):
+                    node_vizinho = self.grafo.nodes[vizinho[1]]["SIRddd"][nome]
+                    atributos["SIRdd"]["S"] += node_vizinho["S"]
+                    atributos["SIRdd"]["I"] +=  node_vizinho["I"]
+                    atributos["SIRdd"]["R"] += node_vizinho["R"]
+                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
+
+            self.t += 1
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1181,9 +1350,12 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
 #txt.gerar_arquivo_destino()
 
-
+#? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-# m = Modelo(arquivo_final)
+m = Modelo(arquivo_final)
+
+#m.avançar_tempo_movimentacao_dinamica(200)
+m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # m.arvores_vizinhas("largura")
 #m.printar_grafo()
 
@@ -1209,7 +1381,6 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 # print(m.pico_infectados)
 # m.printar_grafico_SIRxT()
-
-
-#m.printar_grafico_ID_MAXINFECT_arvore("largura")
+#m.arvores_vizinhas("profundidade")
+#m.printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois()
 
