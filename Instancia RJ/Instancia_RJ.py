@@ -505,14 +505,60 @@ class Modelo:
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
         if tipo_arvore == "largura":
-            resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
-            resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
+            resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
         else:
             resultados = open("./Resultados/resultados_arvore_profundidade.txt", "r")
 
         titulo = f'Picos de Infectados das Árvores de Busca em {tipo_arvore.title()}'
         resultados_lista = [x for x in range(160)]
 
+
+        for linha in resultados:
+            linha = linha.strip()
+
+            if linha == "":
+                break
+
+            id, dia_pico, max_infect = linha.split(", ")
+
+            resultados_lista[int(id)] = [int(float(max_infect))]
+
+        resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
+
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+        fig.set_size_inches([15, 7.5])
+
+        plt.xlim(left=-5, right=164)
+        plt.xticks([x for x in range(0, 160, 4)])
+        plt.yticks([x for x in range(0, 1000001, 100000)])
+        
+        plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        resultados_lista.pop(0)
+
+        #plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
+        plt.gca().set_prop_cycle('color', ['0d66a3'])
+        plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        #ax.legend(["Grafo Normal", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+
+        plt.title(titulo)
+        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
+        ax.set_ylabel('Pico de Infectados')
+
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} FINAL.png", format="png", dpi=300)
+
+    def printar_grafico_ID_MAXINFECT_arvores_largura_profundidade(self):
+
+        resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
+        resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
+        titulo = f'Picos de Infectados das Árvores de Busca em Largura e Profundidade'
+
+        resultados_lista = [x for x in range(160)]
 
         for linha in resultadosL:
             linha = linha.strip()
@@ -544,18 +590,17 @@ class Modelo:
 
         plt.xlim(left=-5, right=164)
         plt.xticks([x for x in range(0, 160, 4)])
-        plt.yticks([x for x in range(0, 900001, 100000)])
+        plt.yticks([x for x in range(0, 1000001, 100000)])
         
         plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         resultados_lista.pop(0)
 
         plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
-        #plt.gca().set_prop_cycle('color', ['0d66a3'])
+
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.legend(["Grafo Normal", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
-        #ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
 
         plt.title(titulo)
         ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
@@ -563,9 +608,7 @@ class Modelo:
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
-        #C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} e Profundidade NOVA COR3.png", format="png", dpi=300)
-        #plt.show()
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Largura e Profundidade FINAL.png", format="png", dpi=300)
 
     def avançar_tempo(self, t):
         #self.printar_estados_vertices()
@@ -1025,7 +1068,7 @@ class Modelo:
 
     def printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois(self):
         resultadosAntes = open("./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt", "r")
-        resultadosDepois = open("./Resultados/resultados arvores 400 dias/resultados_arvore_profundidade.txt", "r")
+        resultadosDepois = open("./Resultados/Graficos SIRxT arvores profundidade 400/resultados_arvore_profundidade.txt", "r")
 
         titulo = f'Picos de Infectados das Árvores de Busca em Profundidade'
         resultados_lista = [x for x in range(160)]
@@ -1081,8 +1124,8 @@ class Modelo:
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
         #C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\Pico Infectados Arvores {tipo_arvore.title()}.png
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Profundidade 400 dias.png", format="png", dpi=300)
-        #plt.show()
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Profundidade 200x400 dias.png", format="png", dpi=300)
+        plt.close
 
     def arvores_vizinhas(self, tipo_arvore):
         self.grafo_original = self.grafo.copy()
@@ -1355,12 +1398,12 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 m = Modelo(arquivo_final)
 
 #m.avançar_tempo_movimentacao_dinamica(200)
-m.avançar_tempo_movimentacao_dinamica_otimizado(200)
+#m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # m.arvores_vizinhas("largura")
 #m.printar_grafo()
 
 # m.gerar_grafos_arvore_largura(200, 1) # FEITO
-# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
+m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
 # os.rename(SIRxTdeVerticesTXT_largura, "./Resultados/Graficos SIRxT arvores largura/SIR_vertice_por_tempo_LARGURA.txt")
 # os.rename(resultados_arvore_largura, "./Resultados/Graficos SIRxT arvores largura/resultados_arvore_largura.txt")
 
@@ -1370,7 +1413,7 @@ m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt")
 
 # m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
-# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 400") # FEITO
+#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 400") # FEITO
 # os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
 # os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/resultados_arvore_profundidade.txt")
 
@@ -1382,5 +1425,7 @@ m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # print(m.pico_infectados)
 # m.printar_grafico_SIRxT()
 #m.arvores_vizinhas("profundidade")
+#m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
+#m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
 #m.printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois()
 
