@@ -4,26 +4,39 @@ OK fazer um sobrepor grafico com tanto em profundidade e largura pra comparar no
 OK colocar 3 momentos graficos pizza apos video explicando melhor cada vertice e os momentos
 OK COLOCAR TITULO EM CADA GRAFICO TEMPO 1, 50, 200
 
-escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
-livros dasgupta e papadimitriou vazirani algorithms cap 3 
-
 OK Perguntar gerador grafo para colocar de exemplo
 
 OK rodar profundidade com 400+/600+ dias
 OK testar ate infectado chegar a 0
 OK gerar grafico do flamengo SIRT alongado e colocar do lado
 
+
+escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
+livros dasgupta e papadimitriou vazirani algorithms cap 3 
+
 substituir grafico de picos profundidade com novos tempos? (PERGUNTAR)
 
-arvore vizinha inserir aresta cria ciclo, remover original, testa para cada uma das que eu posso remover do ciclo
+arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
 
+Fazer alteraçoes texto
+
+Fazer tabela de arvores (usar csv? para importar para excel facilmente)
+	arvore
+	x
+	dia fim do espalhamento (analisar pelo SIRXTvertices)
+	dia pico	(resultados)
+	encontrar lagura pico diferença de modulo?
+
+Ver modelo escrita SBPO
+
+Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
 
 
 - Priscila
 
 Comparar numeros finais com formula derivada de cada SIR para calcular o erro
 Trabalhar com grafo menor (pedir floripa)
-Problema menor para validar os erros
+OK Problema menor para validar os erros
 
 Ok Ajeitar grafo zona sul com e sem botafogo pra direita
 
