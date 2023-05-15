@@ -39,7 +39,7 @@ class Modelo:
         # variaveis globais, se aplicam a todos os vértices
         # retiradas da pagina 8 e 9 do artigo do modelo
 
-        self.frac_infect_inicial = 0.05   #2/15     # 400/3000
+        self.frac_infect_inicial = 0.05      #2/15  # 400/3000
 
         self.v = 91/200    # taxa_virulencia
         self.e = 29/200    # taxa_recuperaçao
@@ -76,6 +76,7 @@ class Modelo:
                 I = floor(self.frac_infect_inicial * populaçao)
             else:
                 I = 0
+            #I = floor(self.frac_infect_inicial * populaçao)    # distribuir igualmente
             S = populaçao - I
 
             Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
@@ -158,7 +159,7 @@ class Modelo:
         plt.savefig(path, format="png", dpi=300)
 
     def printar_grafo(self, tipo=None):
-        # #pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
+        # # pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
         # pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Glória': array([0.809017  , 0.58778526]), 'Catete': array([0.30901698, 0.95105655]),
         # 'Laranjeiras': array([-0.30901702,  0.95105649]), 'Cosme Velho': array([-0.80901699,  0.58778526]), 'Urca': array([-9.99999988e-01, -7.27200340e-08]),
         # 'Leme': array([-0.80901693, -0.58778529]), 'São Conrado': array([-0.30901711, -0.95105646]), 'Vidigal': array([ 0.30901713, -0.95105646]),
@@ -169,8 +170,9 @@ class Modelo:
         #T = nx.balanced_tree(2, 5)
         #nx.spring_layout(self.grafo)
         
-        #pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
-        #print(pos)
+        pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
+        g = self.grafo
+        
         if tipo:
             mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
             
@@ -188,9 +190,8 @@ class Modelo:
         
             pos = graphviz_layout(g, prog="dot")
 
-        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-
+        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=25, node_size=300, clip_on=True) #fonte 6 nodesize 200
         plt.show()  
 
 
@@ -608,7 +609,7 @@ class Modelo:
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Largura e Profundidade FINAL.png", format="png", dpi=300)
+        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Largura e Profundidade 400 dias FINAL.png", format="png", dpi=300)
 
     def avançar_tempo(self, t):
         #self.printar_estados_vertices()
@@ -1377,6 +1378,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/zona sul/arquivo_final.txt"
 # "./txts/zona sul/adjacencias_zona_sul.txt"
 # "./txts/otimizado/adjacencias.txt"
+# "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_final = "./txts/normal (real)/arquivo_final.txt"
@@ -1397,27 +1399,14 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
 
-#m.avançar_tempo_movimentacao_dinamica(200)
+#m.avançar_tempo(200)
 #m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # m.arvores_vizinhas("largura")
 #m.printar_grafo()
 
-# m.gerar_grafos_arvore_largura(200, 1) # FEITO
-m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura") # FEITO
-# os.rename(SIRxTdeVerticesTXT_largura, "./Resultados/Graficos SIRxT arvores largura/SIR_vertice_por_tempo_LARGURA.txt")
-# os.rename(resultados_arvore_largura, "./Resultados/Graficos SIRxT arvores largura/resultados_arvore_largura.txt")
 
-# m.gerar_grafos_arvore_profundidade(200, 1) # FEITO
-# m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 200") # FEITO
-# os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
-# os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 200/resultados_arvore_profundidade.txt")
-
-# m.gerar_grafos_arvore_profundidade(400, 1) # FEITO
-#m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_profundidade, "profundidade 400") # FEITO
-# os.rename(SIRxTdeVerticesTXT_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/SIR_vertice_por_tempo_PROFUNDIDADE.txt")
-# os.rename(resultados_arvore_profundidade, "./Resultados/Graficos SIRxT arvores profundidade 400/resultados_arvore_profundidade.txt")
-
-# print(m.pico_infectados)
+#print(m.pico_infectados)
+#m.printar_grafo()
 #m.printar_grafico_SIRxTdeVerticesPizza()
 #m.printar_grafico_SIRxT()
 # m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
@@ -1425,7 +1414,7 @@ m.printar_grafico_SIRxTdeVerticesPizzaTXT(SIRxTdeVerticesTXT_largura, "largura")
 # print(m.pico_infectados)
 # m.printar_grafico_SIRxT()
 #m.arvores_vizinhas("profundidade")
-#m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
+m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 #m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
 #m.printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois()
 

@@ -9,16 +9,28 @@ OK Perguntar gerador grafo para colocar de exemplo
 OK rodar profundidade com 400+/600+ dias
 OK testar ate infectado chegar a 0
 OK gerar grafico do flamengo SIRT alongado e colocar do lado
+OK escrever explicando sobre as arvores, 
+OK substituir grafico de picos profundidade com novos tempos? (PERGUNTAR)
+OK Fazer alteraçoes texto
 
 
-escrever explicando sobre as arvores, arcos de retorno descendentes e cruzamento
-livros dasgupta e papadimitriou vazirani algorithms cap 3 
+PERGUNTAR:
+	Deixar explicaçao paqueta? pagina 3
+	t pertencente aos naturais deixar? Novo modelo foi implementado em outra funçao. pagina 4
+	Manter listagem dos metodos da classe? pagina 4
+	epsilon?
+	Questao de rodare por menos tempo, padronizaçao de graficos
+	Reecrever tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo)
+	4.2 Bsucas foram feitas ja com movimentaçao diaria
+	Coisas escritas papel
 
-substituir grafico de picos profundidade com novos tempos? (PERGUNTAR)
+
+arcos de retorno descendentes e cruzamento
+Explicar 2 fenomeno de novo (picos parecidos) pagina 13
+Terminar conclusao
+
 
 arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
-
-Fazer alteraçoes texto
 
 Fazer tabela de arvores (usar csv? para importar para excel facilmente)
 	arvore
