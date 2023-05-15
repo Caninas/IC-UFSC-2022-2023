@@ -10,6 +10,8 @@ from random import randint, random
 import multiprocessing as mp
 import ast
 import time
+import pandas as pd
+import openpyxl
 
 from Txt import Txt
 
@@ -157,6 +159,7 @@ class Modelo:
         fig = plt.figure(1)
         fig.set_size_inches(30, 10)
         plt.savefig(path, format="png", dpi=300)
+        plt.close()
 
     def printar_grafo(self, tipo=None):
         # # pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
@@ -197,10 +200,10 @@ class Modelo:
 
         # plt.figure(figsize=(10,8))
 
-        # #nx.draw(self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
-        # nx.draw(self.grafo, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        # #nx.draw( nx.draw(self.grafo, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
-        # plt.show()
+        # plt.show()self.grafo, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
+        #
 
     def printar_estado_vertice(self, vertice):
         print(f"{vertice}: {self.grafo.nodes[vertice]}")
@@ -388,6 +391,15 @@ class Modelo:
 
 
             for i in range(iteraçoes):
+                # qtd_arestas_iguais = 0            # qtd arestas iguais a saude
+                # if inicio == "Saúde":
+                #     self.arestas_primeira_arvore = (self.grafo.copy()).edges()
+                # else:
+                #     for aresta in self.grafo.edges():
+                #         if aresta in self.arestas_primeira_arvore:
+                #             qtd_arestas_iguais += 1
+                #print(self.grafo.nodes[inicio]["id"], "| Arestas iguais à Saúde:", qtd_arestas_iguais, "/158")
+
                 print("Inicio:", inicio, "/ Iteração:", i+1)
 
                 self.avançar_tempo_movimentacao_dinamica(tempo)
@@ -479,7 +491,16 @@ class Modelo:
             
 
             for i in range(iteraçoes):
-                print("Inicio:", inicio, "/ Iteração:", i+1)
+                # qtd_arestas_iguais = 0            # qtd arestas iguais a saude
+                # if inicio == "Saúde":
+                #     self.arestas_primeira_arvore = (self.grafo.copy()).edges()
+                # else:
+                #     for aresta in self.grafo.edges():
+                #         if aresta in self.arestas_primeira_arvore:
+                #             qtd_arestas_iguais += 1
+                #print(self.grafo.nodes[inicio]["id"], "| Arestas iguais à Saúde:", qtd_arestas_iguais, "/158")
+
+                print("\nInicio:", inicio, "| Iteração:", i+1)
 
                 self.avançar_tempo_movimentacao_dinamica(tempo)
                 print("Pico:", self.pico_infectados)
@@ -491,6 +512,7 @@ class Modelo:
             
             tempo_pico = tempo_pico / (i + 1)
             media = soma_pico / (i + 1)
+            #self.salvar_grafo_arvore(fr"C:\Users\rasen\Desktop\Resultados\arvores profundidade\{inicio}.png")
             self.resultados_arvore_profundidade.write(f"{self.grafo.nodes[inicio]['id']}, {tempo_pico}, {media}\n")      
             
             self.SIRxTdeVerticesTXT_profundidade.write(f"{inicio}, ")
@@ -1368,6 +1390,56 @@ class Modelo:
 
             self.t += 1
 
+    def printar_tabela_arvores(self):
+        SIRxTdeVerticesTXT_largura = open("./Resultados/SIR_vertice_por_tempo_LARGURA.txt", "r", encoding="utf-8")
+        SIRxTdeVerticesTXT_profundidade = open("./Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt", "r", encoding="utf-8")
+        resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
+        resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
+
+        tabela_profundidade = "./Resultados/tabela_arvores_profundidade.xlsx"
+        tabela_largura = "./Resultados/tabela_arvores_largura.xlsx"
+
+        resultados_lista = [x for x in range(160)]
+        wb = openpyxl.Workbook()
+        wb.create_sheet("Largura")
+
+        with pd.ExcelWriter(tabela_largura, engine="openpyxl") as writer:
+            writer.book = wb
+            lista_inicio = []
+            lista_resultados = []
+            for linha in resultadosL:
+                linha = linha.strip()
+
+                if linha == "":
+                    break
+
+                id, dia_pico, max_infect = linha.split(", ")
+                resultados_lista[int(id)] = [int(float(dia_pico)), int(float(max_infect))]
+
+            for linha in open("./Resultados/SIR_vertice_por_tempo_LARGURA.txt", "r", encoding="utf-8"):
+                inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
+                SIRxTdeVerticesTXT_largura = ast.literal_eval(dicionario_dados)
+
+                dia_fim = 0
+                terminou = False
+                print("Inicio:", inicio)
+                for t in range(1, 201):
+                    #print([SIRxT for SIRxT in SIRxTdeVerticesTXT_largura.values()])
+                    #print(SIRxTdeVerticesTXT_largura.values())
+                    # for SIRxT in SIRxTdeVerticesTXT_largura.values():
+                    #     print(all SIRxT[1])
+                    if all(int(SIRxT[t][1]) == 0 for SIRxT in SIRxTdeVerticesTXT_largura.values()):
+                        dia_fim = t
+                        print("FIM: ", t)
+                        break
+                lista_inicio.append(inicio)
+                lista_resultados.append([str(resultados_lista[self.grafo.nodes[inicio]["id"]][0]), str(dia_fim) if dia_fim else "200+", 0])
+
+                df = pd.DataFrame(lista_resultados,
+                            index=lista_inicio, columns=["Dia Pico", "Dia fim do espalhamento", "Largura pico"])
+                
+                df.to_excel(writer, sheet_name="Largura")
+
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
@@ -1399,6 +1471,10 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
 
+
+
+m.printar_tabela_arvores()
+
 #m.avançar_tempo(200)
 #m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # m.arvores_vizinhas("largura")
@@ -1414,7 +1490,8 @@ m = Modelo(arquivo_final)
 # print(m.pico_infectados)
 # m.printar_grafico_SIRxT()
 #m.arvores_vizinhas("profundidade")
-m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
+
+#m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 #m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
 #m.printar_grafico_ID_MAXINFECT_arvores_profundidade_antes_depois()
 

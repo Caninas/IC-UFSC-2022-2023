@@ -9,12 +9,15 @@ OK Perguntar gerador grafo para colocar de exemplo
 OK rodar profundidade com 400+/600+ dias
 OK testar ate infectado chegar a 0
 OK gerar grafico do flamengo SIRT alongado e colocar do lado
-OK escrever explicando sobre as arvores, 
+OK escrever explicando sobre as arvores
 OK substituir grafico de picos profundidade com novos tempos? (PERGUNTAR)
 OK Fazer alteraçoes texto
+OK Terminar conclusao
+OK Explicar 2 fenomeno de novo (picos parecidos) pagina 13
 
 
 PERGUNTAR:
+	Arcos de retorno, cruzamento e descendentes não contribui para explicaçao?
 	Deixar explicaçao paqueta? pagina 3
 	t pertencente aos naturais deixar? Novo modelo foi implementado em outra funçao. pagina 4
 	Manter listagem dos metodos da classe? pagina 4
@@ -25,11 +28,6 @@ PERGUNTAR:
 	Coisas escritas papel
 
 
-arcos de retorno descendentes e cruzamento
-Explicar 2 fenomeno de novo (picos parecidos) pagina 13
-Terminar conclusao
-
-
 arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
 
 Fazer tabela de arvores (usar csv? para importar para excel facilmente)
@@ -37,7 +35,7 @@ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
 	x
 	dia fim do espalhamento (analisar pelo SIRXTvertices)
 	dia pico	(resultados)
-	encontrar lagura pico diferença de modulo?
+	encontrar largura pico diferença de modulo?
 
 Ver modelo escrita SBPO
 
