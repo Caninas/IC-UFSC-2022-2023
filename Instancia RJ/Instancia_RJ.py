@@ -1400,11 +1400,11 @@ class Modelo:
         tabela_largura = "./Resultados/tabela_arvores_largura.xlsx"
 
         resultados_lista = [x for x in range(160)]
-        wb = openpyxl.Workbook()
-        wb.create_sheet("Largura")
+        #wb = openpyxl.Workbook()
+        #wb.create_sheet("Largura")
 
         with pd.ExcelWriter(tabela_largura, engine="openpyxl") as writer:
-            writer.book = wb
+            #writer.book = wb
             lista_inicio = []
             lista_resultados = []
             for linha in resultadosL:
@@ -1424,22 +1424,50 @@ class Modelo:
                 terminou = False
                 print("Inicio:", inicio)
                 for t in range(1, 201):
-                    #print([SIRxT for SIRxT in SIRxTdeVerticesTXT_largura.values()])
-                    #print(SIRxTdeVerticesTXT_largura.values())
-                    # for SIRxT in SIRxTdeVerticesTXT_largura.values():
-                    #     print(all SIRxT[1])
                     if all(int(SIRxT[t][1]) == 0 for SIRxT in SIRxTdeVerticesTXT_largura.values()):
                         dia_fim = t
                         print("FIM: ", t)
                         break
                 lista_inicio.append(inicio)
-                lista_resultados.append([str(resultados_lista[self.grafo.nodes[inicio]["id"]][0]), str(dia_fim) if dia_fim else "200+", 0])
+                lista_resultados.append([resultados_lista[self.grafo.nodes[inicio]["id"]][0], dia_fim if dia_fim else "200+", 0])
 
                 df = pd.DataFrame(lista_resultados,
                             index=lista_inicio, columns=["Dia Pico", "Dia fim do espalhamento", "Largura pico"])
                 
                 df.to_excel(writer, sheet_name="Largura")
 
+
+            lista_inicio = []
+            lista_resultados = []
+
+            for linha in resultadosP:
+                linha = linha.strip()
+
+                if linha == "":
+                    break
+
+                id, dia_pico, max_infect = linha.split(", ")
+                resultados_lista[int(id)] = [int(float(dia_pico)), int(float(max_infect))]
+
+            for linha in open("./Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt", "r", encoding="utf-8"):
+                inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
+                SIRxTdeVerticesTXT_largura = ast.literal_eval(dicionario_dados)
+
+                dia_fim = 0
+                terminou = False
+                print("Inicio:", inicio)
+                for t in range(1, 401):
+                    if all(int(SIRxT[t][1]) == 0 for SIRxT in SIRxTdeVerticesTXT_largura.values()):
+                        dia_fim = t
+                        print("FIM: ", t)
+                        break
+                lista_inicio.append(inicio)
+                lista_resultados.append([resultados_lista[self.grafo.nodes[inicio]["id"]][0], dia_fim if dia_fim else "400+", 0])
+
+                df = pd.DataFrame(lista_resultados,
+                            index=lista_inicio, columns=["Dia Pico", "Dia fim do espalhamento", "Largura pico"])
+                
+                df.to_excel(writer, sheet_name="Profundidade")
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
@@ -1473,7 +1501,7 @@ m = Modelo(arquivo_final)
 
 
 
-m.printar_tabela_arvores()
+#m.printar_tabela_arvores()
 
 #m.avançar_tempo(200)
 #m.avançar_tempo_movimentacao_dinamica_otimizado(200)
