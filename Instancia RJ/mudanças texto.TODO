@@ -1,0 +1,52 @@
+Alvaro:
+✔ dar espaço esquerda grafico picos, evidenciar o ponto original @done (5/15/2023, 8:45:12 PM)
+✔ fazer um sobrepor grafico com tanto em profundidade e largura pra comparar no final @done (5/15/2023, 8:45:14 PM)
+✔ colocar 3 momentos graficos pizza apos video explicando melhor cada vertice e os momentos @done (5/15/2023, 8:45:15 PM)
+✔ COLOCAR TITULO EM CADA GRAFICO TEMPO 1, 50, 200 @done (5/15/2023, 8:45:15 PM)
+✔ Perguntar gerador grafo para colocar de exemplo @done (5/15/2023, 8:45:57 PM)
+✔ rodar profundidade com 400+/600+ dias @done (5/15/2023, 8:45:16 PM)
+✔ testar ate infectado chegar a 0 @done (5/15/2023, 8:45:18 PM)
+✔ gerar grafico do flamengo SIRT alongado e colocar do lado @done (5/15/2023, 8:45:17 PM)
+✔ escrever explicando sobre as arvores @done (5/15/2023, 8:45:17 PM)
+✔ substituir grafico de picos profundidade com novos tempos? (PERGUNTAR) @done (5/15/2023, 8:45:17 PM)
+✔ Fazer alteraçoes texto @done (5/15/2023, 8:45:19 PM)
+✔ Terminar conclusao @done (5/15/2023, 8:45:19 PM)
+✔ Explicar 2 fenomeno de novo (picos parecidos) pagina 13 @done (5/15/2023, 8:45:20 PM)
+
+
+	PERGUNTAR:
+		☐ Arcos de retorno, cruzamento e descendentes não contribui para explicaçao?
+		☐ Deixar explicaçao paqueta? pagina 3
+		☐ t pertencente aos naturais deixar? Novo modelo foi implementado em outra funçao. pagina 4
+		☐ Manter listagem dos metodos da classe? pagina 4
+		☐ epsilon?
+		☐ Questao de rodar por menos tempo ate acabar infect, padronizaçao de graficos
+			(padronizar atraves da criaçao de novos dados com infect 0)
+		☐ Reecrever tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo)
+		☐ 4.2 Bsucas foram feitas ja com movimentaçao diaria
+		☐ Coisas escritas papel
+
+
+☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
+
+☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
+	arvore
+	x
+	dia fim do espalhamento (analisar pelo SIRXTvertices)
+	dia pico	(resultados)
+	encontrar largura pico diferença de modulo?
+
+☐ Ver modelo escrita SBPO
+
+☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
+
+
+Pricila:
+
+☐ Comparar numeros finais com formula derivada de cada SIR para calcular o erro
+☐ Trabalhar com grafo menor (pedir floripa)
+☐ Problema menor para validar os erros
+
+✔ Ajeitar grafo zona sul com e sem botafogo pra direita @done (5/15/2023, 8:45:39 PM)
+✔ Mandar pdf da explicação das fórmulas, grafos @done (5/15/2023, 8:45:41 PM)
+✔ Explicar Y do X @done (5/15/2023, 8:45:42 PM)
