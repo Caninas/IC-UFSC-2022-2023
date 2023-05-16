@@ -12,22 +12,32 @@ Alvaro:
 ✔ Fazer alteraçoes texto @done (5/15/2023, 8:45:19 PM)
 ✔ Terminar conclusao @done (5/15/2023, 8:45:19 PM)
 ✔ Explicar 2 fenomeno de novo (picos parecidos) pagina 13 @done (5/15/2023, 8:45:20 PM)
+✔ Arcos de retorno, cruzamento e descendentes não contribui para explicaçao? @done (5/16/2023, 6:06:26 PM)
+✔ t pertencente aos naturais deixar? Novo modelo foi implementado em outra funçao. pagina 4 @done (5/16/2023, 4:40:47 PM)
+✔ epsilon? @done (5/16/2023, 4:40:54 PM)
+✔ Questao de rodar por menos tempo ate acabar infect, padronizaçao de graficos @done (5/16/2023, 6:06:08 PM)
+✔ (padronizar atraves da criaçao de novos dados com infect 0) @done (5/16/2023, 6:06:16 PM)
 
 
 	PERGUNTAR:
-		☐ Arcos de retorno, cruzamento e descendentes não contribui para explicaçao?
-		☐ Deixar explicaçao paqueta? pagina 3
-		☐ t pertencente aos naturais deixar? Novo modelo foi implementado em outra funçao. pagina 4
-		☐ Manter listagem dos metodos da classe? pagina 4
-		☐ epsilon?
-		☐ Questao de rodar por menos tempo ate acabar infect, padronizaçao de graficos
-			(padronizar atraves da criaçao de novos dados com infect 0)
-		☐ Reecrever tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo)
-		☐ 4.2 Bsucas foram feitas ja com movimentaçao diaria
+		☐ 4.2 Bsucas foram feitas ja com movimentaçao diaria 
 		☐ Coisas escritas papel
-
-
+		
+☐ Reecrever tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM
+☐ Manter listagem dos metodos da classe? pagina 4
+☐ Deixar explicaçao paqueta? pagina 3 botar explicaçao barcos paradas etc
+☐ remover 200 de profundidade explicando q teve q ser feito para 400
+☐ botar varep em ep
+☐ botar link certo video, explicar link escrito
+☐ centralizar pagina 3 linha copacabana
+☐ grafico pizza mostrando pessoas q vieram de outros
+☐ grafo ciclo refazer apenas tirando arestas, botar os dois em forma circulo dois ciclos com botafogo ligando
 ☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
+☐ caminho cujas pontas dos caminhos sao vertices do ciclo ou entao caminhos que terao apenas uma das pontas do caminho no ciclo
+☐ tirar uma arestas de cada ciclo, fazer arvore testar
+☐ conexo com numero minimo de arestas
+☐ tabela pagina 14 com semelhanças fenomeno 3
+
 
 ☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
 	arvore
