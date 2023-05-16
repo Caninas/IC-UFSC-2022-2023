@@ -1153,7 +1153,6 @@ class Modelo:
     def arvores_vizinhas(self, tipo_arvore):
         self.grafo_original = self.grafo.copy()
         
-        menor_media = 99999999
         arvore = 0
         quant_arvores = len(self.grafo_original.nodes)
         
@@ -1178,9 +1177,7 @@ class Modelo:
 
             for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
                 vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
-        
 
-            #print(g.nodes(data=True))
 
             grafo_complemento = nx.complement(self.grafo).edges()
 
@@ -1191,7 +1188,7 @@ class Modelo:
                 self.encontrou_ciclo = False
                 ciclo = []
 
-                def busca_em_profundidade(k, anterior, visitados):          # achar ciclo
+                def achar_ciclo(k, anterior, visitados):          # achar ciclo
                     visitados.add(k)
                     for vizinho in self.grafo.edges(k):
                         if not self.encontrou_ciclo:
@@ -1203,9 +1200,18 @@ class Modelo:
                                     print("Encontrou ciclo:", end="")
                                     self.encontrou_ciclo = True
                                     break
-                                busca_em_profundidade(vizinho, anterior, visitados)
+                                achar_ciclo(vizinho, anterior, visitados)
 
-                busca_em_profundidade(u, anterior, visitados)
+                def achar_ciclo_a():
+                    # salvar niveis dos vertices na arvore (pair<nivel, vertice>)
+                    # busca em largura e profundidade linha 1170 - 1173
+                    # igualar niveis dos vertices v, u atraves dos anteriores 
+                    # depois ir voltando com os dois ate chegarem em um antecessor comum
+                    # salvar caminho de v em um array normal e de u em um array de forma inversa,
+                    # depois juntar colocando vertice igual no final do primeiro
+                    pass
+
+                achar_ciclo(u, anterior, visitados)
 
                 ciclo.append(v)
                 while True:                 # montar ciclo
@@ -1217,21 +1223,15 @@ class Modelo:
                     except:
                         break
 
-                # achar ciclo
-                # busca em profundidade com comparaçao atual == v
-                # ir salvando caminho até chegar no final, quando começar a voltar
-                # remover quando ele parar e entrar no if nao visitado
-                # a partir de onde parou +1 e começar montando dnv
-
                 print(ciclo)
                 self.printar_grafo("arvore")
                 #continue
                 self.grafo.add_edge(v, u)
 
-                for vertice in [v, u]:          # atualizar betas com nova aresta
+                for vertice in [v, u]:          # atualizar betas com a nova aresta
                     self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
 
-                #? rodar modelo com ciclo?
+                #! rodar modelo com ciclo
 
                 for indice in range(0, len(ciclo) - 1):    # loop arestas do ciclo (tirando v, u)
                     x = ciclo[indice]
@@ -1242,12 +1242,12 @@ class Modelo:
                     for vertice in [x, y]:          # atualizar betas com nova aresta
                         self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
             
-                    # rodar modelo
+                    #! rodar modelo
                     self.avançar_tempo_movimentacao_dinamica_otimizado()
                     # salvar SIRT (criar outro modelo com SIRT diferente pra cá e otimizado)
                     # salvar resultado (id, dia, pico)
                     
-                    # salvar grafico SIR (arvore com v, u sem x, y.png)
+                    # salvar graficos SIR (arvore com v, u sem x, y.png)
 
                     self.grafo.add_edge(x, y)
 
