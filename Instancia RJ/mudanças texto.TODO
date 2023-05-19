@@ -25,21 +25,24 @@ Alvaro:
 		
 		
 ✔ Deixar explicaçao paqueta? pagina 3 botar explicaçao barcos paradas etc @done (5/18/2023, 12:53:07 PM)
+✔ botar varep em ep @done (5/19/2023, 1:15:38 PM)
+✔ centralizar pagina 3 linha copacabana @done (5/19/2023, 1:06:03 PM)
+✔ remover 200 de profundidade explicando q teve q ser feito para 400 @done (5/19/2023, 1:42:38 PM)
 ☐ Reecrever tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM
-☐ Manter listagem dos metodos da classe? pagina 4
-☐ remover 200 de profundidade explicando q teve q ser feito para 400
-☐ botar varep em ep
+☐ Manter listagem dos metodos da classe? pagina 4 FAZENDO0
 ☐ botar link certo video, explicar link escrito
-☐ centralizar pagina 3 linha copacabana
 ☐ grafico pizza mostrando pessoas q vieram de outros
+
 ☐ grafo ciclo refazer apenas tirando arestas, botar os dois em forma circulo dois ciclos com botafogo ligando
-☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
 ☐ caminho cujas pontas dos caminhos sao vertices do ciclo ou entao caminhos que terao apenas uma das pontas do caminho no ciclo
 ☐ tirar uma arestas de cada ciclo, fazer arvore testar
 ☐ conexo com numero minimo de arestas
 ☐ tabela pagina 14 com semelhanças fenomeno 3
 
+☐ gerar graficos com novas legendas
 
+
+☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
 ☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
 	arvore
 	x

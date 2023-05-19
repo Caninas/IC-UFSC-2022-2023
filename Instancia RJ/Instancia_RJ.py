@@ -41,7 +41,7 @@ class Modelo:
         # variaveis globais, se aplicam a todos os vértices
         # retiradas da pagina 8 e 9 do artigo do modelo
 
-        self.frac_infect_inicial = 0.05      #2/15  # 400/3000
+        self.frac_infect_inicial = 0.05     # 400/3000 2/15  
 
         self.v = 91/200    # taxa_virulencia
         self.e = 29/200    # taxa_recuperaçao
@@ -564,11 +564,11 @@ class Modelo:
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        #ax.legend(["Grafo Normal", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
-        ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        #ax.legend(["Grafo Original", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
 
         plt.title(titulo)
-        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
+        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
@@ -623,10 +623,10 @@ class Modelo:
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Grafo Normal", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Original", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
 
         plt.title(titulo)
-        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
+        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
@@ -1137,11 +1137,11 @@ class Modelo:
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Grafo Normal", "Antes", "Depois"], loc='center right', bbox_to_anchor=(1.127, 0.5))
-        #ax.legend(["Grafo Normal", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Original", "Antes", "Depois"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        #ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
 
         plt.title(titulo)
-        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Real)')
+        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
@@ -1503,16 +1503,16 @@ m = Modelo(arquivo_final)
 
 #m.printar_tabela_arvores()
 
-#m.avançar_tempo(200)
+m.avançar_tempo_movimentacao_dinamica(200)
+m.printar_grafico_SIRxT()
+print(m.pico_infectados)
 #m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # m.arvores_vizinhas("largura")
 #m.printar_grafo()
 
 
-#print(m.pico_infectados)
 #m.printar_grafo()
 #m.printar_grafico_SIRxTdeVerticesPizza()
-#m.printar_grafico_SIRxT()
 # m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
 
 # print(m.pico_infectados)
