@@ -163,17 +163,33 @@ class Modelo:
 
     def printar_grafo(self, tipo=None):
         # # pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
-        # pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Glória': array([0.809017  , 0.58778526]), 'Catete': array([0.30901698, 0.95105655]),
-        # 'Laranjeiras': array([-0.30901702,  0.95105649]), 'Cosme Velho': array([-0.80901699,  0.58778526]), 'Urca': array([-9.99999988e-01, -7.27200340e-08]),
-        # 'Leme': array([-0.80901693, -0.58778529]), 'São Conrado': array([-0.30901711, -0.95105646]), 'Vidigal': array([ 0.30901713, -0.95105646]),
-        # 'Leblon': array([ 0.80901694, -0.58778529]),
-        # 'Gávea': (0, -0.2), 'Flamengo': (0, 0.4), 'Botafogo': (-0.5, 0.2), 'Humaitá': (0.25, 0.1), 'Copacabana': (-0.2, -0.5),
-        # 'Lagoa': (0.4, -0.25), 'Jardim Botânico': (0.6, 0.6), 'Rocinha': (0.7, 0.1)}
+        pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Copacabana': array([0.809017  , 0.58778526]), 'Botafogo': array([0.30901698, 0.95105655]),
+        'Humaitá': array([-0.30901702,  0.95105649]), 'Jardim Botânico': array([-0.80901699,  0.58778526]), 'Gávea': array([-9.99999988e-01, -7.27200340e-08]),
+        'Rocinha': array([-0.80901693, -0.58778529]), 'São Conrado': array([-0.30901711, -0.95105646]), 'Vidigal': array([ 0.30901713, -0.95105646]),
+        'Leblon': array([ 0.80901694, -0.58778529])}
 
         #T = nx.balanced_tree(2, 5)
-        #nx.spring_layout(self.grafo)
         
-        pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
+        
+        #pos = nx.circular_layout(self.grafo.subgraph(["São Conrado", "Rocinha", "Gávea", "Vidigal", "Leblon", "Ipanema", "Copacabana", "Jardim Botânico", "Humaitá", "Botafogo"]))
+        #pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
+        #pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Urca': array([0.57723837, 0.07557802]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586])}
+        pos2 = {'Glória': array([1.65, 3]), 'Catete': array([1.15, 4]), 'Laranjeiras': array([0.65, 3]), 'Flamengo': array([1.5, 2])}#nx.circular_layout(self.grafo.subgraph(['Flamengo', 'Laranjeiras', 'Glória', 'Catete']))
+        #print(pos2)
+
+        pos_b = array([0.5, 1.5])
+        #pos_relativa = dict()
+        print(pos)
+
+        for bairro, posiçao in pos.items():
+            print(posiçao[1])
+            if bairro != "Botafogo":
+                pos[bairro][0] = pos_b[0] + (posiçao[0] - pos["Botafogo"][0])
+                pos[bairro][1] = pos_b[1] + (posiçao[1] - pos["Botafogo"][1])
+        pos["Botafogo"] = pos_b
+        pos3 = { 'Lagoa': array([0, 0]), 'Cosme Velho': array([1.45, 2.65]), 'Leme': array([0, 0]), 'Urca': array([0.9,  2.15])}
+        #pos2 = {'Glória': array([3, 3]), 'Flamengo': array([0.70710678, 0.70710677]), 'Catete': array([-1.73863326e-08,  9.99999992e-01]), 'Laranjeiras': array([-9.99999947e-01, -6.90443471e-08])}
+        pos = {**pos2, **pos, **pos3}
         g = self.grafo
         
         if tipo:
@@ -194,7 +210,7 @@ class Modelo:
             pos = graphviz_layout(g, prog="dot")
 
 
-        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=25, node_size=300, clip_on=True) #fonte 6 nodesize 200
+        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=20, node_size=400, clip_on=True) #fonte 6 nodesize 200
         plt.show()  
 
 
@@ -1471,8 +1487,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1480,8 +1496,8 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/otimizado/adjacencias.txt"
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
-arquivo_adjacencias = "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
-arquivo_final = "./txts/normal (real)/arquivo_final.txt"
+arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
+arquivo_final = "./Txts\outros\zona sul modificada ciclos/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1503,12 +1519,12 @@ m = Modelo(arquivo_final)
 
 #m.printar_tabela_arvores()
 
-m.avançar_tempo_movimentacao_dinamica(200)
-m.printar_grafico_SIRxT()
-print(m.pico_infectados)
+#m.avançar_tempo_movimentacao_dinamica(200)
+#m.printar_grafico_SIRxT()
+#print(m.pico_infectados)
 #m.avançar_tempo_movimentacao_dinamica_otimizado(200)
 # m.arvores_vizinhas("largura")
-#m.printar_grafo()
+m.printar_grafo()
 
 
 #m.printar_grafo()
