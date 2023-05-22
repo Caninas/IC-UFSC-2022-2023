@@ -17,32 +17,32 @@ Alvaro:
 ✔ epsilon? @done (5/16/2023, 4:40:54 PM)
 ✔ Questao de rodar por menos tempo ate acabar infect, padronizaçao de graficos @done (5/16/2023, 6:06:08 PM)
 ✔ (padronizar atraves da criaçao de novos dados com infect 0) @done (5/16/2023, 6:06:16 PM)
-
-
-	PERGUNTAR:
-		☐ 4.2 Bsucas foram feitas ja com movimentaçao diaria 
-		☐ Coisas escritas papel
-		
-		
 ✔ Deixar explicaçao paqueta? pagina 3 botar explicaçao barcos paradas etc @done (5/18/2023, 12:53:07 PM)
 ✔ botar varep em ep @done (5/19/2023, 1:15:38 PM)
 ✔ centralizar pagina 3 linha copacabana @done (5/19/2023, 1:06:03 PM)
 ✔ remover 200 de profundidade explicando q teve q ser feito para 400 @done (5/19/2023, 1:42:38 PM)
-☐ Reecrever tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM
-☐ Manter listagem dos metodos da classe? pagina 4 FAZENDO0
-☐ botar link certo video, explicar link escrito
+✔ botar link certo video, explicar link escrito @done (5/21/2023, 1:15:18 AM)
+✔ Manter listagem dos metodos da classe? pagina 4 FAZENDO0 @done (5/21/2023, 1:15:37 AM)
+✔ caminho cujas pontas dos caminhos sao vertices do ciclo ou entao caminhos que terao apenas uma das pontas do caminho no ciclo @done (5/21/2023, 1:26:12 AM)
+✔ grafo ciclo refazer apenas tirando arestas, botar os dois em forma circulo dois ciclos com botafogo ligando @done (5/21/2023, 1:26:00 AM)
+
+
+	PERGUNTAR:
+		✔ 4.2 Bsucas foram feitas ja com movimentaçao diaria @done (5/21/2023, 1:28:39 AM)
+		☐ Coisas escritas papel
+		
+☐ Reecrever OK tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM
 ☐ grafico pizza mostrando pessoas q vieram de outros
 
-☐ grafo ciclo refazer apenas tirando arestas, botar os dois em forma circulo dois ciclos com botafogo ligando
-☐ caminho cujas pontas dos caminhos sao vertices do ciclo ou entao caminhos que terao apenas uma das pontas do caminho no ciclo
-☐ tirar uma arestas de cada ciclo, fazer arvore testar
-☐ conexo com numero minimo de arestas
-☐ tabela pagina 14 com semelhanças fenomeno 3
+☐ tirar uma arestas de cada ciclo, fazer arvore testar ( conexo com numero minimo de arestas? )
+☐ tabela pagina 14 com semelhanças arestas fenomeno 3
 
 ☐ gerar graficos com novas legendas
 
 
 ☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
+☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
+
 ☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
 	arvore
 	x
@@ -52,16 +52,14 @@ Alvaro:
 
 ☐ Ver modelo escrita SBPO
 
-☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
-
 
 Pricila:
 
-✔ colocar referencia livro hethcote primeiro artigo @done (5/18/2023, 4:58:55 PM)
 ☐ Comparar numeros finais com formula derivada de cada SIR para calcular o erro
 ☐ Trabalhar com grafo menor (pedir floripa)
 ☐ Problema menor para validar os erros
-
+	
 ✔ Ajeitar grafo zona sul com e sem botafogo pra direita @done (5/15/2023, 8:45:39 PM)
 ✔ Mandar pdf da explicação das fórmulas, grafos @done (5/15/2023, 8:45:41 PM)
+✔ colocar referencia livro hethcote primeiro artigo @done (5/18/2023, 4:58:55 PM)
 ✔ Explicar Y do X @done (5/15/2023, 8:45:42 PM)
