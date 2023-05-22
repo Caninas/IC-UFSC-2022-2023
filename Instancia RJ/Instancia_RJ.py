@@ -576,13 +576,11 @@ class Modelo:
         plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         resultados_lista.pop(0)
 
-        #plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
         plt.gca().set_prop_cycle('color', ['0d66a3'])
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        #ax.legend(["Grafo Original", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
-        ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.130, 0.5))
 
         plt.title(titulo)
         ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
@@ -590,7 +588,8 @@ class Modelo:
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores {tipo_arvore.title()} FINAL.png", format="png", dpi=300)
+        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores {tipo_arvore.title()} FINAL.png", format="png", dpi=300)
+        plt.close()
 
     def printar_grafico_ID_MAXINFECT_arvores_largura_profundidade(self):
 
@@ -640,7 +639,7 @@ class Modelo:
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Grafo Original", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Original", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.130, 0.5))
 
         plt.title(titulo)
         ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
@@ -648,7 +647,7 @@ class Modelo:
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
-        plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Largura e Profundidade 400 dias FINAL.png", format="png", dpi=300)
+        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade 400 dias FINAL.png", format="png", dpi=300)
 
     def avançar_tempo(self, t):
         #self.printar_estados_vertices()
@@ -1156,7 +1155,7 @@ class Modelo:
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Grafo Original", "Antes", "Depois"], loc='center right', bbox_to_anchor=(1.127, 0.5))
+        ax.legend(["Grafo Original", "Antes", "Depois"], loc='center right', bbox_to_anchor=(1.130, 0.5))
         #ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.127, 0.5))
 
         plt.title(titulo)
@@ -1410,8 +1409,8 @@ class Modelo:
             self.t += 1
 
     def printar_tabela_arvores(self):
-        SIRxTdeVerticesTXT_largura = open("./Resultados/SIR_vertice_por_tempo_LARGURA.txt", "r", encoding="utf-8")
-        SIRxTdeVerticesTXT_profundidade = open("./Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt", "r", encoding="utf-8")
+        #SIRxTdeVerticesTXT_largura = open("./Resultados/SIR_vertice_por_tempo_LARGURA.txt", "r", encoding="utf-8")
+        #SIRxTdeVerticesTXT_profundidade = open("./Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt", "r", encoding="utf-8")
         resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
         resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
 
@@ -1419,11 +1418,11 @@ class Modelo:
         tabela_largura = "./Resultados/tabela_arvores_largura.xlsx"
 
         resultados_lista = [x for x in range(160)]
-        #wb = openpyxl.Workbook()
-        #wb.create_sheet("Largura")
+        wb = openpyxl.Workbook()
+        wb.create_sheet("Largura")
 
         with pd.ExcelWriter(tabela_largura, engine="openpyxl") as writer:
-            #writer.book = wb
+            writer.book = wb
             lista_inicio = []
             lista_resultados = []
             for linha in resultadosL:
@@ -1435,20 +1434,50 @@ class Modelo:
                 id, dia_pico, max_infect = linha.split(", ")
                 resultados_lista[int(id)] = [int(float(dia_pico)), int(float(max_infect))]
 
+
             for linha in open("./Resultados/SIR_vertice_por_tempo_LARGURA.txt", "r", encoding="utf-8"):
                 inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
                 SIRxTdeVerticesTXT_largura = ast.literal_eval(dicionario_dados)
 
+                infectados_em_t = []
                 dia_fim = 0
+
+                largura_pico = 0
+                pico_terminou = False
+                pico = 0
+
                 terminou = False
                 print("Inicio:", inicio)
-                for t in range(1, 201):
-                    if all(int(SIRxT[t][1]) == 0 for SIRxT in SIRxTdeVerticesTXT_largura.values()):
+                for t in range(1, 401):
+                    infectados_vertices = [int(SIRxT[t][1]) for SIRxT in SIRxTdeVerticesTXT_largura.values()]
+
+                    soma_infectados = sum(infectados_vertices)
+                    infectados_em_t.append(soma_infectados)
+
+                    if t == resultados_lista[self.grafo.nodes[inicio]["id"]][0]:
+                        print("a")
+                        tempo = t
+                        while abs(infectados_em_t[tempo-1] - infectados_em_t[tempo-2]) > 5000:
+                            largura_pico += 1
+                            tempo -= 1
+
+                        tempo = t
+                        infectados_em_t2 = []
+                        soma_infectados = sum([int(SIRxT[tempo][1]) for SIRxT in SIRxTdeVerticesTXT_largura.values()])
+                        infectados_em_t2.append(soma_infectados)
+
+                        while abs(infectados_em_t2[tempo-t] - sum([int(SIRxT[tempo+1][1]) for SIRxT in SIRxTdeVerticesTXT_largura.values()])) > 5000:
+                            largura_pico += 1
+                            tempo += 1
+
+
+                    print(f"{t}:", abs(infectados_em_t[t-1] - infectados_em_t[t-2]), "t-2:", infectados_em_t[t-2], "t-1:", infectados_em_t[t-1])
+                    if soma_infectados == 0:
                         dia_fim = t
                         print("FIM: ", t)
                         break
                 lista_inicio.append(inicio)
-                lista_resultados.append([resultados_lista[self.grafo.nodes[inicio]["id"]][0], dia_fim if dia_fim else "200+", 0])
+                lista_resultados.append([resultados_lista[self.grafo.nodes[inicio]["id"]][0], dia_fim if dia_fim else "200+", largura_pico])
 
                 df = pd.DataFrame(lista_resultados,
                             index=lista_inicio, columns=["Dia Pico", "Dia fim do espalhamento", "Largura pico"])
@@ -1470,13 +1499,13 @@ class Modelo:
 
             for linha in open("./Resultados/SIR_vertice_por_tempo_PROFUNDIDADE.txt", "r", encoding="utf-8"):
                 inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
-                SIRxTdeVerticesTXT_largura = ast.literal_eval(dicionario_dados)
+                SIRxTdeVerticesTXT_profundidade = ast.literal_eval(dicionario_dados)
 
                 dia_fim = 0
                 terminou = False
                 print("Inicio:", inicio)
                 for t in range(1, 401):
-                    if all(int(SIRxT[t][1]) == 0 for SIRxT in SIRxTdeVerticesTXT_largura.values()):
+                    if all(int(SIRxT[t][1]) == 0 for SIRxT in SIRxTdeVerticesTXT_profundidade.values()):
                         dia_fim = t
                         print("FIM: ", t)
                         break
@@ -1500,7 +1529,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final = "./Txts\outros\zona sul/arquivo_final.txt"
+arquivo_final = "./Txts/normal (real)/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1517,13 +1546,12 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
-print(len(m.grafo.nodes()))
-for bairro in m.grafo.nodes():
-    m.vertice_de_inicio = bairro
-    m.avançar_tempo_movimentacao_dinamica(200, False)
-    print(f"Inicio {bairro}: {m.pico_infectados}")
+# print(len(m.grafo.nodes()))
+# for bairro in m.grafo.nodes():
+#     m.vertice_de_inicio = bairro
+#     m.avançar_tempo_movimentacao_dinamica(200, False)
+#     print(f"Inicio {bairro}: {m.pico_infectados}")
 
-arquivo_final = "./Txts\outros\zona sul modificada ciclos/arquivo_final.txt"
 #m.printar_tabela_arvores()
 
 #m.avançar_tempo_movimentacao_dinamica(200)
@@ -1531,8 +1559,11 @@ arquivo_final = "./Txts\outros\zona sul modificada ciclos/arquivo_final.txt"
 #print(m.pico_infectados)
 # m.arvores_vizinhas("largura")
 
+# m.printar_grafico_ID_MAXINFECT_arvore(tipo_arvore="largura")
+# m.printar_grafico_ID_MAXINFECT_arvore(tipo_arvore="profundidade")
+# m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
-
+m.printar_tabela_arvores()
 
 #m.printar_grafo()
 #m.printar_grafico_SIRxTdeVerticesPizza()

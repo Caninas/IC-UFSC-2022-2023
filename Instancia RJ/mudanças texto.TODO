@@ -25,9 +25,12 @@ Alvaro:
 ✔ Manter listagem dos metodos da classe? pagina 4 FAZENDO0 @done (5/21/2023, 1:15:37 AM)
 ✔ caminho cujas pontas dos caminhos sao vertices do ciclo ou entao caminhos que terao apenas uma das pontas do caminho no ciclo @done (5/21/2023, 1:26:12 AM)
 ✔ grafo ciclo refazer apenas tirando arestas, botar os dois em forma circulo dois ciclos com botafogo ligando @done (5/21/2023, 1:26:00 AM)
+✔ gerar graficos com novas legendas @done (5/22/2023, 2:24:01 PM)
 
 
 	PERGUNTAR:
+		☐ Largura pico é apenas o do maior? diferença n funciona pois o pico quando chega no pico a diferença de t para t-1 é pequena
+			☐ andar frente e tras ate diferença ficar maior que 5000 e so depois contabilizar >5000 para terminar.
 		✔ 4.2 Bsucas foram feitas ja com movimentaçao diaria @done (5/21/2023, 1:28:39 AM)
 		☐ Coisas escritas papel
 		
@@ -37,7 +40,6 @@ Alvaro:
 ☐ tirar uma arestas de cada ciclo, fazer arvore testar ( conexo com numero minimo de arestas? )
 ☐ tabela pagina 14 com semelhanças arestas fenomeno 3
 
-☐ gerar graficos com novas legendas
 
 
 ☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
