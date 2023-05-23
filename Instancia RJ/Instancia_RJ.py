@@ -1515,11 +1515,46 @@ class Modelo:
                             index=lista_inicio, columns=["Dia Pico", "Dia fim do espalhamento", "Largura pico"])
                 
                 df.to_excel(writer, sheet_name="Profundidade")
+
+    def montar_tabela_zona_sul_ciclos(self):
+        bairros_fora_ciclo = ("Cosme Velho", "Urca", "Lagoa", "Leme")
+        lista_resultados = []
+        inicios = []
+        tabela_largura = "./Resultados/tabela_remoçao_arestas.xlsx"
+
+        wb = openpyxl.Workbook()
+        wb.create_sheet("Teste")
+
+        with pd.ExcelWriter(tabela_largura, engine="openpyxl") as writer:
+            writer.book = wb
+        lista_resultados.append([])
+
+        df = pd.DataFrame(lista_resultados,
+                    index=inicios, columns=colunas)
+        
+        df.to_excel(writer, sheet_name="Profundidade")
+        txt_resultados = open("Resultados")
+        colunas = []
+        g = self.grafo.copy()
+        for inicio in self.grafo.nodes():
+            inicios.append(inicio)
+            lista_resultados.append([])
+            self.vertice_de_inicio = inicio
+            for arestaA, arestaB in self.grafo.edges():
+                if arestaA not in bairros_fora_ciclo and arestaB not in bairros_fora_ciclo:
+                    g.remove_edge(arestaA, arestaB)
+                    self.avançar_tempo_movimentacao_dinamica(200)
+                
+                    lista_resultados[-1].append(self.pico_infectados)
+                    if len(colunas) != 19:
+                        colunas.append(f"{arestaA}-{arestaB}")
+                    
+                    g.add_edge(arestaA, arestaB)
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1528,7 +1563,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final = "./Txts/outros\zona sul modificada ciclos/arquivo_final_minimal_3.txt"
+arquivo_final = "./Txts/outros\zona sul modificada ciclos/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1553,10 +1588,11 @@ m.vertice_de_inicio = "Jardim Botânico"
 
 #m.printar_tabela_arvores()
 
+m.montar_tabela_zona_sul_ciclos()
 m.avançar_tempo_movimentacao_dinamica(200)
 #m.printar_grafico_SIRxT()
 print(m.pico_infectados)
-#m.printar_grafo("zonasul")
+m.printar_grafo("zonasul")
 # m.arvores_vizinhas("largura")
 
 # m.printar_grafico_ID_MAXINFECT_arvore(tipo_arvore="largura")
