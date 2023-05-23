@@ -163,35 +163,34 @@ class Modelo:
 
     def printar_grafo(self, tipo=None):
         # # pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
-        pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Copacabana': array([0.809017  , 0.58778526]), 'Botafogo': array([0.30901698, 0.95105655]),
-        'Humaitá': array([-0.30901702,  0.95105649]), 'Jardim Botânico': array([-0.80901699,  0.58778526]), 'Gávea': array([-9.99999988e-01, -7.27200340e-08]),
-        'Rocinha': array([-0.80901693, -0.58778529]), 'São Conrado': array([-0.30901711, -0.95105646]), 'Vidigal': array([ 0.30901713, -0.95105646]),
-        'Leblon': array([ 0.80901694, -0.58778529])}
 
-        #T = nx.balanced_tree(2, 5)
+        if tipo == "zonasul":
+            pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Copacabana': array([0.809017  , 0.58778526]), 'Botafogo': array([0.30901698, 0.95105655]),
+            'Humaitá': array([-0.30901702,  0.95105649]), 'Jardim Botânico': array([-0.80901699,  0.58778526]), 'Gávea': array([-9.99999988e-01, -7.27200340e-08]),
+            'Rocinha': array([-0.80901693, -0.58778529]), 'São Conrado': array([-0.30901711, -0.95105646]), 'Vidigal': array([ 0.30901713, -0.95105646]),
+            'Leblon': array([ 0.80901694, -0.58778529])}
+            pos2 = {'Glória': array([1, 3.5]), 'Catete': array([0, 3.5]), 'Laranjeiras': array([0, 2.5]), 'Flamengo': array([1, 2.5])}
+            pos3 = { 'Lagoa': array([-0.15, 0.8]), 'Cosme Velho': array([0.5, 3]), 'Leme': array([0.6, 0.5]), 'Urca': array([0.5,  2.3])}
+            pos_b = array([0.5, 1.5])
+            print(pos)
+
+            for bairro, posiçao in pos.items():
+                if bairro != "Botafogo":
+                    pos[bairro][0] = pos_b[0] + (posiçao[0] - pos["Botafogo"][0])
+                    pos[bairro][1] = pos_b[1] + (posiçao[1] - pos["Botafogo"][1])
+            pos["Botafogo"] = pos_b
+            #pos2 = {'Glória': array([3, 3]), 'Flamengo': array([0.70710678, 0.70710677]), 'Catete': array([-1.73863326e-08,  9.99999992e-01]), 'Laranjeiras': array([-9.99999947e-01, -6.90443471e-08])}
+            pos = {**pos2, **pos, **pos3}
         
+        #T = nx.balanced_tree(2, 5)
         
         #pos = nx.circular_layout(self.grafo.subgraph(["São Conrado", "Rocinha", "Gávea", "Vidigal", "Leblon", "Ipanema", "Copacabana", "Jardim Botânico", "Humaitá", "Botafogo"]))
         #pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Botafogo': array([0.31947341, 0.18126152]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Humaitá': array([-0.04907372,  0.02847084]), 'Copacabana': array([ 0.11292418, -0.20412333]), 'Urca': array([0.57723837, 0.07557802]), 'Jardim Botânico': array([-0.34296672, -0.06957464]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586]), 'Ipanema': array([-0.13604816, -0.39443646]), 'Leblon': array([-0.42540793, -0.42112642]), 'Gávea': array([-0.55692957, -0.28087638]), 'Vidigal': array([-0.72900454, -0.46273238]), 'Rocinha': array([-0.8624544 , -0.36491218]), 'São Conrado': array([-1.        , -0.51200198])}
         #pos = {'Flamengo': array([0.6043461, 0.4442784]), 'Laranjeiras': array([0.45074005, 0.55273503]), 'Glória': array([0.8534418 , 0.58982338]), 'Catete': array([0.68333495, 0.64406827]), 'Cosme Velho': array([0.42134842, 0.85813163]), 'Urca': array([0.57723837, 0.07557802]), 'Lagoa': array([-0.2287956 , -0.22462745]), 'Leme': array([ 0.30783336, -0.43993586])}
-        pos2 = {'Glória': array([1, 3.5]), 'Catete': array([0, 3.5]), 'Laranjeiras': array([0, 2.5]), 'Flamengo': array([1, 2.5])}#nx.circular_layout(self.grafo.subgraph(['Flamengo', 'Laranjeiras', 'Glória', 'Catete']))
-        #print(pos2)
-        pos3 = { 'Lagoa': array([-0.15, 0.8]), 'Cosme Velho': array([0.5, 3]), 'Leme': array([0.6, 0.5]), 'Urca': array([0.5,  2.3])}
 
-        pos_b = array([0.5, 1.5])
-        #pos_relativa = dict()
-        print(pos)
-
-        for bairro, posiçao in pos.items():
-            if bairro != "Botafogo":
-                pos[bairro][0] = pos_b[0] + (posiçao[0] - pos["Botafogo"][0])
-                pos[bairro][1] = pos_b[1] + (posiçao[1] - pos["Botafogo"][1])
-        pos["Botafogo"] = pos_b
-        #pos2 = {'Glória': array([3, 3]), 'Flamengo': array([0.70710678, 0.70710677]), 'Catete': array([-1.73863326e-08,  9.99999992e-01]), 'Laranjeiras': array([-9.99999947e-01, -6.90443471e-08])}
-        pos = {**pos2, **pos, **pos3}
         g = self.grafo
         
-        if tipo:
+        if tipo == "arvore":
             mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}
             
             g = nx.relabel_nodes(self.grafo, mapping)
@@ -1529,7 +1528,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final = "./Txts/normal (real)/arquivo_final.txt"
+arquivo_final = "./Txts/outros\zona sul modificada ciclos/arquivo_final_minimal_3.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1546,26 +1545,26 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
+m.vertice_de_inicio = "Jardim Botânico"
 # print(len(m.grafo.nodes()))
 # for bairro in m.grafo.nodes():
-#     m.vertice_de_inicio = bairro
 #     m.avançar_tempo_movimentacao_dinamica(200, False)
 #     print(f"Inicio {bairro}: {m.pico_infectados}")
 
 #m.printar_tabela_arvores()
 
-#m.avançar_tempo_movimentacao_dinamica(200)
+m.avançar_tempo_movimentacao_dinamica(200)
 #m.printar_grafico_SIRxT()
-#print(m.pico_infectados)
+print(m.pico_infectados)
+#m.printar_grafo("zonasul")
 # m.arvores_vizinhas("largura")
 
 # m.printar_grafico_ID_MAXINFECT_arvore(tipo_arvore="largura")
 # m.printar_grafico_ID_MAXINFECT_arvore(tipo_arvore="profundidade")
 # m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
-m.printar_tabela_arvores()
+#m.printar_tabela_arvores()
 
-#m.printar_grafo()
 #m.printar_grafico_SIRxTdeVerticesPizza()
 # m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
 
