@@ -1,6 +1,7 @@
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
+from matplotlib.patches import ConnectionPatch
 import pydot
 from networkx.drawing.nx_pydot import graphviz_layout
 import numpy as np
@@ -54,8 +55,9 @@ class Modelo:
         self.lambda_R = 3/5
 
         # diz se o SIR que não respeita distanciamento esta ou nao em seu vertice original
-        self.juntos = True
+        self.juntos = False
         self.isolados = False
+        self.edges_isoladas = []
 
         self.array_top_populaçao = []
 
@@ -95,7 +97,8 @@ class Modelo:
                 SIRdd={"S": S2pontos, "I": I2pontos, "R": 0},
                 SIRddd={},       # SIR ESTRANGEIRO (SIRdd de outros) #
                 SIRdddantes={},
-                beta=float(beta))
+                beta=float(beta),
+                isolado=False)
             g.add_edges_from(adj)
 
         return g
@@ -127,7 +130,7 @@ class Modelo:
             self.tempos = []
             self.t = 1
             self.pico_infectados = 0
-            self.juntos = True
+            #self.juntos = True
 
     def estimar_tempo_restante(self, percorrido, total):
         if percorrido:
@@ -240,7 +243,7 @@ class Modelo:
         plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        if path:
+        if x:
             plt.xlim(left=1, right=len(x))
             plt.plot(x, y)
         else:
@@ -252,14 +255,15 @@ class Modelo:
         ax.set_ylabel('Pessoas')
 
 
-        if not path:
-            plt.show()
-            #plt.close()
-        else:
+        if path and not x:
+            plt.savefig(path, format="png", bbox_inches='tight')
+        elif x:
             inicio = path.split("\\")[-1]
             plt.title(f'Raiz: {inicio.split(".png")[0]}')
             plt.savefig(path, format="png", bbox_inches='tight')
-            plt.close()
+        else:
+            plt.show()
+        plt.close()
 
     def mergesort(self, array):
         if len(array) > 1:
@@ -306,33 +310,48 @@ class Modelo:
             
             self.mergesort(self.array_top_populaçao)
             
-            for i in range(len(self.array_top_populaçao)):
-                self.array_top_populaçao[i] = pop[self.array_top_populaçao[i]]
+            self.array_top_populaçao = [pop[self.array_top_populaçao[i]] for i in range(self.quantidade_bairros_selecionados)]
 
         if not self.isolados and not self.juntos:
-            print("Isolando vértices!")
+            print("Isolando vértices!:", self.array_top_populaçao)
+
             for bairro in self.array_top_populaçao:
+                self.grafo.nodes[bairro]["isolado"] = True
+
                 for vizinho, populaçao_de_fora in self.grafo.nodes[bairro]["SIRddd"].items():   # mandar a pop de outros de dentro para fora
-                    self.grafo.nodes[vizinho]["SIRdd"]["S"] += populaçao_de_fora["S"]
-                    populaçao_de_fora["S"] = 0
+                    #print(vizinho,populaçao_de_fora)
+                    try:
+                        self.grafo.nodes[vizinho]["SIRdd"]["S"] += populaçao_de_fora["S"]
+                        populaçao_de_fora["S"] = 0
 
-                    self.grafo.nodes[vizinho]["SIRdd"]["I"] += populaçao_de_fora["I"]
-                    populaçao_de_fora["I"] = 0
+                        self.grafo.nodes[vizinho]["SIRdd"]["I"] += populaçao_de_fora["I"]
+                        populaçao_de_fora["I"] = 0
 
-                    self.grafo.nodes[vizinho]["SIRdd"]["R"] += populaçao_de_fora["R"]
-                    populaçao_de_fora["R"] = 0
+                        self.grafo.nodes[vizinho]["SIRdd"]["R"] += populaçao_de_fora["R"]
+                        populaçao_de_fora["R"] = 0
+                    except:
+                        pass
 
+                for vizinho in self.grafo.edges(bairro):
+                    self.edges_isoladas.append(vizinho)
+
+                self.grafo.remove_edges_from(self.edges_isoladas)
 
                 for vizinho in self.grafo.edges(bairro):            # receber pop de fora de volta
-                    self.grafo.nodes[bairro]["SIRdd"]["S"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["S"]
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["S"] = 0
 
-                    self.grafo.nodes[bairro]["SIRdd"]["I"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["I"]
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["I"] = 0
+                    try:
+                        self.grafo.nodes[bairro]["SIRdd"]["S"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["S"]
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["S"] = 0
 
-                    self.grafo.nodes[bairro]["SIRdd"]["R"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["R"]
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["R"] = 0
+                        self.grafo.nodes[bairro]["SIRdd"]["I"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["I"]
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["I"] = 0
 
+                        self.grafo.nodes[bairro]["SIRdd"]["R"] += self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["R"]
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][bairro]["R"] = 0
+                    except:
+                        pass
+
+            
             self.isolados = True
 
         else:
@@ -342,20 +361,26 @@ class Modelo:
             
             print("Tirando isolamento!")
 
+            for aresta in self.edges_isoladas:
+                self.grafo.add_edge(*aresta)
+            
+            self.edges_isoladas = []
+
             for bairro in self.array_top_populaçao:
                 nome = bairro
                 atributos = self.grafo.nodes[nome]
+                atributos["isolado"] = False
 
-                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
-                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
-                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+                # S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                # I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                # R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
 
-                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+                # atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                # atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                # atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
 
-                for vizinho in self.grafo.edges(nome):
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+                # for vizinho in self.grafo.edges(nome):
+                #     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
 
             self.isolados = False
 
@@ -758,42 +783,74 @@ class Modelo:
     def avançar_tempo_movimentacao_dinamica(self, t, printar=True):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
 
-        self.resetar_grafo()
+        #self.resetar_grafo()
         for tempo in range(t):
             if printar:
                 print(self.t)
             # distribuiçao de pessoas
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
-
-                try:
-                    self.SIRxTdeVertices[nome][self.t] = [
-                        atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
-                        atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
-                        atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
-                    ]
-                except:
-                    self.SIRxTdeVertices[nome] = dict()
-                    self.SIRxTdeVertices[nome][self.t] = [
-                        atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
-                        atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
-                        atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
-                    ]
-
-
-                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
-                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
-                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
-
-                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+                if not atributos["isolado"]:
+                    try:
+                        self.SIRxTdeVertices[nome][self.t] = [[
+                            [atributos["SIRd"]["S"], atributos["SIRdd"]["S"]],
+                            [atributos["SIRd"]["I"], atributos["SIRdd"]["I"]],
+                            [atributos["SIRd"]["R"], atributos["SIRdd"]["R"]],
+                            [atributos["SIRddd"].copy()]
+                        ]]
+                    except:
+                        self.SIRxTdeVertices[nome] = dict()
+                        self.SIRxTdeVertices[nome][self.t] = [[
+                            [atributos["SIRd"]["S"], atributos["SIRdd"]["S"]],
+                            [atributos["SIRd"]["I"], atributos["SIRdd"]["I"]],
+                            [atributos["SIRd"]["R"], atributos["SIRdd"]["R"]],
+                            [atributos["SIRddd"].copy()]
+                        ]]
+                        # self.SIRxTdeVertices[nome][self.t] = [
+                        #     atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
+                        #     atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
+                        #     atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
+                        # ]
 
 
-                for vizinho in self.grafo.edges(nome):
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+                    S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                    I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                    R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                    atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                    atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                    atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
 
 
+                    for vizinho in self.grafo.edges(nome):
+                        if not self.grafo.nodes[vizinho[1]]["isolado"]:
+                            self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+                        else:
+                            self.grafo.nodes[vizinho[1]]["SIRddd"] = {}
+                            atributos["SIRdd"]["S"] += S_2pontos_saindo
+                            atributos["SIRdd"]["I"] += I_2pontos_saindo
+                            atributos["SIRdd"]["R"] += R_2pontos_saindo
+
+                    #try:
+                    # except:
+                    #     self.SIRxTdeVertices[nome] = dict()
+                    #     self.SIRxTdeVertices[nome][self.t].append([
+                    #         [atributos["SIRd"]["S"], atributos["SIRdd"]["S"]],
+                    #         [atributos["SIRd"]["I"], atributos["SIRdd"]["I"]],
+                    #         [atributos["SIRd"]["R"], atributos["SIRdd"]["R"]],
+                    #         [atributos["SIRddd"]]
+                    #     ])
+
+            for node in list(self.grafo.nodes(data=True)):
+                nome, atributos = node
+                #print(nome,  [atributos["SIRddd"]])
+                self.SIRxTdeVertices[nome][self.t].append([
+                        [atributos["SIRd"]["S"], atributos["SIRdd"]["S"]],
+                        [atributos["SIRd"]["I"], atributos["SIRdd"]["I"]],
+                        [atributos["SIRd"]["R"], atributos["SIRdd"]["R"]],
+                        [atributos["SIRddd"].copy()]
+                    ])
+                
             self.tempos.append(self.t)
 
             for node in list(self.grafo.nodes(data=True)):
@@ -804,10 +861,12 @@ class Modelo:
                 atributos["SIRdddantes"]["S"] = atributos["SIRdddantes"]["I"] = atributos["SIRdddantes"]["R"] = 0
 
                 for vizinho in atributos["SIRddd"].values():
-                    atributos["SIRdddantes"]["S"] += vizinho["S"]
-                    atributos["SIRdddantes"]["I"] += vizinho["I"]
-                    atributos["SIRdddantes"]["R"] += vizinho["R"]
-
+                    try:
+                        atributos["SIRdddantes"]["S"] += vizinho["S"]
+                        atributos["SIRdddantes"]["I"] += vizinho["I"]
+                        atributos["SIRdddantes"]["R"] += vizinho["R"]
+                    except:
+                        pass
             self.SIRs.append([])
             soma_SIR = [0, 0, 0]
 
@@ -844,18 +903,21 @@ class Modelo:
 
                 # prob de acontecer um encontro de Sddd (estrangeiros) com Infectados nesse vertice
                 # (do ponto de vista do vertice vizinho = Ypi -> j = Ypj, ou seja, do ponto de vista desse vertice = Ypi)
-                for vizinho in atributos["SIRddd"].values():                # SIR t+1 vizinhos
-                    X_2pontos_ji = 0
+                
+                if not atributos["isolado"]:
+                    for vizinho, atributos_v in atributos["SIRddd"].items():                # SIR t+1 vizinhos
+                        if not self.grafo.nodes[vizinho]["isolado"]:
+                            X_2pontos_ji = 0
 
-                    for i in range(vizinho["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
-                        X_2pontos_ji += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
-                        
-                    recuperados_novos_ddd = ceil(self.e * vizinho["I"])
+                            for i in range(atributos_v["S"]):       # calculo do numero de encontros na pop de suscetiveis que vem de outros vertices
+                                X_2pontos_ji += random() < Y_ponto                                            # baseado na probabilidade de Y_2pontos
+                                
+                            recuperados_novos_ddd = ceil(self.e * atributos_v["I"])
 
-                    vizinho["S"] = vizinho["S"] - floor(self.v * X_2pontos_ji)
-                    vizinho["I"] = vizinho["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ji)
-                    vizinho["R"] = vizinho["R"] + recuperados_novos_ddd
-        
+                            atributos_v["S"] = atributos_v["S"] - floor(self.v * X_2pontos_ji)
+                            atributos_v["I"] = atributos_v["I"] - recuperados_novos_ddd + floor(self.v * X_2pontos_ji)
+                            atributos_v["R"] = atributos_v["R"] + recuperados_novos_ddd
+                
                 # SIR t+1 SIRponto e SIR2pontos
                 recuperados_novos_d = ceil(self.e * atributos["SIRd"]["I"])
                 recuperados_novos_dd = ceil(self.e * atributos["SIRdd"]["I"])
@@ -870,6 +932,8 @@ class Modelo:
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
+            if self.SIRs[self.t-1][1] - self.SIRs[self.t-2][1] > 5000:
+                print("diferença maior que 5000")
 
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.tempo_pico = self.t
@@ -1520,19 +1584,12 @@ class Modelo:
         bairros_fora_ciclo = ("Cosme Velho", "Urca", "Lagoa", "Leme")
         lista_resultados = []
         inicios = []
-        tabela_largura = "./Resultados/tabela_remoçao_arestas.xlsx"
+        tabela_ciclos_zs = "./Resultados/tabela_remoçao_arestas.xlsx"
 
         wb = openpyxl.Workbook()
         wb.create_sheet("Teste")
 
-        with pd.ExcelWriter(tabela_largura, engine="openpyxl") as writer:
-            writer.book = wb
-        lista_resultados.append([])
 
-        df = pd.DataFrame(lista_resultados,
-                    index=inicios, columns=colunas)
-        
-        df.to_excel(writer, sheet_name="Profundidade")
         txt_resultados = open("Resultados")
         colunas = []
         g = self.grafo.copy()
@@ -1540,6 +1597,7 @@ class Modelo:
             inicios.append(inicio)
             lista_resultados.append([])
             self.vertice_de_inicio = inicio
+
             for arestaA, arestaB in self.grafo.edges():
                 if arestaA not in bairros_fora_ciclo and arestaB not in bairros_fora_ciclo:
                     g.remove_edge(arestaA, arestaB)
@@ -1550,11 +1608,124 @@ class Modelo:
                         colunas.append(f"{arestaA}-{arestaB}")
                     
                     g.add_edge(arestaA, arestaB)
+        
+        with pd.ExcelWriter(tabela_ciclos_zs, engine="openpyxl") as writer:
+            writer.book = wb
+
+            df = pd.DataFrame(lista_resultados,
+                        index=inicios, columns=colunas)
+        
+        df.to_excel(writer, sheet_name="Profundidade")
+
+
+    def printar_grafico_SIR_t0_VerticePizza(self, path=None):
+        vertice = "Botafogo"
+        dia = 40
+
+
+        sir_t0_antes = self.SIRxTdeVertices[vertice][dia][0]
+        sir_t0_depois = self.SIRxTdeVertices[vertice][dia][1]
+
+
+        #plt.style.use('_mpl-gallery-nogrid')
+        #os.mkdir(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\figs\{tipo}\inicio {inicio}")
+        y_grafico = []
+        
+        y_grafico.append([0,0,0])
+        #print(inicio, "imagem", t)
+        #coluna = 0
+        #linha = 0
+
+        fig = plt.figure(1)
+        fig.set_size_inches([15, 7.5])
+        #ax1 = fig.add_subplot(131)
+        ax2 = fig.add_subplot(121)
+        ax2.set_title(f"Vértice {vertice} dia {dia}", fontdict={"size":18}, pad=60)
+        ax3 = fig.add_subplot(122)
+
+        #ax1.axis('off')
+        ax2.axis('off')
+        ax3.axis('off')
+
+        # #ax1.set_title("Flamengo em t0 antes esplhamento")
+        # colors = ["blue", "#0C46E8", "#33691E", "#39AB33", "#BF1900", "red"]
+        # labels = [r"$\mathcal{\dot{S}}$", r"$\mathcal{\ddot{S}}$", r"$\mathcal{\dot{I}}$", r"$\mathcal{\ddot{I}}$", r"$\mathcal{\dot{R}}$", r"$\mathcal{\ddot{R}}$"]
+        # x1 = [sir_t0_antes[0][0], sir_t0_antes[0][1], sir_t0_antes[1][0], sir_t0_antes[1][1], sir_t0_antes[2][0], sir_t0_antes[2][1]]
+        # total1 = sum(x1)
+        # ax1.pie(x1, colors=colors, radius=6, center=(4, 4), textprops={'fontsize': 18},
+        #         autopct=lambda p: '{:.0f}'.format(p * total1 / 100), wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True, labels=labels)
+        
+
+        Sddd = Iddd = Rddd = 0
+
+        bottom = 1
+        width = 0.2
+
+        for j, (bairro, dici) in enumerate(reversed(sir_t0_depois[3][0].items())):
+            Sddd += dici["S"]
+            Iddd += dici["I"]
+            Rddd += dici["R"]
+
+            bottom -= dici["S"]
+            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color='#0C46E8',
+                    alpha=0.1 + 0.25 * j)
+            ax3.bar_label(bc, labels=[f"{dici['S']}"], label_type='center')
+
+
+        ax3.set_title('Bairros vizinhos', fontdict={"size":18})
+        ax3.legend(fontsize=15)
+        ax3.set_xlim(- 2.5 * width, 2.5 * width)
+
+
+
+        #colors_depois = ["blue", "#0202a6", "#3b96ff", "#1aa103", "#0e6100", "#55eb3b", "red", "#8c0000", "#f73e3e"]
+        colors_depois = ["blue", "#0C46E8", "#0D8CFF", "#33691E", "#39AB33", "#6AC230", "#BF1900", "red", "#f73e3e"]
+        labels_depois = [r"$\mathcal{\dot{S}}$", r"$\mathcal{\ddot{S}}$", r"$\mathcal{\dddot{S}}$", r"$\mathcal{\dot{I}}$", r"$\mathcal{\ddot{I}}$", r"$\mathcal{\dddot{I}}$", r"$\mathcal{\dot{R}}$", r"$\mathcal{\ddot{R}}$", r"$\mathcal{\dddot{R}}$"]
+        x2 = [sir_t0_depois[0][0], sir_t0_depois[0][1], Sddd, sir_t0_depois[1][0], sir_t0_depois[1][1], Iddd, sir_t0_depois[2][0], sir_t0_depois[2][1], Rddd]
+        total2 = sum(x2)
+
+        angle = -360 * ((sir_t0_depois[0][0] + sir_t0_depois[0][1] + Sddd/2) / total2)
+        explode = [0, 0, 1.5, 0, 0, 0, 0, 0, 0]
+
+        wedges, *_ = ax2.pie(x2, colors=colors_depois, radius=6, center=(4, 4), textprops={'fontsize': 18}, startangle=angle, explode=explode,
+                autopct=lambda p: '{:.0f}'.format(p * total2 / 100), wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True, labels=labels_depois)
+
+        theta1, theta2 = wedges[2].theta1, wedges[2].theta2
+        center, r = wedges[2].center, wedges[2].r
+        bar_height = Sddd
+
+        # draw top connecting line
+        #(x, y - (2*np.pi*r)*(Sddd/2.5 / total2)),
+        x = r * np.cos(np.pi / 180 * theta1) + center[0]
+        y = r * np.sin(np.pi / 180 * theta1) + center[1]
+        con = ConnectionPatch(xyA=(- width / 2, -bar_height), xyB=(x, y),
+                            coordsA=ax3.transData, coordsB=ax2.transData)
+        con.set_color([0, 0, 0])
+        con.set_linewidth(3)
+        ax2.add_artist(con)
+
+        # draw bottom connecting line
+        #(x, y + (2*np.pi*r)*(Sddd/2.5 / total2))
+        x = r * np.cos(np.pi / 180 * theta2) + center[0]
+        y = r * np.sin(np.pi / 180 * theta2) + center[1]
+        con = ConnectionPatch(xyA=(- width / 2, 0), xyB=(x, y), coordsA=ax3.transData,
+                            coordsB=ax2.transData)
+        con.set_color([0, 0, 0])
+        ax3.add_artist(con)
+        con.set_linewidth(3)
+
+        plt.savefig(path, format="png", dpi=300)
+        plt.show()
+        plt.close()
+
+
+
+        
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1563,7 +1734,7 @@ os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia 
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final = "./Txts/outros\zona sul modificada ciclos/arquivo_final.txt"
+arquivo_final = "./Txts/outros\zona sul modificada ciclos/arquivo_final_minimal_3.txt" #"./txts/normal (real)/arquivo_final.txt"   
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1580,19 +1751,55 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
-m.vertice_de_inicio = "Jardim Botânico"
+m.vertice_de_inicio = "Flamengo"
+m.resetar_grafo()
+
 # print(len(m.grafo.nodes()))
 # for bairro in m.grafo.nodes():
 #     m.avançar_tempo_movimentacao_dinamica(200, False)
 #     print(f"Inicio {bairro}: {m.pico_infectados}")
 
 #m.printar_tabela_arvores()
+#m.montar_tabela_zona_sul_ciclos()
 
-m.montar_tabela_zona_sul_ciclos()
-m.avançar_tempo_movimentacao_dinamica(200)
-#m.printar_grafico_SIRxT()
-print(m.pico_infectados)
-m.printar_grafo("zonasul")
+#print(m.grafo.edges())
+
+m.avançar_tempo_movimentacao_dinamica(40)
+m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png")
+
+
+# print(m.tempo_pico)
+# print(m.pico_infectados)
+# m.printar_grafico_SIRxT()
+# m.printar_grafo("zonasul")
+
+
+## ! teste isolamento
+# pico_antigo = 73
+# duraçao_ciclo = pico_antigo // 10
+# dia_aumento_significativo = 18
+
+# vezes = (pico_antigo - dia_aumento_significativo) // duraçao_ciclo
+# dias_sobrando = (pico_antigo - dia_aumento_significativo) % duraçao_ciclo
+
+# m.avançar_tempo_movimentacao_dinamica(dia_aumento_significativo)
+
+# for dia in range(vezes):
+#     m.isolar_vertices_mais_populosos()
+#     m.avançar_tempo_movimentacao_dinamica(duraçao_ciclo)
+
+# m.avançar_tempo_movimentacao_dinamica(dias_sobrando)
+# print("tejnpo :",m.t)
+# if m.isolados == True:
+#     m.isolar_vertices_mais_populosos()
+
+# m.avançar_tempo_movimentacao_dinamica(200 - m.t + 1)
+
+# print(m.tempo_pico)
+# print(m.pico_infectados)
+## ! fim teste isolamento
+
+
 # m.arvores_vizinhas("largura")
 
 # m.printar_grafico_ID_MAXINFECT_arvore(tipo_arvore="largura")
