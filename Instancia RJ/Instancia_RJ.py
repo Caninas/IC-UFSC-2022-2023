@@ -867,6 +867,7 @@ class Modelo:
                         atributos["SIRdddantes"]["R"] += vizinho["R"]
                     except:
                         pass
+
             self.SIRs.append([])
             soma_SIR = [0, 0, 0]
 
@@ -1618,9 +1619,8 @@ class Modelo:
         df.to_excel(writer, sheet_name="Profundidade")
 
 
-    def printar_grafico_SIR_t0_VerticePizza(self, path=None):
-        vertice = "Botafogo"
-        dia = 40
+    def printar_grafico_SIR_t0_VerticePizza(self, path=None, dia=1, v="Flamengo"):
+        vertice = v
 
 
         sir_t0_antes = self.SIRxTdeVertices[vertice][dia][0]
@@ -1667,10 +1667,9 @@ class Modelo:
             Rddd += dici["R"]
 
             bottom -= dici["S"]
-            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color='#0C46E8',
-                    alpha=0.1 + 0.25 * j)
+            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color="red",
+                    alpha=0.1 + (1/len(sir_t0_depois[3][0].items())) * j)
             ax3.bar_label(bc, labels=[f"{dici['S']}"], label_type='center')
-
 
         ax3.set_title('Bairros vizinhos', fontdict={"size":18})
         ax3.legend(fontsize=15)
@@ -1680,7 +1679,7 @@ class Modelo:
 
         #colors_depois = ["blue", "#0202a6", "#3b96ff", "#1aa103", "#0e6100", "#55eb3b", "red", "#8c0000", "#f73e3e"]
         colors_depois = ["blue", "#0C46E8", "#0D8CFF", "#33691E", "#39AB33", "#6AC230", "#BF1900", "red", "#f73e3e"]
-        labels_depois = [r"$\mathcal{\dot{S}}$", r"$\mathcal{\ddot{S}}$", r"$\mathcal{\dddot{S}}$", r"$\mathcal{\dot{I}}$", r"$\mathcal{\ddot{I}}$", r"$\mathcal{\dddot{I}}$", r"$\mathcal{\dot{R}}$", r"$\mathcal{\ddot{R}}$", r"$\mathcal{\dddot{R}}$"]
+        labels_depois = [r"$\dot{S}$", r"$\ddot{S}$", r"$\dddot{S}$", r"$\dot{I}$", r"$\ddot{I}$", r"$\dddot{I}$", r"$\dot{R}$", r"$\ddot{R}$", r"$\dddot{R}$"]
         x2 = [sir_t0_depois[0][0], sir_t0_depois[0][1], Sddd, sir_t0_depois[1][0], sir_t0_depois[1][1], Iddd, sir_t0_depois[2][0], sir_t0_depois[2][1], Rddd]
         total2 = sum(x2)
 
@@ -1724,8 +1723,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1734,7 +1733,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final = "./Txts/outros\zona sul modificada ciclos/arquivo_final_minimal_3.txt" #"./txts/normal (real)/arquivo_final.txt"   
+arquivo_final =  "./txts/normal (real)/arquivo_final.txt"#   "./Txts/outros\zona sul modificada ciclos/arquivo_final_minimal_3.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1764,13 +1763,13 @@ m.resetar_grafo()
 
 #print(m.grafo.edges())
 
-m.avançar_tempo_movimentacao_dinamica(40)
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png")
+m.avançar_tempo_movimentacao_dinamica(10)
+m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=10, v="Flamengo")
 
 
 # print(m.tempo_pico)
 # print(m.pico_infectados)
-# m.printar_grafico_SIRxT()
+# m.printar_grafico_SIRxT() 
 # m.printar_grafo("zonasul")
 
 
