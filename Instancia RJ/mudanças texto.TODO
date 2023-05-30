@@ -47,17 +47,27 @@ Alvaro:
 
 
 
-☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
-☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
 
 ☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
-	arvore
-	x
-	dia fim do espalhamento (analisar pelo SIRXTvertices)
-	dia pico	(resultados)
-	encontrar largura pico modulo
+arvore
+x
+dia fim do espalhamento (analisar pelo SIRXTvertices)
+dia pico	(resultados)
+encontrar largura pico modulo
 
-☐ Ver modelo escrita SBPO
+✔ Ver modelo escrita SBPO @done (5/30/2023, 4:59:20 PM)
+
+
+☐ passar para modelo SBPO
+☐ pedir grafo florianopolis
+	☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
+	☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
+☐ mudar grafico pizza novo
+	☐ fazer comparação antes e depois movimentaçao
+☐ grafico SIRT original zona sul X grafico minimal
+
+☐ grafico boxplot, revisar
+
 
 
 Pricila:

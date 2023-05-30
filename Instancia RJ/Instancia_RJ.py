@@ -1667,7 +1667,7 @@ class Modelo:
             Rddd += dici["R"]
 
             bottom -= dici["S"]
-            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color="red",
+            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color="C0",
                     alpha=0.1 + (1/len(sir_t0_depois[3][0].items())) * j)
             ax3.bar_label(bc, labels=[f"{dici['S']}"], label_type='center')
 
@@ -1763,8 +1763,8 @@ m.resetar_grafo()
 
 #print(m.grafo.edges())
 
-m.avançar_tempo_movimentacao_dinamica(10)
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=10, v="Flamengo")
+m.avançar_tempo_movimentacao_dinamica(40)
+m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=40, v="Flamengo")
 
 
 # print(m.tempo_pico)
