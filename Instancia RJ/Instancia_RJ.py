@@ -1761,12 +1761,11 @@ class Modelo:
                 self.grafo.add_edge(arestaA1, arestaB1)
 
             arquivo_log.write(f"{inicio}: [{pico_infectados}, {colunas}]\n")
-            print(colunas[pico_infectados.index(min(pico_infectados))])
             df = pd.DataFrame(pico_infectados)
             sns.boxplot(data=df, width=0.5, fliersize=10, color="red")
-            print(plt.xticks())
             sns.swarmplot(data=df)
             plt.savefig(f"{path}/{inicio}.png", format="png", dpi=300)
+            plt.close()
 
         
 #? Escrever resultados etc
