@@ -13,6 +13,7 @@ import ast
 import time
 import pandas as pd
 import openpyxl
+import seaborn as sns
 
 from Txt import Txt
 
@@ -234,7 +235,7 @@ class Modelo:
                 f"        SIRdd:  {self.grafo.nodes[vertice]['SIRdd']}\n"
                 f"        SIRddd:  {self.grafo.nodes[vertice]['SIRddd']}")
 
-    def printar_grafico_SIRxT(self, x=None, y=None, path=None):
+    def  printar_grafico_SIRxT(self, x=None, y=None, path=None):
         fig = plt.figure(1)#.set_fig
         ax = fig.add_subplot(111)
         fig.set_size_inches([9, 6])
@@ -933,7 +934,7 @@ class Modelo:
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
-            if self.SIRs[self.t-1][1] - self.SIRs[self.t-2][1] > 5000:
+            if self.SIRs[self.t-1][1] - self.SIRs[self.t-2][1] > 5000 and printar:
                 print("diferença maior que 5000")
 
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
@@ -1640,7 +1641,7 @@ class Modelo:
         fig.set_size_inches([15, 7.5])
         #ax1 = fig.add_subplot(131)
         ax2 = fig.add_subplot(121)
-        ax2.set_title(f"Vértice {vertice} dia {dia}", fontdict={"size":18}, pad=60)
+        ax2.set_title(f"Vértice {vertice} no dia {dia}", fontdict={"size":18}, pad=60)
         ax3 = fig.add_subplot(122)
 
         #ax1.axis('off')
@@ -1667,7 +1668,7 @@ class Modelo:
             Rddd += dici["R"]
 
             bottom -= dici["S"]
-            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color="C0",
+            bc = ax3.bar(0, dici["S"], width, bottom=bottom, label=bairro, color="#0D8CFF",
                     alpha=0.1 + (1/len(sir_t0_depois[3][0].items())) * j)
             ax3.bar_label(bc, labels=[f"{dici['S']}"], label_type='center')
 
@@ -1717,14 +1718,62 @@ class Modelo:
         plt.show()
         plt.close()
 
+    def boxplot_zs_minimal_retirada_arestas(self, path):
+        bairros_fora_ciclo = ("Cosme Velho", "Urca", "Lagoa", "Leme")
+        pico_infectados = []
+        arestas_removidas = []
+        ciclo1 = [('Flamengo', "Botafogo"), ('Flamengo', "Glória"), ("Glória", "Catete"), ("Catete", "Laranjeiras"), ("Botafogo", "Laranjeiras")]
+        ciclo2 = [('Botafogo', 'Humaitá'), ('Botafogo', 'Copacabana'), ('Humaitá', 'Jardim Botânico'), ('Copacabana', 'Ipanema'), ('Jardim Botânico', 'Gávea'), ('Ipanema', 'Leblon'), ('Leblon', 'Vidigal'), ('Vidigal', 'São Conrado'), ('Gávea', 'Rocinha'), ('Rocinha', 'São Conrado')]
 
+        inicios = []
+
+        g = self.grafo.copy()
+        arquivo_log = open(f"{path}/dados_boxplot.txt", "w", encoding="utf-8")
+        for inicio in self.grafo.nodes():
+            pico_infectados = []
+            colunas = []
+            inicios.append(inicio)
+            
+            print("Inicio:", inicio)
+            self.vertice_de_inicio = inicio
+
+            for arestaA1, arestaB1 in ciclo1:
+                print(f"{arestaA1}-{arestaB1}")
+                self.grafo.remove_edge(arestaA1, arestaB1)
+
+                for arestaA2, arestaB2 in ciclo2:
+                    print(f"    {arestaA2}-{arestaB2}", end=" ")
+                    self.grafo.remove_edge(arestaA2, arestaB2)
+
+                    for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
+                        vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
+
+                    self.avançar_tempo_movimentacao_dinamica(200, False)
+                
+                    pico_infectados.append(self.pico_infectados)
+                    print(self.pico_infectados)
+                    colunas.append(f"{arestaA1}-{arestaB1} {arestaA2}-{arestaB2}")
+
+
+                    self.grafo.add_edge(arestaA2, arestaB2)
+                    self.resetar_grafo()
+
+                self.grafo.add_edge(arestaA1, arestaB1)
+
+            arquivo_log.write(f"{inicio}: [{pico_infectados}, {colunas}]\n")
+            print(colunas[pico_infectados.index(min(pico_infectados))])
+            df = pd.DataFrame(pico_infectados)
+            sns.boxplot(data=df, width=0.5, fliersize=10, color="red")
+            print(plt.xticks())
+            sns.swarmplot(data=df)
+            plt.savefig(f"{path}/{inicio}.png", format="png", dpi=300)
 
         
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1733,7 +1782,7 @@ os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia 
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final =  "./txts/normal (real)/arquivo_final.txt"#   "./Txts/outros\zona sul modificada ciclos/arquivo_final_minimal_3.txt"
+arquivo_final =   "./Txts/outros\zona sul modificada ciclos/arquivo_final.txt"#"./txts/normal (real)/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1763,14 +1812,14 @@ m.resetar_grafo()
 
 #print(m.grafo.edges())
 
-m.avançar_tempo_movimentacao_dinamica(40)
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=40, v="Flamengo")
-
+#m.printar_grafo("zonasul")
+#m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
+m.boxplot_zs_minimal_retirada_arestas(r"C:\Users\rasen\Desktop")
 
 # print(m.tempo_pico)
-# print(m.pico_infectados)
-# m.printar_grafico_SIRxT() 
-# m.printar_grafo("zonasul")
+#print(m.pico_infectados)
+#print(m.grafo.edges())
+#m.printar_grafico_SIRxT(path=r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Grafico SIRxT zs original.png") 
 
 
 ## ! teste isolamento
