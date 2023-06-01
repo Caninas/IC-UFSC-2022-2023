@@ -26,26 +26,28 @@ Alvaro:
 ✔ caminho cujas pontas dos caminhos sao vertices do ciclo ou entao caminhos que terao apenas uma das pontas do caminho no ciclo @done (5/21/2023, 1:26:12 AM)
 ✔ grafo ciclo refazer apenas tirando arestas, botar os dois em forma circulo dois ciclos com botafogo ligando @done (5/21/2023, 1:26:00 AM)
 ✔ gerar graficos com novas legendas @done (5/22/2023, 2:24:01 PM)
-
+✔ Ver modelo escrita SBPO @done (5/30/2023, 4:59:20 PM)
+✔ passar para modelo SBPO @done (5/31/2023, 2:02:29 PM)
+✔ pedir grafo florianopolis @done (5/31/2023, 2:02:30 PM)
+✔ grafico boxplot, revisar @done (5/31/2023, 9:21:04 PM)
+✔ grafico SIRT original zona sul X grafico minimal @done (5/31/2023, 2:02:54 PM)
 
 	PERGUNTAR:
-		☐ Largura pico é apenas o do maior? diferença n funciona pois o pico quando chega no pico a diferença de t para t-1 é pequena
-			☐ andar frente e tras ate diferença ficar maior que 5000 e so depois contabilizar >5000 para terminar.
 		✔ 4.2 Bsucas foram feitas ja com movimentaçao diaria @done (5/21/2023, 1:28:39 AM)
-		☐ Coisas escritas papel
+		✔ Coisas escritas papel @done (6/1/2023, 12:39:16 AM)
+		✔ atualizar drive apagar olds @done (5/23/2023, 1:23:29 PM)
+		✔ tirar uma arestas de cada ciclo, fazer arvore testar ( conexo com numero minimo de arestas? ) @done (5/23/2023, 2:19:47 PM)
+		✔ quanto mais linear melhor. vertice de inicio com conexao a uma ponta tambem é melhor @done (5/28/2023, 1:26:20 AM)
+		✔ Reecrever OK tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM @done (5/28/2023, 1:26:34 AM)
+		✔ grafico pizza mostrando pessoas q vieram de outros @done (5/29/2023, 6:08:49 PM)
 
-✔ atualizar drive apagar olds @done (5/23/2023, 1:23:29 PM)
-✔ tirar uma arestas de cada ciclo, fazer arvore testar ( conexo com numero minimo de arestas? ) @done (5/23/2023, 2:19:47 PM)
-✔ quanto mais linear melhor. vertice de inicio com conexao a uma ponta tambem é melhor @done (5/28/2023, 1:26:20 AM)
-
-
-✔ Reecrever OK tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM @done (5/28/2023, 1:26:34 AM)
-
-✔ grafico pizza mostrando pessoas q vieram de outros @done (5/29/2023, 6:08:49 PM)
+		
+		
+		
+☐ Largura pico é apenas o do maior? diferença n funciona pois o pico quando chega no pico a diferença de t para t-1 é pequena
+	☐ andar frente e tras ate diferença ficar maior que 5000 e so depois contabilizar >5000 para terminar.
 
 ☐ tabela pagina 14 com semelhanças arestas fenomeno 3
-
-
 
 
 ☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
@@ -55,14 +57,10 @@ dia fim do espalhamento (analisar pelo SIRXTvertices)
 dia pico	(resultados)
 encontrar largura pico modulo
 
-✔ Ver modelo escrita SBPO @done (5/30/2023, 4:59:20 PM)
 
 
-✔ passar para modelo SBPO @done (5/31/2023, 2:02:29 PM)
-✔ pedir grafo florianopolis @done (5/31/2023, 2:02:30 PM)
-✔ grafico boxplot, revisar @done (5/31/2023, 9:21:04 PM)
-✔ grafico SIRT original zona sul X grafico minimal @done (5/31/2023, 2:02:54 PM)
 
+☐ aumentar fonte grafo rj completo figura 2
 ☐ terminar algoritmo heuristica
 	☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
 	☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo

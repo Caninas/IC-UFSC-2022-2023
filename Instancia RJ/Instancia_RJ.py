@@ -49,7 +49,6 @@ class Modelo:
         self.e = 29/200    # taxa_recuperaçao
 
         self.alpha = 2/5        # fraçao de pessoas que respeitam o distanciamento, fator de distanciamento
-                                # aplicado por vertice ou globalmente
 
         self.lambda_S = 2/5       # fraçao de pessoas que respeitam distanciamento mas precisam sair (podem ser infectados)
         self.lambda_I = 1/10      
