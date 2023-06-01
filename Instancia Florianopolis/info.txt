@@ -1,0 +1,23 @@
+Estou te mandando os dois grafos de Florianópolis que usei, de 12 e 16 vértices. Os dois estão num formato tipo:
+N M
+S0 S1 S2 ... S(N-1)
+I0 I1 I2 I3 ... I(N-1)
+com N sendo o número de vértices, M o número de arcos, e S e I representando o número de suscetíveis para cada vértice.
+Logo depois seguem M linhas 
+u v beta
+indicando um arco de u para v com o valor beta. Para cada arco u, v também aparece um arco v, u no arquivo.
+
+
+Caso você queira criar um grafo diferente, também estou incluindo os dados que usei numa pasta própria.
+
+tabela1552_clean.txt contém os valores de população para os bairros, extraídos do IBGE.
+
+bairros_floripa_raw.txt contém os dados extraídos do covidômetro, com cada bairro sendo representado com duas linhas assim:
+{nome do bairro}: {número de casos?} {número de infectados} {número de recuperados} {número de óbitos}
+{nome do bairro vizinho 1}:{nome do bairro vizinho 2}:...:{nome do bairro vizinho k}
+
+Como essas duas fontes têm número diferentes de bairros, eu tive que fazer um agrupamento para ter a população total para cada bairro do covidômetro. As escolhas que eu fiz para agrupar bairros que não tinham um nome exatamente correspondente estão no arquivo subdiv_floripa.txt, com cada linha tipo
+{bairro do IBGE} < {bairro do covidômetro}
+para indicar que um bairro do IBGE foi agrupado em tal bairro do covidômetro.
+
+Com isso, obtive as populações do arquivo population_final49.txt. O agrupamento para o grafo de 12 vértices também está em agrupamentos_bairros.txt caso você queira olhar.
