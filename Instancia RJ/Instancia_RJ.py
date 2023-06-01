@@ -493,13 +493,14 @@ class Modelo:
             print("Tipo de árvore inválida") if self.picos_infectados_arvores \
             else print("É necessário rodar o modelo sobre as árvores primeiro")
 
-    def busca_em_profundidade(self, v, anterior, visitados):
+    def busca_em_profundidade(self, v, anterior, visitados, niveis, nivel=0):
         visitados.add(v)
+        niveis[v] = nivel
         for vizinho in self.grafo_original.edges(v):
             vizinho = vizinho[1]
             if vizinho not in visitados:
                 anterior[vizinho] = v
-                self.busca_em_profundidade(vizinho, anterior, visitados)
+                self.busca_em_profundidade(vizinho, anterior, visitados, niveis, nivel+1)
 
     def gerar_grafos_arvore_profundidade(self, tempo, iteraçoes):
         self.resultados_arvore_profundidade = open(resultados_arvore_profundidade, "w", encoding="utf-8")
@@ -1233,13 +1234,13 @@ class Modelo:
         plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Profundidade 200x400 dias.png", format="png", dpi=300)
         plt.close
 
-    def arvores_vizinhas(self, tipo_arvore):
+    def heuristica_arvores_vizinhas(self, tipo_arvore):
         self.grafo_original = self.grafo.copy()
         
         arvore = 0
         quant_arvores = len(self.grafo_original.nodes)
         
-        for inicio in self.grafo_original.nodes:
+        for inicio in self.grafo_original.nodes:                # para cada arvore original
             self.estimar_tempo_restante(arvore, quant_arvores)
             arvore += 1
             self.vertice_de_inicio = inicio
@@ -1248,13 +1249,15 @@ class Modelo:
             tempo_pico = 0
 
             anterior = {}
+            niveis = {}
             if tipo_arvore == "largura":
                 anterior = self.busca_em_largura(inicio)
             else:
                 visitados = set()
-                self.busca_em_profundidade(inicio, anterior, visitados)
-
+                self.busca_em_profundidade(inicio, anterior, visitados, niveis, 0)
+            print(niveis)
             self.grafo.remove_edges_from(list(self.grafo.edges()))
+
             for vertice, ant in anterior.items():
                 self.grafo.add_edge(ant, vertice)
 
@@ -1263,7 +1266,7 @@ class Modelo:
 
 
             grafo_complemento = nx.complement(self.grafo).edges()
-
+            print(len(self.grafo.edges()), len(grafo_complemento))
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
                 print("Criando", v, "-->", u)
                 anterior = {}
@@ -1286,15 +1289,34 @@ class Modelo:
                                 achar_ciclo(vizinho, anterior, visitados)
 
                 def achar_ciclo_a():
+                    # vertice de maior nivel
+                    w, z = (v, u) if (max(niveis[v], niveis[u]), min(niveis[v], niveis[u])) == (niveis[v], niveis[u]) else (u, v)
+                    print(w, z)
+                    nivel = niveis[w]
+                    print(niveis[v], niveis[u]) # parei aqui
+                    while nivel > min(niveis[v], niveis[u]):
+                        print("a")
+                        try:
+                            w = anterior[w]
+                            print(w)
+                        except KeyError:
+                            pass
+                        nivel -= 1
+                    
+                    print(nivel, w, z)
+
+                    while w != z:
+                        pass
+
                     # salvar niveis dos vertices na arvore (pair<nivel, vertice>)
                     # busca em largura e profundidade linha 1170 - 1173
                     # igualar niveis dos vertices v, u atraves dos anteriores 
                     # depois ir voltando com os dois ate chegarem em um antecessor comum
                     # salvar caminho de v em um array normal e de u em um array de forma inversa,
                     # depois juntar colocando vertice igual no final do primeiro
-                    pass
-
-                achar_ciclo(u, anterior, visitados)
+                
+                achar_ciclo_a()
+                #achar_ciclo(u, anterior, visitados)
 
                 ciclo.append(v)
                 while True:                 # montar ciclo
@@ -1583,41 +1605,47 @@ class Modelo:
                 df.to_excel(writer, sheet_name="Profundidade")
 
     def montar_tabela_zona_sul_ciclos(self):
-        bairros_fora_ciclo = ("Cosme Velho", "Urca", "Lagoa", "Leme")
-        lista_resultados = []
+        #bairros_fora_ciclo = ("Cosme Velho", "Urca", "Lagoa", "Leme")
+        ciclo1 = [('Flamengo', "Botafogo"), ('Flamengo', "Glória"), ("Glória", "Catete"), ("Catete", "Laranjeiras"), ("Botafogo", "Laranjeiras")]
+        ciclo2 = [('Botafogo', 'Humaitá'), ('Botafogo', 'Copacabana'), ('Humaitá', 'Jardim Botânico'), ('Copacabana', 'Ipanema'), ('Jardim Botânico', 'Gávea'), ('Ipanema', 'Leblon'), ('Leblon', 'Vidigal'), ('Vidigal', 'São Conrado'), ('Gávea', 'Rocinha'), ('Rocinha', 'São Conrado')]
+
         inicios = []
-        tabela_ciclos_zs = "./Resultados/tabela_remoçao_arestas.xlsx"
 
-        wb = openpyxl.Workbook()
-        wb.create_sheet("Teste")
-
-
-        txt_resultados = open("Resultados")
-        colunas = []
+        #txt_resultados = open("Resultados")
         g = self.grafo.copy()
         for inicio in self.grafo.nodes():
+            picos_infectados = []
+            arestas_removidas = []
             inicios.append(inicio)
-            lista_resultados.append([])
+
+            print("Inicio:", inicio)
             self.vertice_de_inicio = inicio
 
-            for arestaA, arestaB in self.grafo.edges():
-                if arestaA not in bairros_fora_ciclo and arestaB not in bairros_fora_ciclo:
-                    g.remove_edge(arestaA, arestaB)
-                    self.avançar_tempo_movimentacao_dinamica(200)
-                
-                    lista_resultados[-1].append(self.pico_infectados)
-                    if len(colunas) != 19:
-                        colunas.append(f"{arestaA}-{arestaB}")
-                    
-                    g.add_edge(arestaA, arestaB)
+            for arestaA1, arestaB1 in ciclo1:
+                print(f"{arestaA1}-{arestaB1}")
+                self.grafo.remove_edge(arestaA1, arestaB1)
         
-        with pd.ExcelWriter(tabela_ciclos_zs, engine="openpyxl") as writer:
-            writer.book = wb
+                for arestaA2, arestaB2 in ciclo2:
+                    print(f"    {arestaA2}-{arestaB2}", end=" ")
+                    self.grafo.remove_edge(arestaA2, arestaB2)
 
-            df = pd.DataFrame(lista_resultados,
-                        index=inicios, columns=colunas)
+                    self.avançar_tempo_movimentacao_dinamica(200)
+                    
+                    picos_infectados.append(self.pico_infectados)
+                    print(self.pico_infectados)
+                    arestas_removidas.append(f"{arestaA1}-{arestaB1} {arestaA2}-{arestaB2}")
+
+                    self.grafo.add_edge(arestaA2, arestaB2)
+                
+                self.grafo.add_edge(arestaA1, arestaB1)
         
-        df.to_excel(writer, sheet_name="Profundidade")
+        # with pd.ExcelWriter(tabela_ciclos_zs, engine="openpyxl") as writer:
+        #     writer.book = wb
+
+        #     df = pd.DataFrame(lista_resultados,
+        #                 index=inicios, columns=colunas)
+        
+        # df.to_excel(writer, sheet_name="Profundidade")
 
 
     def printar_grafico_SIR_t0_VerticePizza(self, path=None, dia=1, v="Flamengo"):
@@ -1720,8 +1748,7 @@ class Modelo:
 
     def boxplot_zs_minimal_retirada_arestas(self, path):
         bairros_fora_ciclo = ("Cosme Velho", "Urca", "Lagoa", "Leme")
-        pico_infectados = []
-        arestas_removidas = []
+
         ciclo1 = [('Flamengo', "Botafogo"), ('Flamengo', "Glória"), ("Glória", "Catete"), ("Catete", "Laranjeiras"), ("Botafogo", "Laranjeiras")]
         ciclo2 = [('Botafogo', 'Humaitá'), ('Botafogo', 'Copacabana'), ('Humaitá', 'Jardim Botânico'), ('Copacabana', 'Ipanema'), ('Jardim Botânico', 'Gávea'), ('Ipanema', 'Leblon'), ('Leblon', 'Vidigal'), ('Vidigal', 'São Conrado'), ('Gávea', 'Rocinha'), ('Rocinha', 'São Conrado')]
 
@@ -1731,7 +1758,7 @@ class Modelo:
         arquivo_log = open(f"{path}/dados_boxplot.txt", "w", encoding="utf-8")
         for inicio in self.grafo.nodes():
             pico_infectados = []
-            colunas = []
+            arestas_removidas = []
             inicios.append(inicio)
             
             print("Inicio:", inicio)
@@ -1752,7 +1779,7 @@ class Modelo:
                 
                     pico_infectados.append(self.pico_infectados)
                     print(self.pico_infectados)
-                    colunas.append(f"{arestaA1}-{arestaB1} {arestaA2}-{arestaB2}")
+                    arestas_removidas.append(f"{arestaA1}-{arestaB1} {arestaA2}-{arestaB2}")
 
 
                     self.grafo.add_edge(arestaA2, arestaB2)
@@ -1760,7 +1787,7 @@ class Modelo:
 
                 self.grafo.add_edge(arestaA1, arestaB1)
 
-            arquivo_log.write(f"{inicio}: [{pico_infectados}, {colunas}]\n")
+            arquivo_log.write(f"{inicio}: [{pico_infectados}, {arestas_removidas}]\n")
             df = pd.DataFrame(pico_infectados)
             sns.boxplot(data=df, width=0.5, fliersize=10, color="red")
             sns.swarmplot(data=df)
@@ -1771,8 +1798,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1781,7 +1808,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Ins
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final =   "./Txts/outros\zona sul modificada ciclos/arquivo_final.txt"#"./txts/normal (real)/arquivo_final.txt"
+arquivo_final =  "./txts/normal (real)/arquivo_final.txt" # "./Txts/outros\zona sul modificada ciclos/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1801,6 +1828,9 @@ m = Modelo(arquivo_final)
 m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
+m.heuristica_arvores_vizinhas("profundidade")
+
+
 # print(len(m.grafo.nodes()))
 # for bairro in m.grafo.nodes():
 #     m.avançar_tempo_movimentacao_dinamica(200, False)
@@ -1813,7 +1843,7 @@ m.resetar_grafo()
 
 #m.printar_grafo("zonasul")
 #m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
-m.boxplot_zs_minimal_retirada_arestas(r"C:\Users\rasen\Desktop")
+#m.boxplot_zs_minimal_retirada_arestas(r"C:\Users\rasen\Desktop")
 
 # print(m.tempo_pico)
 #print(m.pico_infectados)

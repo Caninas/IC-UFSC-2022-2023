@@ -60,13 +60,15 @@ encontrar largura pico modulo
 
 ✔ passar para modelo SBPO @done (5/31/2023, 2:02:29 PM)
 ✔ pedir grafo florianopolis @done (5/31/2023, 2:02:30 PM)
-	☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
-	☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
-☐ mudar grafico pizza novo
-	☐ fazer comparação antes e depois movimentaçao
+✔ grafico boxplot, revisar @done (5/31/2023, 9:21:04 PM)
 ✔ grafico SIRT original zona sul X grafico minimal @done (5/31/2023, 2:02:54 PM)
 
-☐ grafico boxplot, revisar
+☐ terminar algoritmo heuristica
+	☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
+	☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
+✔ mudar grafico pizza novo @done (5/31/2023, 9:21:30 PM)
+	☐ fazer comparação antes e depois movimentaçao
+
 
 
 
