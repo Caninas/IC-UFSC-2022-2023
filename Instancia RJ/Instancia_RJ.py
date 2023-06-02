@@ -1,4 +1,5 @@
 import os
+import sys
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
@@ -14,6 +15,7 @@ import time
 import pandas as pd
 import openpyxl
 import seaborn as sns
+from blessed import Terminal
 
 from Txt import Txt
 
@@ -28,7 +30,7 @@ from Txt import Txt
 
 class Modelo:
     # arquivo no formato | int(id), adjs(sep=", ")/prop1(name), prop2(populaçao), prop3(beta)... |
-    def __init__(self, arq_final):
+    def __init__(self, arq_final, flo=False):
         self.arquivo = open(arq_final, "r", encoding="utf-8")
         # tempo atual
         self.t = 1
@@ -61,9 +63,10 @@ class Modelo:
 
         self.array_top_populaçao = []
 
-        self.grafo = self.gerar_grafo()     # grafo utilizado atualmente
+        self.grafo = self.gerar_grafo_florianopolis() if flo else self.gerar_grafo()     # grafo utilizado atualmente
         self.grafo_original = 0             # copia do grafo original, usado na criaçao de arvores
 
+        self.terminal = Terminal()
 
     def gerar_grafo(self):
         g = nx.Graph()
@@ -138,6 +141,10 @@ class Modelo:
         else:
             self.estimativa_tempo_inicial = time.perf_counter()
             estimativa = 0
+
+        #with self.terminal.location(y=self.terminal.height):
+            #print("Tempo restante:", self.tempo_restante, "segundos")
+            #print(self.terminal.on_firebrick2("   "))
         print(f"Estimativa {estimativa/60:.2f} minutos | {total - percorrido} arvores restantes")
 
 
@@ -166,7 +173,8 @@ class Modelo:
 
     def printar_grafo(self, tipo=None):
         # # pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
-
+        self.grafo = nx.Graph(self.grafo)
+        pos = nx.spring_layout(nx.Graph(self.grafo))
         if tipo == "zonasul":
             pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Copacabana': array([0.809017  , 0.58778526]), 'Botafogo': array([0.30901698, 0.95105655]),
             'Humaitá': array([-0.30901702,  0.95105649]), 'Jardim Botânico': array([-0.80901699,  0.58778526]), 'Gávea': array([-9.99999988e-01, -7.27200340e-08]),
@@ -210,8 +218,8 @@ class Modelo:
         
             pos = graphviz_layout(g, prog="dot")
 
-
-        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=15, node_size=300) #fonte 6 nodesize 200
+        #font_size=15
+        nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=11, node_size=300) #fonte 6 nodesize 200
         plt.savefig(fr"Exemplo grafo zs novo.png", format="png", dpi=300)
 
         plt.show()  
@@ -1233,22 +1241,24 @@ class Modelo:
         plt.close
 
     def heuristica_arvores_vizinhas(self, tipo_arvore, path_arquivo_log: str, path_arquivo_picos: str):
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_arquivo_log = f"{path_arquivo_log}_{tipo_arvore}.txt"
         path_arquivo_picos = f"{path_arquivo_picos}_{tipo_arvore}.txt"
 
         arquivo_log = open(path_arquivo_log, "a", encoding="utf-8", buffering=1)
-        arquivo_picos = open(path_arquivo_picos, "w", encoding="utf-8", buffering=1)
+        arquivo_picos = open(path_arquivo_picos, "a", encoding="utf-8", buffering=1)
         arquivo_picos.write(f"Inicio da arvore:\n v-u adicionada (cria ciclo) pico dia_pico\n  x-y removida (volta a ser arvore) pico dia_pico fim_espalhamento\n")
 
         self.grafo_original = self.grafo.copy()
         
         arvore = 0
         quant_arvores = len(self.grafo_original.nodes)
-        
+        indice_arvore = 0
+
         for inicio in self.grafo_original.nodes:                # para cada arvore original
             arquivo_picos.write(f"\nInicio {inicio}:\n")
-            print("INICIOS ", end="")
-            self.estimar_tempo_restante(arvore, quant_arvores)
+
+            #self.estimar_tempo_restante(arvore, quant_arvores)
             arvore += 1
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
@@ -1272,14 +1282,14 @@ class Modelo:
 
 
             grafo_complemento = nx.complement(self.grafo).edges()
-            print(len(self.grafo.edges()), len(grafo_complemento))
-            indice_aresta = 0
+            #print(len(self.grafo.edges()), len(grafo_complemento))
 
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
-                print("ADIÇÃO ARESTA CRIA CICLO ", end="")
-                self.estimar_tempo_restante(indice_aresta, len(grafo_complemento))
-                indice_aresta += 1
-                print("Criando", v, "-->", u)
+                
+                print("ADIÇÃO ARESTA: ", end="")
+                self.estimar_tempo_restante(indice_arvore, len(self.grafo_original.nodes)*len(grafo_complemento))
+                indice_arvore += 1
+
                 #anterior = {}
                 #visitados = set()
                 #self.encontrou_ciclo = False
@@ -1322,7 +1332,8 @@ class Modelo:
                     if ciclo2:
                         ciclo.append(ciclo2.reverse())  # append outro lado do caminho na arvore
                     #print("W e Z dps de achar ciclo:", w, z)
-                    print("ciclo:", ciclo)
+                    #with self.terminal.location(x=0, y=self.terminal.height-4):
+                    print("Criando", v, "-->", u, "/ ciclo:", ciclo)
 
                     # salvar niveis dos vertices na arvore (pair<nivel, vertice>)
                     # busca em largura e profundidade linha 1170 - 1173
@@ -1352,14 +1363,15 @@ class Modelo:
                 for vertice in [v, u]:          # atualizar betas com a nova aresta
                     self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
 
-                self.avançar_tempo_movimentacao_dinamica_otimizado()
+                self.avançar_tempo_movimentacao_dinamica_otimizado(printar=False)
                 arquivo_picos.write(f" {v}-{u} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
                 arquivo_log.write(f"{self.SIRxTdeVertices}\n")
 
-                for indice in range(0, len(ciclo) - 1):    # loop arestas do ciclo (tirando v, u)
+                for indice in range(0, len(ciclo) - 1):    # loop arestas do ciclo (menos v, u)
                     self.resetar_grafo()
                     x = ciclo[indice]
                     y = ciclo[indice + 1]
+                    #with self.terminal.location(y=self.terminal.height-4):
                     print(f"Removendo {x} -> {y}")
                     self.grafo.remove_edge(x, y)
 
@@ -1367,7 +1379,7 @@ class Modelo:
                         self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
             
                     #! rodar modelo
-                    self.avançar_tempo_movimentacao_dinamica_otimizado()
+                    self.avançar_tempo_movimentacao_dinamica_otimizado(printar=False)
                     arquivo_picos.write(f"  {x}-{y} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
                     arquivo_log.write(f"{self.SIRxTdeVertices}\n")
                     #self.tempo_pico, self.pico_infectados, self.SIRxTdeVertices
@@ -1377,6 +1389,7 @@ class Modelo:
                     # salvar graficos SIR (arvore com v, u sem x, y.png)
 
                     self.grafo.add_edge(x, y)
+                self.grafo.remove_edge(v, u)
 
             # self.grafo.remove_edges_from(list(self.grafo.edges()))
             # self.grafo.add_edges_from(g.edges())
@@ -1425,6 +1438,7 @@ class Modelo:
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
                 
             if printar:
+                #with self.terminal.location(y=self.terminal.height-2):
                 print("tempo=", self.t)
             self.tempos.append(self.t)
             if soma_SIR[1] == 0:
@@ -1498,7 +1512,11 @@ class Modelo:
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
-            print(soma_SIR)
+            
+            if printar:
+                #with self.terminal.location(y=self.terminal.height-3):
+                print(soma_SIR)
+
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.tempo_pico = self.t
                 self.pico_infectados = soma_SIR[1]
@@ -1673,7 +1691,15 @@ class Modelo:
 
 
         sir_t0_antes = self.SIRxTdeVertices[vertice][dia][0]
+        
         sir_t0_depois = self.SIRxTdeVertices[vertice][dia][1]
+        print(sir_t0_depois)
+        sir_t0_depois[0][0] = floor(self.lambda_S * sir_t0_depois[0][0])
+        sir_t0_depois[1][0] = floor(self.lambda_I * sir_t0_depois[1][0])
+        sir_t0_depois[2][0] = floor(self.lambda_R * sir_t0_depois[2][0])
+
+
+        print(sir_t0_depois)
 
 
         #plt.style.use('_mpl-gallery-nogrid')
@@ -1728,7 +1754,7 @@ class Modelo:
 
         #colors_depois = ["blue", "#0202a6", "#3b96ff", "#1aa103", "#0e6100", "#55eb3b", "red", "#8c0000", "#f73e3e"]
         colors_depois = ["blue", "#0C46E8", "#0D8CFF", "#33691E", "#39AB33", "#6AC230", "#BF1900", "red", "#f73e3e"]
-        labels_depois = [r"$\dot{S}$", r"$\ddot{S}$", r"$\dddot{S}$", r"$\dot{I}$", r"$\ddot{I}$", r"$\dddot{I}$", r"$\dot{R}$", r"$\ddot{R}$", r"$\dddot{R}$"]
+        labels_depois = [r"$\dot{\mathcal{S}}$", r"$\ddot{\mathcal{S}}$", r"$\dddot{\mathcal{S}}$", r"$\dot{\mathcal{I}}$", r"$\ddot{\mathcal{I}}$", r"$\dddot{\mathcal{I}}$", r"$\dot{\mathcal{R}}$", r"$\ddot{\mathcal{R}}$", r"$\dddot{\mathcal{R}}$"]
         x2 = [sir_t0_depois[0][0], sir_t0_depois[0][1], Sddd, sir_t0_depois[1][0], sir_t0_depois[1][1], Iddd, sir_t0_depois[2][0], sir_t0_depois[2][1], Rddd]
         total2 = sum(x2)
 
@@ -1814,12 +1840,57 @@ class Modelo:
             plt.savefig(f"{path}/{inicio}.png", format="png", dpi=300)
             plt.close()
 
-        
+    def gerar_grafo_florianopolis(self):
+        g = nx.DiGraph()
+
+        for linha in self.arquivo:
+            adj, propriedades = linha.strip().split("/")
+            nome, *adj = adj.split(", ")
+            numero, populaçao_s, populaçao_i, *beta = propriedades.split(", ")
+            
+            populaçao_s, populaçao_i = int(populaçao_s), int(populaçao_i)
+
+            print(beta)
+
+            adj = [(nome, v, float(beta[i])) for i, v in enumerate(adj)]
+
+            #if nome == self.vertice_de_inicio:
+            I = populaçao_i
+            #else:
+                #I = 0
+            #I = floor(self.frac_infect_inicial * populaçao)    # distribuir igualmente
+            S = populaçao_s
+
+            Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
+            Iponto = floor(self.alpha * I)
+
+            S2pontos = S - Sponto               # pessoas que nao respeitam (podem sair do vertice)
+            I2pontos = I - Iponto
+
+            g.add_node(nome, 
+                id=int(numero), 
+                populaçao=populaçao_s + populaçao_i,
+                SIR_t0={"S": S, "I": I, "R": 0},
+                SIRd={"S": Sponto, "I": Iponto, "R": 0},
+                SIRdd={"S": S2pontos, "I": I2pontos, "R": 0},
+                SIRddd={},       # SIR ESTRANGEIRO (SIRdd de outros) #
+                SIRdddantes={},
+                #beta=float(beta),
+                isolado=False)
+            
+            g.add_weighted_edges_from(adj, "beta")
+        print("a")
+        print(g.edges(data=True))
+        print(g.get_edge_data("Grupo 1", "Grupo 2")['beta'])
+
+        return g
+
+
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1828,7 +1899,8 @@ os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia 
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final =  "./txts/normal (real)/arquivo_final.txt" # "./Txts/outros\zona sul modificada ciclos/arquivo_final.txt"
+arquivo_final =  "./txts/normal (real)/arquivo_final.txt" #"./Txts/outros\zona sul/arquivo_final.txt"
+arquivo_final_flo = "../Instancia Florianopolis/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
 
@@ -1844,14 +1916,14 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 #? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final)
-m.vertice_de_inicio = "Flamengo"
-m.resetar_grafo()
-
+m = Modelo(arquivo_final, flo=False)
+#m.vertice_de_inicio = "Flamengo"
+#m.resetar_grafo()
+m.printar_grafo()
 
 path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
-m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
+#m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 
 
 # print(len(m.grafo.nodes()))
@@ -1865,6 +1937,7 @@ m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 #print(m.grafo.edges())
 
 #m.printar_grafo("zonasul")
+#m.avançar_tempo_movimentacao_dinamica(30)
 #m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
 #m.boxplot_zs_minimal_retirada_arestas(r"C:\Users\rasen\Desktop")
 
