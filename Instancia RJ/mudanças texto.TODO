@@ -60,10 +60,10 @@ encontrar largura pico modulo
 
 
 
-☐ aumentar fonte grafo rj completo figura 2
-☐ terminar algoritmo heuristica
-	☐ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo)))
-	☐ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo
+☐ aumentar fonte grafo rj completo figura 2 (gerar varios indexado 0-n guardar em pasta com txt com pos de cada)
+✔ terminar algoritmo heuristica @done (6/2/2023, 6:30:07 PM)
+	✔ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo))) @done (6/2/2023, 6:30:13 PM)
+	✔ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo @done (6/2/2023, 6:30:16 PM)
 ✔ mudar grafico pizza novo @done (5/31/2023, 9:21:30 PM)
 	☐ fazer comparação antes e depois movimentaçao
 
