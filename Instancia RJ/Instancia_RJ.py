@@ -952,7 +952,6 @@ class Modelo:
                     atributos["SIRdd"]["R"] += node_vizinho["R"]
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {}
 
-
             self.t += 1
 
     def printar_grafico_SIRxTdeVerticesPizza(self):
@@ -1233,19 +1232,27 @@ class Modelo:
         plt.savefig(fr"C:\Users\rasen\Desktop\Resultados\com betas\Pico Infectados Arvores Profundidade 200x400 dias.png", format="png", dpi=300)
         plt.close
 
-    def heuristica_arvores_vizinhas(self, tipo_arvore):
+    def heuristica_arvores_vizinhas(self, tipo_arvore, path_arquivo_log: str, path_arquivo_picos: str):
+        path_arquivo_log = f"{path_arquivo_log}_{tipo_arvore}.txt"
+        path_arquivo_picos = f"{path_arquivo_picos}_{tipo_arvore}.txt"
+
+        arquivo_log = open(path_arquivo_log, "a", encoding="utf-8", buffering=1)
+        arquivo_picos = open(path_arquivo_picos, "w", encoding="utf-8", buffering=1)
+        arquivo_picos.write(f"Inicio da arvore:\n v-u adicionada (cria ciclo) pico dia_pico\n  x-y removida (volta a ser arvore) pico dia_pico fim_espalhamento\n")
+
         self.grafo_original = self.grafo.copy()
         
         arvore = 0
         quant_arvores = len(self.grafo_original.nodes)
         
         for inicio in self.grafo_original.nodes:                # para cada arvore original
+            arquivo_picos.write(f"\nInicio {inicio}:\n")
+            print("INICIOS ", end="")
             self.estimar_tempo_restante(arvore, quant_arvores)
             arvore += 1
             self.vertice_de_inicio = inicio
             self.resetar_grafo()
-            soma_pico = 0
-            tempo_pico = 0
+            print("Inicio:", inicio)
 
             anterior = {}
             niveis = {}
@@ -1254,7 +1261,7 @@ class Modelo:
             else:
                 visitados = set()
                 self.busca_em_profundidade(inicio, anterior, visitados, niveis, 0)
-            print(niveis)
+
             self.grafo.remove_edges_from(list(self.grafo.edges()))
 
             for vertice, ant in anterior.items():
@@ -1266,46 +1273,56 @@ class Modelo:
 
             grafo_complemento = nx.complement(self.grafo).edges()
             print(len(self.grafo.edges()), len(grafo_complemento))
+            indice_aresta = 0
+
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
+                print("ADIÇÃO ARESTA CRIA CICLO ", end="")
+                self.estimar_tempo_restante(indice_aresta, len(grafo_complemento))
+                indice_aresta += 1
                 print("Criando", v, "-->", u)
-                anterior = {}
-                visitados = set()
-                self.encontrou_ciclo = False
+                #anterior = {}
+                #visitados = set()
+                #self.encontrou_ciclo = False
                 ciclo = []
 
-                def achar_ciclo(k, anterior, visitados):          # achar ciclo
-                    visitados.add(k)
-                    for vizinho in self.grafo.edges(k):
-                        if not self.encontrou_ciclo:
-                            vizinho = vizinho[1]
+                # def achar_ciclo(k, anterior, visitados):          # achar ciclo
+                #     visitados.add(k)
+                #     for vizinho in self.grafo.edges(k):
+                #         if not self.encontrou_ciclo:
+                #             vizinho = vizinho[1]
 
-                            if vizinho not in visitados:
-                                anterior[vizinho] = k
-                                if vizinho == v:
-                                    print("Encontrou ciclo:", end="")
-                                    self.encontrou_ciclo = True
-                                    break
-                                achar_ciclo(vizinho, anterior, visitados)
+                #             if vizinho not in visitados:
+                #                 anterior[vizinho] = k
+                #                 if vizinho == v:
+                #                     print("Encontrou ciclo:", end="")
+                #                     self.encontrou_ciclo = True
+                #                     break
+                #                 achar_ciclo(vizinho, anterior, visitados)
 
-                def achar_ciclo_a():
-                    # vertice de maior nivel
+                def achar_ciclo_a(anterior):
+                    # w vertice de maior nivel, z menor
                     w, z = (v, u) if (max(niveis[v], niveis[u]), min(niveis[v], niveis[u])) == (niveis[v], niveis[u]) else (u, v)
-                    print(w, z)
+
                     nivel = niveis[w]
-                    print(niveis[v], niveis[u]) # parei aqui
-                    while nivel > min(niveis[v], niveis[u]):
-                        print("a")
-                        try:
-                            w = anterior[w]
-                            print(w)
-                        except KeyError:
-                            pass
+
+                    while nivel > niveis[z]:
+                        ciclo.append(w)
+                        w = anterior[w]
                         nivel -= 1
                     
-                    print(nivel, w, z)
-
+                    #print("W e Z mesmo nivel:", w, z)
+                    
+                    ciclo2 = []
                     while w != z:
-                        pass
+                        ciclo.append(w)
+                        w = anterior[w]
+                        ciclo2.append(z)
+                        z = anterior[z]
+                    ciclo.append(w)     # raiz
+                    if ciclo2:
+                        ciclo.append(ciclo2.reverse())  # append outro lado do caminho na arvore
+                    #print("W e Z dps de achar ciclo:", w, z)
+                    print("ciclo:", ciclo)
 
                     # salvar niveis dos vertices na arvore (pair<nivel, vertice>)
                     # busca em largura e profundidade linha 1170 - 1173
@@ -1314,33 +1331,36 @@ class Modelo:
                     # salvar caminho de v em um array normal e de u em um array de forma inversa,
                     # depois juntar colocando vertice igual no final do primeiro
                 
-                achar_ciclo_a()
+                achar_ciclo_a(anterior)
                 #achar_ciclo(u, anterior, visitados)
 
-                ciclo.append(v)
-                while True:                 # montar ciclo
-                    try:
-                        if anterior[ciclo[-1]] != v:
-                            ciclo.append(anterior[ciclo[-1]])
-                        else:
-                            raise Exception
-                    except:
-                        break
+                # ciclo.append(v)
+                # while True:                 # montar ciclo
+                #     try:
+                #         if anterior[ciclo[-1]] != v:
+                #             ciclo.append(anterior[ciclo[-1]])
+                #         else:
+                #             raise Exception
+                #     except:
+                #         break
 
-                print(ciclo)
-                self.printar_grafo("arvore")
-                #continue
+                #print(ciclo)
+                #self.printar_grafo("arvore")
+                
                 self.grafo.add_edge(v, u)
 
                 for vertice in [v, u]:          # atualizar betas com a nova aresta
                     self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
 
-                #! rodar modelo com ciclo
+                self.avançar_tempo_movimentacao_dinamica_otimizado()
+                arquivo_picos.write(f" {v}-{u} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
+                arquivo_log.write(f"{self.SIRxTdeVertices}\n")
 
                 for indice in range(0, len(ciclo) - 1):    # loop arestas do ciclo (tirando v, u)
+                    self.resetar_grafo()
                     x = ciclo[indice]
                     y = ciclo[indice + 1]
-
+                    print(f"Removendo {x} -> {y}")
                     self.grafo.remove_edge(x, y)
 
                     for vertice in [x, y]:          # atualizar betas com nova aresta
@@ -1348,6 +1368,9 @@ class Modelo:
             
                     #! rodar modelo
                     self.avançar_tempo_movimentacao_dinamica_otimizado()
+                    arquivo_picos.write(f"  {x}-{y} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
+                    arquivo_log.write(f"{self.SIRxTdeVertices}\n")
+                    #self.tempo_pico, self.pico_infectados, self.SIRxTdeVertices
                     # salvar SIRT (criar outro modelo com SIRT diferente pra cá e otimizado)
                     # salvar resultado (id, dia, pico)
                     
@@ -1355,7 +1378,6 @@ class Modelo:
 
                     self.grafo.add_edge(x, y)
 
-            print(type(grafo_complemento["Copacabana", "Flamengo"]))
             # self.grafo.remove_edges_from(list(self.grafo.edges()))
             # self.grafo.add_edges_from(g.edges())
             # print(len(self.grafo.edges()))
@@ -1368,28 +1390,27 @@ class Modelo:
             self.salvar_grafo_arvore(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\dsdsaddas\{inicio}.png")
         self.grafo = self.grafo_original 
 
-    def avançar_tempo_movimentacao_dinamica_otimizado(self, t):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
+    def avançar_tempo_movimentacao_dinamica_otimizado(self, printar=True):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
-        for tempo in range(t):
-            print(self.t)
+        soma_SIR = [0,1,0]
+        while True:
             # distribuiçao de pessoas
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
 
-                try:
+                if self.t != 1:          # antes da distribuiçao de pessoas salva estado de cada vértice
                     self.SIRxTdeVertices[nome][self.t] = [
                         atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
                         atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
                         atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
                     ]
-                except:
+                else:            
                     self.SIRxTdeVertices[nome] = dict()
                     self.SIRxTdeVertices[nome][self.t] = [
                         atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
                         atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
                         atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
                     ]
-
 
                 S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
                 I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
@@ -1402,11 +1423,12 @@ class Modelo:
 
                 for vizinho in self.grafo.edges(nome):
                     self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
-
-
-            #print("tempo=", self.t)
+                
+            if printar:
+                print("tempo=", self.t)
             self.tempos.append(self.t)
-
+            if soma_SIR[1] == 0:
+                break
             self.SIRs.append([])
             soma_SIR = [0, 0, 0]
 
@@ -1476,11 +1498,10 @@ class Modelo:
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
-
+            print(soma_SIR)
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.tempo_pico = self.t
                 self.pico_infectados = soma_SIR[1]
-
 
             for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
                 nome, atributos = node
@@ -1827,7 +1848,10 @@ m = Modelo(arquivo_final)
 m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
-m.heuristica_arvores_vizinhas("profundidade")
+
+path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
+path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
+m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 
 
 # print(len(m.grafo.nodes()))
