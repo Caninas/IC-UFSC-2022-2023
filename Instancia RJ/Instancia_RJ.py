@@ -220,6 +220,7 @@ class Modelo:
 
         #font_size=15
         nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=11, node_size=300) #fonte 6 nodesize 200
+        print(pos)
         plt.savefig(fr"Exemplo grafo zs novo.png", format="png", dpi=300)
 
         plt.show()  
