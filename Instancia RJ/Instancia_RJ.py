@@ -33,6 +33,7 @@ class Modelo:
     def __init__(self, arq_final, flo=False):
         self.arquivo = open(arq_final, "r", encoding="utf-8")
         # tempo atual
+        self.floripa = flo
         self.t = 1
 
         # variaveis para a construçao do grafico posteriormente
@@ -63,7 +64,7 @@ class Modelo:
 
         self.array_top_populaçao = []
 
-        self.grafo = self.gerar_grafo_florianopolis() if flo else self.gerar_grafo()     # grafo utilizado atualmente
+        self.grafo = self.gerar_grafo_florianopolis() if self.floripa else self.gerar_grafo()     # grafo utilizado atualmente
         self.grafo_original = 0             # copia do grafo original, usado na criaçao de arvores
 
         self.terminal = Terminal()
@@ -109,13 +110,19 @@ class Modelo:
 
     def resetar_grafo(self):
         for vertice in self.grafo:
-            populaçao = self.grafo.nodes[vertice]["populaçao"]
+            if self.floripa:
+                populaçao_s, populaçao_i = self.grafo.nodes[vertice]["populaçao_s"], self.grafo.nodes[vertice]["populaçao_i"]
+                I = populaçao_i
+                S = populaçao_s
             
-            if vertice == self.vertice_de_inicio:
-                I = floor(self.frac_infect_inicial * populaçao)
+            
             else:
-                I = 0
-            S = populaçao - I
+                populaçao = self.grafo.nodes[vertice]["populaçao"]
+                if vertice == self.vertice_de_inicio:
+                    I = floor(self.frac_infect_inicial * populaçao)
+                else:
+                    I = 0
+                S = populaçao - I
 
             Sponto = floor(self.alpha * S)      # pessoas que respeitam o distanciamento social (ficam no vertice)
             Iponto = floor(self.alpha * I)
@@ -152,15 +159,27 @@ class Modelo:
         mapping = {old_label:new_label["id"] for old_label, new_label in self.grafo.nodes(data=True)}            
         g = nx.relabel_nodes(self.grafo, mapping)
 
-        for vertice in g.nodes(data=True):
-            del vertice[1]["id"]
-            del vertice[1]["populaçao"]
-            del vertice[1]["SIR_t0"]
-            del vertice[1]["SIRd"]
-            del vertice[1]["SIRdd"]
-            del vertice[1]["SIRddd"]
-            del vertice[1]["SIRdddantes"]
-            del vertice[1]["beta"]
+        if self.floripa:
+            for vertice in g.nodes(data=True):
+                del vertice[1]["id"]
+                del vertice[1]["populaçao_s"]
+                del vertice[1]["populaçao_i"]
+                del vertice[1]["SIR_t0"]
+                del vertice[1]["SIRd"]
+                del vertice[1]["SIRdd"]
+                del vertice[1]["SIRddd"]
+                del vertice[1]["SIRdddantes"]
+                del vertice[1]["beta"]
+        else:
+            for vertice in g.nodes(data=True):
+                del vertice[1]["id"]
+                del vertice[1]["populaçao"]
+                del vertice[1]["SIR_t0"]
+                del vertice[1]["SIRd"]
+                del vertice[1]["SIRdd"]
+                del vertice[1]["SIRddd"]
+                del vertice[1]["SIRdddantes"]
+                del vertice[1]["beta"]
     
         pos = graphviz_layout(g, prog="dot")
 
@@ -206,15 +225,27 @@ class Modelo:
             
             g = nx.relabel_nodes(self.grafo, mapping)
 
-            for vertice in g.nodes(data=True):
-                del vertice[1]["id"]
-                del vertice[1]["populaçao"]
-                del vertice[1]["SIR_t0"]
-                del vertice[1]["SIRd"]
-                del vertice[1]["SIRdd"]
-                del vertice[1]["SIRddd"]
-                del vertice[1]["SIRdddantes"]
-                del vertice[1]["beta"]
+            if self.floripa:
+                for vertice in g.nodes(data=True):
+                    del vertice[1]["id"]
+                    del vertice[1]["populaçao_s"]
+                    del vertice[1]["populaçao_i"]
+                    del vertice[1]["SIR_t0"]
+                    del vertice[1]["SIRd"]
+                    del vertice[1]["SIRdd"]
+                    del vertice[1]["SIRddd"]
+                    del vertice[1]["SIRdddantes"]
+                    del vertice[1]["beta"]
+            else:
+                for vertice in g.nodes(data=True):
+                    del vertice[1]["id"]
+                    del vertice[1]["populaçao"]
+                    del vertice[1]["SIR_t0"]
+                    del vertice[1]["SIRd"]
+                    del vertice[1]["SIRdd"]
+                    del vertice[1]["SIRddd"]
+                    del vertice[1]["SIRdddantes"]
+                    del vertice[1]["beta"]
         
             pos = graphviz_layout(g, prog="dot")
 
@@ -313,7 +344,11 @@ class Modelo:
             self.quantidade_bairros_selecionados = round(0.4 * len(self.grafo.nodes))
 
             for vertice in self.grafo.nodes(data=True):
-                pop[vertice[1]["populaçao"]] = vertice[0]
+                if self.floripa:
+                    pop[vertice[1]["populaçao_s"] + vertice[1]["populaçao_i"]] = vertice[0]
+
+                else:
+                    pop[vertice[1]["populaçao"]] = vertice[0]
 
                 self.array_top_populaçao.append(vertice[1]["populaçao"])
             
@@ -1251,6 +1286,8 @@ class Modelo:
         arquivo_picos.write(f"Inicio da arvore:\n v-u adicionada (cria ciclo) pico dia_pico\n  x-y removida (volta a ser arvore) pico dia_pico fim_espalhamento\n")
 
         self.grafo_original = self.grafo.copy()
+        self.grafo_original.remove_edges_from(list(self.grafo_original.edges()))
+        self.grafo_original.add_edges_from(self.grafo.edges(data=True))
         
         arvore = 0
         quant_arvores = len(self.grafo_original.nodes)
@@ -1275,11 +1312,15 @@ class Modelo:
 
             self.grafo.remove_edges_from(list(self.grafo.edges()))
 
-            for vertice, ant in anterior.items():
-                self.grafo.add_edge(ant, vertice)
+            if self.floripa:
+                for vertice, ant in anterior.items():
+                    self.grafo.add_weighted_edges_from((ant, vertice, self.grafo_original.get_edge_data(ant, vertice)["beta"]))
+            else:
+                for vertice, ant in anterior.items():
+                    self.grafo.add_edge(ant, vertice)
 
-            for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
-                vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
+                for vertice in self.grafo.nodes(data=True):                         # setar betas novamente
+                    vertice[1]["beta"] = 1 / (len(self.grafo.edges(vertice[0])) + 1)
 
 
             grafo_complemento = nx.complement(self.grafo).edges()
@@ -1358,11 +1399,12 @@ class Modelo:
 
                 #print(ciclo)
                 #self.printar_grafo("arvore")
-                
-                self.grafo.add_edge(v, u)
-
-                for vertice in [v, u]:          # atualizar betas com a nova aresta
-                    self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
+                if self.floripa:
+                    self.grafo.add_weighted_edges_from((v, u, self.peso_medio))
+                else:
+                    self.grafo.add_edge(v, u)
+                    for vertice in [v, u]:          # atualizar betas com a nova aresta
+                        self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
 
                 self.avançar_tempo_movimentacao_dinamica_otimizado(printar=False)
                 arquivo_picos.write(f" {v}-{u} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
@@ -1376,9 +1418,13 @@ class Modelo:
                     print(f"Removendo {x} -> {y}")
                     self.grafo.remove_edge(x, y)
 
-                    for vertice in [x, y]:          # atualizar betas com nova aresta
-                        self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
-            
+                    if self.floripa:
+                        self.grafo.add_weighted_edges_from((v, u, self.grafo_original.get_edge_data()["beta"]))
+                    else:
+                        self.grafo.add_edge(x, y)
+                        for vertice in [x, y]:          # atualizar betas com nova aresta
+                            self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
+                
                     #! rodar modelo
                     self.avançar_tempo_movimentacao_dinamica_otimizado(printar=False)
                     arquivo_picos.write(f"  {x}-{y} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
@@ -1389,7 +1435,6 @@ class Modelo:
                     
                     # salvar graficos SIR (arvore com v, u sem x, y.png)
 
-                    self.grafo.add_edge(x, y)
                 self.grafo.remove_edge(v, u)
 
             # self.grafo.remove_edges_from(list(self.grafo.edges()))
@@ -1409,6 +1454,7 @@ class Modelo:
         soma_SIR = [0,1,0]
         while True:
             # distribuiçao de pessoas
+            #self.printar_estado_vertice("Grupo 1")
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
 
@@ -1426,18 +1472,33 @@ class Modelo:
                         atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
                     ]
 
-                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
-                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
-                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+                if self.floripa:
+                    #print(self.grafo.edges(data=True))
+                    for vizinho in self.grafo.edges(nome, data=True):
+                        print(vizinho)
+                        S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * vizinho[2]["beta"])
+                        I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * vizinho[2]["beta"])
+                        R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * vizinho[2]["beta"])
 
-                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+                        atributos["SIRdd"]["S"] -= S_2pontos_saindo
+                        atributos["SIRdd"]["I"] -= I_2pontos_saindo
+                        atributos["SIRdd"]["R"] -= R_2pontos_saindo
+
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+
+                else:
+                    S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                    I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                    R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                    atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                    atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                    atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
 
 
-                for vizinho in self.grafo.edges(nome):
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
-                
+                    for vizinho in self.grafo.edges(nome):
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+             
             if printar:
                 #with self.terminal.location(y=self.terminal.height-2):
                 print("tempo=", self.t)
@@ -1461,7 +1522,7 @@ class Modelo:
                 soma_SIR[0] += atributos["SIRd"]["S"] + atributos["SIRdd"]["S"] + atributos["SIRdddantes"]["S"]
                 soma_SIR[1] += atributos["SIRd"]["I"] + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]
                 soma_SIR[2] += atributos["SIRd"]["R"] + atributos["SIRdd"]["R"] + atributos["SIRdddantes"]["R"]
-                
+
                 #! Calculo X_ponto + Sdd que fica (Ypi = Ypi -> i)
 
                 Nponto = floor(self.lambda_S * atributos["SIRd"]["S"]) + floor(self.lambda_I * atributos["SIRd"]["I"]) + floor(self.lambda_R * atributos["SIRd"]["R"])
@@ -1843,7 +1904,7 @@ class Modelo:
 
     def gerar_grafo_florianopolis(self):
         g = nx.DiGraph()
-
+        self.peso_medio = 0
         for linha in self.arquivo:
             adj, propriedades = linha.strip().split("/")
             nome, *adj = adj.split(", ")
@@ -1867,10 +1928,12 @@ class Modelo:
 
             S2pontos = S - Sponto               # pessoas que nao respeitam (podem sair do vertice)
             I2pontos = I - Iponto
-
+            self.peso_medio += sum([float(beta[i]) for i, v in enumerate(adj)])
             g.add_node(nome, 
                 id=int(numero), 
-                populaçao=populaçao_s + populaçao_i,
+                #populaçao=populaçao_s + populaçao_i,
+                populaçao_s = populaçao_s,
+                populaçao_i = populaçao_i,
                 SIR_t0={"S": S, "I": I, "R": 0},
                 SIRd={"S": Sponto, "I": Iponto, "R": 0},
                 SIRdd={"S": S2pontos, "I": I2pontos, "R": 0},
@@ -1880,18 +1943,16 @@ class Modelo:
                 isolado=False)
             
             g.add_weighted_edges_from(adj, "beta")
-        print("a")
-        print(g.edges(data=True))
-        print(g.get_edge_data("Grupo 1", "Grupo 2")['beta'])
-
+        self.peso_medio - self.peso_medio / len(g.nodes())
         return g
+
 
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1917,14 +1978,16 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 #? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final, flo=False)
+m = Modelo(arquivo_final_flo, flo=True)
+#print(m.grafo.edges(data=True))
 #m.vertice_de_inicio = "Flamengo"
 #m.resetar_grafo()
-m.printar_grafo()
+#m.avançar_tempo_movimentacao_dinamica_otimizado()
+#m.printar_grafo()
 
 path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
-#m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
+m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 
 
 # print(len(m.grafo.nodes()))
