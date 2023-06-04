@@ -15,7 +15,7 @@ import time
 import pandas as pd
 import openpyxl
 import seaborn as sns
-from blessed import Terminal
+#from blessed import Terminal
 
 from Txt import Txt
 
@@ -64,10 +64,10 @@ class Modelo:
 
         self.array_top_populaçao = []
 
-        self.grafo = self.gerar_grafo_florianopolis() if self.floripa else self.gerar_grafo()     # grafo utilizado atualmente
+        self.grafo = (self.gerar_grafo_florianopolis if self.floripa else self.gerar_grafo)()    # grafo utilizado atualmente
         self.grafo_original = 0             # copia do grafo original, usado na criaçao de arvores
 
-        self.terminal = Terminal()
+        #self.terminal = Terminal()
 
     def gerar_grafo(self):
         g = nx.Graph()
@@ -169,7 +169,6 @@ class Modelo:
                 del vertice[1]["SIRdd"]
                 del vertice[1]["SIRddd"]
                 del vertice[1]["SIRdddantes"]
-                del vertice[1]["beta"]
         else:
             for vertice in g.nodes(data=True):
                 del vertice[1]["id"]
@@ -186,13 +185,13 @@ class Modelo:
         nx.draw(g, pos, with_labels=True, font_weight='bold', font_size=6, node_size=200, clip_on=True)
 
         fig = plt.figure(1)
-        fig.set_size_inches(30, 10)
         plt.savefig(path, format="png", dpi=300)
         plt.close()
 
     def printar_grafo(self, tipo=None):
         # # pos = nx.circular_layout(self.grafo.subgraph(("Ipanema"...)))
-        self.grafo = nx.Graph(self.grafo)
+        #self.grafo = nx.Graph(self.grafo)
+
         pos = nx.spring_layout(nx.Graph(self.grafo))
         if tipo == "zonasul":
             pos = {'Ipanema': array([1.0000000e+00, 1.4702742e-08]), 'Copacabana': array([0.809017  , 0.58778526]), 'Botafogo': array([0.30901698, 0.95105655]),
@@ -235,7 +234,6 @@ class Modelo:
                     del vertice[1]["SIRdd"]
                     del vertice[1]["SIRddd"]
                     del vertice[1]["SIRdddantes"]
-                    del vertice[1]["beta"]
             else:
                 for vertice in g.nodes(data=True):
                     del vertice[1]["id"]
@@ -539,6 +537,7 @@ class Modelo:
     def busca_em_profundidade(self, v, anterior, visitados, niveis, nivel=0):
         visitados.add(v)
         niveis[v] = nivel
+
         for vizinho in self.grafo_original.edges(v):
             vizinho = vizinho[1]
             if vizinho not in visitados:
@@ -1277,18 +1276,14 @@ class Modelo:
         plt.close
 
     def heuristica_arvores_vizinhas(self, tipo_arvore, path_arquivo_log: str, path_arquivo_picos: str):
-        os.system('cls' if os.name == 'nt' else 'clear')
         path_arquivo_log = f"{path_arquivo_log}_{tipo_arvore}.txt"
         path_arquivo_picos = f"{path_arquivo_picos}_{tipo_arvore}.txt"
 
         arquivo_log = open(path_arquivo_log, "a", encoding="utf-8", buffering=1)
         arquivo_picos = open(path_arquivo_picos, "a", encoding="utf-8", buffering=1)
-        arquivo_picos.write(f"Inicio da arvore:\n v-u adicionada (cria ciclo) pico dia_pico\n  x-y removida (volta a ser arvore) pico dia_pico fim_espalhamento\n")
+        arquivo_picos.write(f"Inicio da arvore:\n v-u adicionada (cria ciclo) pico dia_pico fim_espalhamento\n  x-y removida (volta a ser arvore) pico dia_pico fim_espalhamento\n")
 
         self.grafo_original = self.grafo.copy()
-        self.grafo_original.remove_edges_from(list(self.grafo_original.edges()))
-        self.grafo_original.add_edges_from(self.grafo.edges(data=True))
-        
         arvore = 0
         quant_arvores = len(self.grafo_original.nodes)
         indice_arvore = 0
@@ -1314,7 +1309,7 @@ class Modelo:
 
             if self.floripa:
                 for vertice, ant in anterior.items():
-                    self.grafo.add_weighted_edges_from((ant, vertice, self.grafo_original.get_edge_data(ant, vertice)["beta"]))
+                    self.grafo.add_weighted_edges_from([(ant, vertice, self.grafo_original.get_edge_data(ant, vertice)["beta"]), (vertice, ant, self.grafo_original.get_edge_data(vertice, ant)["beta"])], weight="beta")
             else:
                 for vertice, ant in anterior.items():
                     self.grafo.add_edge(ant, vertice)
@@ -1327,7 +1322,6 @@ class Modelo:
             #print(len(self.grafo.edges()), len(grafo_complemento))
 
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
-                
                 print("ADIÇÃO ARESTA: ", end="")
                 self.estimar_tempo_restante(indice_arvore, len(self.grafo_original.nodes)*len(grafo_complemento))
                 indice_arvore += 1
@@ -1371,8 +1365,10 @@ class Modelo:
                         ciclo2.append(z)
                         z = anterior[z]
                     ciclo.append(w)     # raiz
+                    print("ciclo1:", ciclo, "ciclo2", ciclo2)
                     if ciclo2:
-                        ciclo.append(ciclo2.reverse())  # append outro lado do caminho na arvore
+                        ciclo2.reverse()            # reverse n retorna nada
+                        ciclo.extend(ciclo2)  # append outro lado do caminho na arvore
                     #print("W e Z dps de achar ciclo:", w, z)
                     #with self.terminal.location(x=0, y=self.terminal.height-4):
                     print("Criando", v, "-->", u, "/ ciclo:", ciclo)
@@ -1400,13 +1396,14 @@ class Modelo:
                 #print(ciclo)
                 #self.printar_grafo("arvore")
                 if self.floripa:
-                    self.grafo.add_weighted_edges_from((v, u, self.peso_medio))
+                    self.grafo.add_weighted_edges_from([(v, u, self.peso_medio), (u, v, self.peso_medio)], weight="beta")
                 else:
                     self.grafo.add_edge(v, u)
                     for vertice in [v, u]:          # atualizar betas com a nova aresta
                         self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
 
-                self.avançar_tempo_movimentacao_dinamica_otimizado(printar=False)
+
+                self.avançar_tempo_movimentacao_dinamica_otimizado(printar=True)
                 arquivo_picos.write(f" {v}-{u} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
                 arquivo_log.write(f"{self.SIRxTdeVertices}\n")
 
@@ -1416,26 +1413,27 @@ class Modelo:
                     y = ciclo[indice + 1]
                     #with self.terminal.location(y=self.terminal.height-4):
                     print(f"Removendo {x} -> {y}")
-                    self.grafo.remove_edge(x, y)
 
-                    if self.floripa:
-                        self.grafo.add_weighted_edges_from((v, u, self.grafo_original.get_edge_data()["beta"]))
-                    else:
-                        self.grafo.add_edge(x, y)
-                        for vertice in [x, y]:          # atualizar betas com nova aresta
-                            self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
-                
+                    self.grafo.remove_edges_from([(x, y), (y, x)])
+
                     #! rodar modelo
-                    self.avançar_tempo_movimentacao_dinamica_otimizado(printar=False)
+                    self.avançar_tempo_movimentacao_dinamica_otimizado(printar=True)
+
                     arquivo_picos.write(f"  {x}-{y} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
                     arquivo_log.write(f"{self.SIRxTdeVertices}\n")
                     #self.tempo_pico, self.pico_infectados, self.SIRxTdeVertices
                     # salvar SIRT (criar outro modelo com SIRT diferente pra cá e otimizado)
                     # salvar resultado (id, dia, pico)
                     
+                    if self.floripa:
+                        self.grafo.add_weighted_edges_from([(x, y, self.grafo_original.get_edge_data(x, y)["beta"]), (y, x, self.grafo_original.get_edge_data(y, x)["beta"])], weight="beta")
+                    else:
+                        self.grafo.add_edge(x, y)
+                        for vertice in [x, y]:          # atualizar betas com nova aresta
+                            self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
                     # salvar graficos SIR (arvore com v, u sem x, y.png)
 
-                self.grafo.remove_edge(v, u)
+                self.grafo.remove_edges_from([(v, u), (u, v)])
 
             # self.grafo.remove_edges_from(list(self.grafo.edges()))
             # self.grafo.add_edges_from(g.edges())
@@ -1446,8 +1444,8 @@ class Modelo:
 
 
             # salvar arvore original
-            self.salvar_grafo_arvore(fr"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\dsdsaddas\{inicio}.png")
-        self.grafo = self.grafo_original 
+            self.salvar_grafo_arvore(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\arvores\{inicio}.png")
+        self.grafo = self.grafo_original
 
     def avançar_tempo_movimentacao_dinamica_otimizado(self, printar=True):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
@@ -1475,7 +1473,7 @@ class Modelo:
                 if self.floripa:
                     #print(self.grafo.edges(data=True))
                     for vizinho in self.grafo.edges(nome, data=True):
-                        print(vizinho)
+                        #print(vizinho)
                         S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * vizinho[2]["beta"])
                         I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * vizinho[2]["beta"])
                         R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * vizinho[2]["beta"])
@@ -1502,9 +1500,8 @@ class Modelo:
             if printar:
                 #with self.terminal.location(y=self.terminal.height-2):
                 print("tempo=", self.t)
+
             self.tempos.append(self.t)
-            if soma_SIR[1] == 0:
-                break
             self.SIRs.append([])
             soma_SIR = [0, 0, 0]
 
@@ -1574,7 +1571,6 @@ class Modelo:
                 atributos["SIRdd"]["R"] = atributos["SIRdd"]["R"] + recuperados_novos_dd
 
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
-            
             if printar:
                 #with self.terminal.location(y=self.terminal.height-3):
                 print(soma_SIR)
@@ -1582,6 +1578,9 @@ class Modelo:
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.tempo_pico = self.t
                 self.pico_infectados = soma_SIR[1]
+
+            if soma_SIR[1] == 0:
+                break
 
             for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
                 nome, atributos = node
@@ -1905,14 +1904,13 @@ class Modelo:
     def gerar_grafo_florianopolis(self):
         g = nx.DiGraph()
         self.peso_medio = 0
+
         for linha in self.arquivo:
             adj, propriedades = linha.strip().split("/")
             nome, *adj = adj.split(", ")
             numero, populaçao_s, populaçao_i, *beta = propriedades.split(", ")
             
             populaçao_s, populaçao_i = int(populaçao_s), int(populaçao_i)
-
-            print(beta)
 
             adj = [(nome, v, float(beta[i])) for i, v in enumerate(adj)]
 
@@ -1929,6 +1927,7 @@ class Modelo:
             S2pontos = S - Sponto               # pessoas que nao respeitam (podem sair do vertice)
             I2pontos = I - Iponto
             self.peso_medio += sum([float(beta[i]) for i, v in enumerate(adj)])
+
             g.add_node(nome, 
                 id=int(numero), 
                 #populaçao=populaçao_s + populaçao_i,
@@ -1943,16 +1942,74 @@ class Modelo:
                 isolado=False)
             
             g.add_weighted_edges_from(adj, "beta")
-        self.peso_medio - self.peso_medio / len(g.nodes())
+            
+        self.peso_medio = self.peso_medio / len(g.nodes())
         return g
 
+    def boxplot_heuristica_floripa(self, path_picos):
+        picos = open(path_picos, "r", encoding="utf-8")
 
+        picos_por_arvore = dict()
+
+        picos.readline();picos.readline();picos.readline();picos.readline()
+
+        for linha in picos:
+            if linha.strip():
+                if linha[0] == " ":
+                    if linha[1] == " ":             # remoção de arestas
+                        linha = (linha.strip()).split("-")
+
+                        verticeA = linha.pop(0)
+                        linha = linha[0].split(" ")
+                        verticeB = linha[0:2]
+
+                        pico, dia_pico, dia_fim = linha[2::]
+
+                        picos_por_arvore[arvore_atual].append(int(pico))
+                    else:                       # adiçao de aresta
+                        linha = (linha.strip()).split("-")
+
+                        verticeA = linha.pop(0)
+                        linha = linha[0].split(" ")
+                        verticeB = linha[0:2]
+
+                        pico, dia_pico, dia_fim = linha[2::]
+
+                        picos_por_arvore[arvore_atual].append(int(pico))
+                else:
+                    arvore_atual = linha.strip().split(" ", maxsplit=1)[1].split(":")[0]
+                    picos_por_arvore[arvore_atual] = []
+
+        #print(picos_por_arvore)
+        #fig, ax = plt.subplots(3, 6)
+        #df = pd.DataFrame(picos_por_arvore)
+
+        #print(picos_por_arvore)
+        #picos_por_arvore = {"Grupos": [key for key in picos_por_arvore.keys()], "Picos": [picos_por_arvore[key] for key in picos_por_arvore.keys()]}
+        #print(picos_por_arvore)
+        picos_por_arvore = {key: picos_por_arvore[key] for key in sorted(picos_por_arvore.keys(), key=lambda x: int(x.split(" ")[1]))}
+        df = pd.DataFrame.from_dict({'Início da Árvore': list(picos_por_arvore.keys()), 'Pico': list(picos_por_arvore.values())})#, columns=("Grupo", "Pico"), orient='index')
+        df = df.explode(column='Pico').reset_index(drop=True)
+        plt.figure(figsize=(14,7))
+
+        print(df)
+        #g = sns.FacetGrid(df, col="Grupos") #col_wrap=4,  height=2, ylim=(0, 10))
+        sns.boxplot(data=df, x="Início da Árvore", y="Pico", width=0.7, color="red").set(title='Pico de Infectados da Heurística')
+        sns.swarmplot(data=df, x="Início da Árvore", y="Pico", size=1)
+
+        #g.map_dataframe(sns.boxplot, width=0.5, fliersize=10, color="red")
+        #g.map_dataframe(sns.swarmplot, size=2)
+            
+            #plt.show()
+        plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplotteste.png", format="png", dpi=300, bbox_inches="tight")
+            
+        plt.close()
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -1984,10 +2041,41 @@ m = Modelo(arquivo_final_flo, flo=True)
 #m.resetar_grafo()
 #m.avançar_tempo_movimentacao_dinamica_otimizado()
 #m.printar_grafo()
-
+m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\arvores\Infectados em todos\picos_por_arvores_e_arestas_profundidade.txt")
 path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
-m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
+#m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
+
+#?visitados = set()
+# anterior = {}
+# niveis = {}
+# m.grafo_original = m.grafo.copy()
+# m.busca_em_profundidade("Grupo 1", anterior, visitados, niveis, 0)
+# ciclo = []
+# v, u = "Grupo 10", "Grupo 6"
+# w, z = (v, u) if (max(niveis[v], niveis[u]), min(niveis[v], niveis[u])) == (niveis[v], niveis[u]) else (u, v)
+# nivel = niveis[w]
+# print(niveis, "\n\n", anterior)
+# m.grafo.remove_edges_from(list(m.grafo.edges()))
+# for vertice, ant in anterior.items():
+#     m.grafo.add_weighted_edges_from([(ant, vertice, m.grafo_original.get_edge_data(ant, vertice)["beta"]), (vertice, ant, m.grafo_original.get_edge_data(vertice, ant)["beta"])], weight="beta")
+# m.printar_grafo()
+# while nivel > niveis[z]:
+#     ciclo.append(w)
+#     w = anterior[w]
+#     nivel -= 1
+# print("W e Z mesmo nivel:", w, z)
+# ciclo2 = []
+# while w != z:
+#     ciclo.append(w)
+#     w = anterior[w]
+#     ciclo2.append(z)
+#     z = anterior[z]
+# ciclo.append(w)     # raiz
+# if ciclo2:
+#     ciclo.extend(list(reversed(ciclo2)))  # append outro lado do caminho na arvore
+# print("W e Z dps de achar ciclo:", w, z)
+#?print("Criando", v, "-->", u, "/ ciclo:", ciclo, "\n")
 
 
 # print(len(m.grafo.nodes()))
