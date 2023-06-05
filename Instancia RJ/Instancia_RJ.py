@@ -1319,7 +1319,7 @@ class Modelo:
 
 
             grafo_complemento = nx.complement(self.grafo).edges()
-            #print(len(self.grafo.edges()), len(grafo_complemento))
+            print(len(grafo_complemento))
 
             for v, u in grafo_complemento:      # adiçao da aresta que cria ciclo
                 print("ADIÇÃO ARESTA: ", end="")
@@ -1403,6 +1403,7 @@ class Modelo:
                         self.grafo.nodes[vertice]["beta"] = 1 / (len(self.grafo.edges(vertice)) + 1)
 
 
+                self.resetar_grafo()
                 self.avançar_tempo_movimentacao_dinamica_otimizado(printar=True)
                 arquivo_picos.write(f" {v}-{u} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
                 arquivo_log.write(f"{self.SIRxTdeVertices}\n")
@@ -1944,6 +1945,7 @@ class Modelo:
             g.add_weighted_edges_from(adj, "beta")
             
         self.peso_medio = self.peso_medio / len(g.nodes())
+        print(len(g.edges()))
         return g
 
     def boxplot_heuristica_floripa(self, path_picos):
@@ -2041,10 +2043,10 @@ m = Modelo(arquivo_final_flo, flo=True)
 #m.resetar_grafo()
 #m.avançar_tempo_movimentacao_dinamica_otimizado()
 #m.printar_grafo()
-m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\arvores\Infectados em todos\picos_por_arvores_e_arestas_profundidade.txt")
+#m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\arvores\Infectados em todos\picos_por_arvores_e_arestas_profundidade.txt")
 path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
-#m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
+m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 
 #?visitados = set()
 # anterior = {}
