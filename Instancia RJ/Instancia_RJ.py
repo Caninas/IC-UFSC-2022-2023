@@ -1886,7 +1886,7 @@ class Modelo:
         inicios = []
 
         g = self.grafo.copy()
-        arquivo_log = open(f"{path}/dados_boxplot.txt", "w", encoding="utf-8")
+        arquivo_log = open(f"{path}/dados_boxplot_zs_minimal.txt", "w", encoding="utf-8")
         for inicio in self.grafo.nodes():
             pico_infectados = []
             arestas_removidas = []
@@ -1968,7 +1968,6 @@ class Modelo:
             g.add_weighted_edges_from(adj, "beta")
             
         self.peso_medio = self.peso_medio / len(g.nodes())
-        print(len(g.edges()))
         return g
 
     def boxplot_heuristica_floripa(self, path_picos):
@@ -2068,8 +2067,8 @@ m = Modelo(arquivo_final_flo, flo=True)
 #m.printar_grafo()
 path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
+m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\picos_por_arvores_e_arestas_profundidade.txt")
-#m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
 
 #?visitados = set()
 # anterior = {}
