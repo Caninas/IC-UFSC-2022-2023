@@ -65,9 +65,13 @@ encontrar largura pico modulo
 	✔ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo))) @done (6/2/2023, 6:30:13 PM)
 	✔ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo @done (6/2/2023, 6:30:16 PM)
 ✔ mudar grafico pizza novo @done (5/31/2023, 9:21:30 PM)
-	☐ fazer comparação antes e depois movimentaçao
+	✔ fazer comparação antes e depois movimentaçao @done (6/6/2023, 4:19:39 PM)
 
-
+☐ comparar pico grafo original com inicio da infecçao em vertice de inicio da arvore, profundidade e largura
+☐ arvore em largura heuristica
+☐ gerar grafico SIRT arvore em profundidade inicio flamengo e colocar do lado do grafo original incio flamengo
+☐ boxblot sem adiçoes
+☐ gerar SIRT grafo original todos os inicios
 
 
 Pricila:
@@ -75,7 +79,8 @@ Pricila:
 ☐ Comparar numeros finais com formula derivada de cada SIR para calcular o erro
 ☐ Trabalhar com grafo menor (pedir floripa)
 ☐ Problema menor para validar os erros
-	
+
+
 ✔ Ajeitar grafo zona sul com e sem botafogo pra direita @done (5/15/2023, 8:45:39 PM)
 ✔ Mandar pdf da explicação das fórmulas, grafos @done (5/15/2023, 8:45:41 PM)
 ✔ colocar referencia livro hethcote primeiro artigo @done (5/18/2023, 4:58:55 PM)
