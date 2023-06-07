@@ -2035,7 +2035,7 @@ class Modelo:
     def rodar_modelo_inicio_vertices(self, path_resultados):
         arquivo_picos = open(f"{path_resultados}", "w", encoding="utf-8", buffering=1)
         arquivo_picos.write("Picos por Inicio Grafo Original RJ\nInicio Pico Dia_do_Pico Fim_Espalhamento\n\n")
-
+        #! SALVAR SIRXT DE VERTICES PARA GRAFICO SIRT
         for inicio in self.grafo.nodes():
             self.vertice_de_inicio = inicio
             pico = [0, 0, 0]
