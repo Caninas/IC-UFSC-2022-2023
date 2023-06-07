@@ -142,7 +142,7 @@ class Modelo:
             self.pico_infectados = 0
             #self.juntos = True
 
-    def estimar_tempo_restante(self, percorrido, total):
+    def estimar_tempo_restante(self, percorrido, total, texto_restante="arvores restantes"):
         if percorrido:
             estimativa = ((time.perf_counter() - self.estimativa_tempo_inicial) / percorrido) * (total - percorrido)
         else:
@@ -152,7 +152,7 @@ class Modelo:
         #with self.terminal.location(y=self.terminal.height):
             #print("Tempo restante:", self.tempo_restante, "segundos")
             #print(self.terminal.on_firebrick2("   "))
-        print(f"Estimativa {estimativa/60:.2f} minutos | {total - percorrido} arvores restantes")
+        print(f"Estimativa {estimativa/60:.2f} minutos | {total - percorrido} {texto_restante}")
 
 
     def salvar_grafo_arvore(self, path):
@@ -426,20 +426,24 @@ class Modelo:
 
             self.isolados = False
 
-    def busca_em_largura(self, inicio):
+    def busca_em_largura(self, inicio, niveis):
         fila = []
         visitados = {inicio}
         anterior = {}
-
         fila.append(inicio)
+
+        niveis[inicio] = 0
+
         while len(fila):
             v = fila.pop(0)
+
             for vizinho in self.grafo_original.edges(v):
                 vizinho = vizinho[1]
                 if vizinho not in visitados:
                     visitados.add(vizinho)
                     fila.append(vizinho)
                     anterior[vizinho] = v
+                    niveis[vizinho] = niveis[v] + 1
 
         return anterior
 
@@ -1300,11 +1304,11 @@ class Modelo:
             anterior = {}
             niveis = {}
             if tipo_arvore == "largura":
-                anterior = self.busca_em_largura(inicio)
+                anterior = self.busca_em_largura(inicio, niveis)
             else:
                 visitados = set()
                 self.busca_em_profundidade(inicio, anterior, visitados, niveis, 0)
-            
+
             self.grafo.remove_edges_from(list(self.grafo.edges()))
 
             if self.floripa:
@@ -1347,6 +1351,17 @@ class Modelo:
                 #                     self.encontrou_ciclo = True
                 #                     break
                 #                 achar_ciclo(vizinho, anterior, visitados)
+                                #achar_ciclo(u, anterior, visitados)
+
+                # ciclo.append(v)
+                # while True:                 # montar ciclo
+                #     try:
+                #         if anterior[ciclo[-1]] != v:
+                #             ciclo.append(anterior[ciclo[-1]])
+                #         else:
+                #             raise Exception
+                #     except:
+                #         break
 
                 def achar_ciclo_a(anterior):
                     # w vertice de maior nivel, z menor
@@ -1384,20 +1399,7 @@ class Modelo:
                     # depois juntar colocando vertice igual no final do primeiro
                 
                 achar_ciclo_a(anterior)
-                #achar_ciclo(u, anterior, visitados)
 
-                # ciclo.append(v)
-                # while True:                 # montar ciclo
-                #     try:
-                #         if anterior[ciclo[-1]] != v:
-                #             ciclo.append(anterior[ciclo[-1]])
-                #         else:
-                #             raise Exception
-                #     except:
-                #         break
-
-                #print(ciclo)
-                #self.printar_grafo("arvore")
                 if self.floripa:
                     self.grafo.add_weighted_edges_from([(v, u, self.grafo_original.get_edge_data(v, u)["beta"]), (u, v, self.grafo_original.get_edge_data(u, v)["beta"])], weight="beta")
                 else:
@@ -1471,7 +1473,7 @@ class Modelo:
             self.salvar_grafo_arvore(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\arvores\{inicio}.png")
         self.grafo = self.grafo_original
 
-    def avançar_tempo_movimentacao_dinamica_otimizado(self, printar=True):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
+    def avançar_tempo_movimentacao_dinamica_otimizado(self, printar=0):    # s = nome vertice de origem (no caso de utilizar um grafo arvore)
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
         soma_SIR = [0,1,0]
         while True:
@@ -1523,7 +1525,7 @@ class Modelo:
              
             if printar:
                 #with self.terminal.location(y=self.terminal.height-2):
-                print("tempo=", self.t)
+                print("tempo=", self.t, end=' ') if printar==2 else print("tempo=", self.t, end=' | ')
 
             self.tempos.append(self.t)
             self.SIRs.append([])
@@ -1597,13 +1599,14 @@ class Modelo:
             self.SIRs[self.t-1] = [soma_SIR[0], soma_SIR[1], soma_SIR[2]]
             if printar:
                 #with self.terminal.location(y=self.terminal.height-3):
-                print(soma_SIR)
+                print(soma_SIR) if printar==2 else print(f"SIR: {soma_SIR}", end='\r')
 
             if not any(i[1] > soma_SIR[1] for i in self.SIRs):
                 self.tempo_pico = self.t
                 self.pico_infectados = soma_SIR[1]
 
             if soma_SIR[1] == 0:
+                print("")
                 break
 
             for node in list(self.grafo.nodes(data=True)):          # voltar pessoas para o proprio vertice
@@ -1970,7 +1973,7 @@ class Modelo:
         self.peso_medio = self.peso_medio / len(g.nodes())
         return g
 
-    def boxplot_heuristica_floripa(self, path_picos):
+    def boxplot_heuristica_floripa(self, path_picos, tipo_arvore):
         picos = open(path_picos, "r", encoding="utf-8")
 
         picos_por_arvore = dict()
@@ -1999,7 +2002,7 @@ class Modelo:
 
                         pico, dia_pico, dia_fim = linha[2::]
 
-                        picos_por_arvore[arvore_atual].append(int(pico))
+                        #picos_por_arvore[arvore_atual].append(int(pico))
                 else:
                     arvore_atual = linha.strip().split(" ", maxsplit=1)[1].split(":")[0]
                     picos_por_arvore[arvore_atual] = []
@@ -2012,22 +2015,44 @@ class Modelo:
         #picos_por_arvore = {"Grupos": [key for key in picos_por_arvore.keys()], "Picos": [picos_por_arvore[key] for key in picos_por_arvore.keys()]}
         #print(picos_por_arvore)
         picos_por_arvore = {key: picos_por_arvore[key] for key in sorted(picos_por_arvore.keys(), key=lambda x: int(x.split(" ")[1]))}
-        df = pd.DataFrame.from_dict({'Início da Árvore de Busca em Profundidade': list(picos_por_arvore.keys()), 'Pico': list(picos_por_arvore.values())})#, columns=("Grupo", "Pico"), orient='index')
+        df = pd.DataFrame.from_dict({f'Início da Árvore de Busca em {tipo_arvore.title()}': list(picos_por_arvore.keys()), 'Pico': list(picos_por_arvore.values())})
         df = df.explode(column='Pico').reset_index(drop=True)
         plt.figure(figsize=(14,7))
 
         print(df)
         #g = sns.FacetGrid(df, col="Grupos") #col_wrap=4,  height=2, ylim=(0, 10))
-        sns.boxplot(data=df, x="Início da Árvore de Busca em Profundidade", y="Pico", width=0.7, color="red").set(title='Pico de Infectados da Heurística')
-        sns.swarmplot(data=df, x="Início da Árvore de Busca em Profundidade", y="Pico", size=4)
+        sns.boxplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", width=0.7, color="red").set(title='Pico de Infectados da Heurística')
+        sns.swarmplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", size=4)
 
         #g.map_dataframe(sns.boxplot, width=0.5, fliersize=10, color="red")
         #g.map_dataframe(sns.swarmplot, size=2)
             
             #plt.show()
-        plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplotteste.png", format="png", dpi=300, bbox_inches="tight")
+        plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplot_heuristica_{tipo_arvore}_sem_adiçoes.png", format="png", dpi=300, bbox_inches="tight")
             
         plt.close()
+
+    def rodar_modelo_inicio_vertices(self, path_resultados):
+        arquivo_picos = open(f"{path_resultados}", "w", encoding="utf-8", buffering=1)
+        arquivo_picos.write("Picos por Inicio Grafo Original RJ\nInicio Pico Dia_do_Pico Fim_Espalhamento\n\n")
+
+        for inicio in self.grafo.nodes():
+            self.vertice_de_inicio = inicio
+            pico = [0, 0, 0]
+            print("\nInicio:", inicio)
+            self.estimar_tempo_restante(list(self.grafo.nodes()).index(inicio), len(self.grafo.nodes()), "vértices de início restante")
+            for iteraçao in range(3):
+                print("Iteração:", iteraçao+1)
+
+                self.resetar_grafo()
+                #print(self.printar_estados_vertices())
+                self.avançar_tempo_movimentacao_dinamica_otimizado(1)
+                pico = [x+y for x, y in zip(pico, [self.pico_infectados, self.tempo_pico, self.t])]
+
+            pico = [int(x/3) for x in pico]
+            
+            arquivo_picos.write(f"{inicio} {pico[0]} {pico[1]} {pico[2]}\n")
+
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
@@ -2057,7 +2082,6 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt = Txt(arquivo_adjacencias, arquivo_ID_nomes, arquivo_final, tabela_populaçao)
 #txt.gerar_arquivo_destino()
 
-#? RODAR HEURISTICA NA ZONA SUL
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final_flo, flo=True)
 #print(m.grafo.edges(data=True))
@@ -2067,8 +2091,20 @@ m = Modelo(arquivo_final_flo, flo=True)
 #m.printar_grafo()
 path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
-m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
-m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\picos_por_arvores_e_arestas_profundidade.txt")
+#m.heuristica_arvores_vizinhas("largura", path_log, path_picos)
+#m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
+m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\picos_por_arvores_e_arestas_profundidade.txt", "profundidade")
+#m.rodar_modelo_inicio_vertices("./Resultados/picos_inicios_grafo_original.txt")
+
+
+
+
+
+
+
+
+
+
 
 #?visitados = set()
 # anterior = {}

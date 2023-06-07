@@ -67,10 +67,12 @@ encontrar largura pico modulo
 ✔ mudar grafico pizza novo @done (5/31/2023, 9:21:30 PM)
 	✔ fazer comparação antes e depois movimentaçao @done (6/6/2023, 4:19:39 PM)
 
-☐ comparar pico grafo original com inicio da infecçao em vertice de inicio da arvore, profundidade e largura
-☐ arvore em largura heuristica
+✔ gerar picos grafo original inicios @done (6/7/2023, 2:24:44 AM)
+	☐ pico grafo original com inicio da infecçao X vertice de inicio da arvore, profundidade e largura
+✔ arvore em largura heuristica @done (6/7/2023, 5:50:08 PM)
 ☐ gerar grafico SIRT arvore em profundidade inicio flamengo e colocar do lado do grafo original incio flamengo
-☐ boxblot sem adiçoes e pintar pontos boxplot com adiçoes de outra cor para diferenciar de remoçoes
+✔ boxblot sem adiçoes @done (6/7/2023, 6:01:15 PM)
+☐ pintar pontos boxplot com adiçoes de outra cor para diferenciar de remoçoes
 ☐ gerar SIRT grafo original todos os inicios
 
 
