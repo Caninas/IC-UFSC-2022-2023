@@ -70,7 +70,7 @@ encontrar largura pico modulo
 ✔ gerar picos grafo original inicios @done (6/7/2023, 2:24:44 AM)
 	☐ pico grafo original com inicio da infecçao X vertice de inicio da arvore, profundidade e largura
 ✔ arvore em largura heuristica @done (6/7/2023, 5:50:08 PM)
-☐ gerar grafico SIRT arvore em profundidade inicio flamengo e colocar do lado do grafo original incio flamengo
+✔ gerar grafico SIRT arvore em profundidade inicio flamengo e colocar do lado do grafo original incio flamengo @done (6/7/2023, 9:02:09 PM)
 ✔ boxblot sem adiçoes @done (6/7/2023, 6:01:15 PM)
 ☐ pintar pontos boxplot com adiçoes de outra cor para diferenciar de remoçoes
 

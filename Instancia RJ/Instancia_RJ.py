@@ -616,13 +616,14 @@ class Modelo:
         self.grafo = self.grafo_original 
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
+        resultados_grafo_original = open("./Resultados/picos_inicios_grafo_originall.txt", "r")
         if tipo_arvore == "largura":
             resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
         else:
             resultados = open("./Resultados/resultados_arvore_profundidade.txt", "r")
 
         titulo = f'Picos de Infectados das Árvores de Busca em {tipo_arvore.title()}'
-        resultados_lista = [x for x in range(160)]
+        resultados_lista = [x for x in range(159)]
 
 
         for linha in resultados:
@@ -633,23 +634,39 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)] = [int(float(max_infect))]
+            resultados_lista[int(id)-1] = [int(float(max_infect))]
 
-        resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
+
+        resultados_grafo_original.readline();resultados_grafo_original.readline();resultados_grafo_original.readline();
+        
+        for linha in resultados_grafo_original:
+            linha = linha.strip()
+            linha = linha.split(" ")
+            if linha == "":
+                break
+
+            nome_bairro = " ".join(linha[0:len(linha)-3])
+            pico, dia_pico, dia_fim = linha[len(linha)-3:len(linha)]
+            print(nome_bairro)
+            resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(int(pico))
+        
+        print(resultados_lista)
+        
+        #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
 
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
         fig.set_size_inches([15, 7.5])
 
         plt.xlim(left=-5, right=164)
-        plt.xticks([x for x in range(0, 160, 4)])
+        plt.xticks([x for x in range(0, 159, 4)])
         plt.yticks([x for x in range(0, 1000001, 100000)])
         
-        plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
-        resultados_lista.pop(0)
+        #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        #resultados_lista.pop(0)
 
-        plt.gca().set_prop_cycle('color', ['0d66a3'])
-        plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
+        plt.gca().set_prop_cycle('color', ['0d66a3', "red"])
+        plt.plot([x for x in range(0, 159)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.130, 0.5))
@@ -659,8 +676,8 @@ class Modelo:
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-        
-        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores {tipo_arvore.title()} FINAL.png", format="png", dpi=300)
+        plt.show()
+        #plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores {tipo_arvore.title()} FINAL.png", format="png", dpi=300)
         plt.close()
 
     def printar_grafico_ID_MAXINFECT_arvores_largura_profundidade(self):
@@ -2057,8 +2074,8 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -2083,7 +2100,7 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt.gerar_arquivo_destino()
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final_flo, flo=True)
+m = Modelo(arquivo_final, flo=False)
 #print(m.grafo.edges(data=True))
 #m.vertice_de_inicio = "Flamengo"
 #m.resetar_grafo()
@@ -2093,10 +2110,10 @@ path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
 path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
 #m.heuristica_arvores_vizinhas("largura", path_log, path_picos)
 #m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
-m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\picos_por_arvores_e_arestas_profundidade.txt", "profundidade")
+#m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\picos_por_arvores_e_arestas_profundidade.txt", "profundidade")
 #m.rodar_modelo_inicio_vertices("./Resultados/picos_inicios_grafo_original.txt")
 
-
+m.printar_grafico_ID_MAXINFECT_arvore("largura")
 
 
 
