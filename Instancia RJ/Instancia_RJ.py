@@ -15,6 +15,8 @@ import time
 import pandas as pd
 import openpyxl
 import seaborn as sns
+
+from scipy.interpolate import interp1d
 #from blessed import Terminal
 
 from Txt import Txt
@@ -82,6 +84,8 @@ class Modelo:
 
             if nome == self.vertice_de_inicio:
                 I = floor(self.frac_infect_inicial * populaçao)
+            elif nome == "Trindade":
+                I = 200
             else:
                 I = 0
             #I = floor(self.frac_infect_inicial * populaçao)    # distribuir igualmente
@@ -272,7 +276,7 @@ class Modelo:
                 f"        SIRdd:  {self.grafo.nodes[vertice]['SIRdd']}\n"
                 f"        SIRddd:  {self.grafo.nodes[vertice]['SIRddd']}")
 
-    def  printar_grafico_SIRxT(self, x=None, y=None, path=None):
+    def printar_grafico_SIRxT(self, x=None, y=None, path=None):
         fig = plt.figure(1)#.set_fig
         ax = fig.add_subplot(111)
         fig.set_size_inches([9, 6])
@@ -280,6 +284,10 @@ class Modelo:
 
         plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+       
+        # for i in range(len(self.tempos), 201):    # igualar a 200
+        #     self.tempos.append(i)
+        #     self.SIRs.append(self.SIRs[-1])
 
         if x:
             plt.xlim(left=1, right=len(x))
@@ -287,6 +295,7 @@ class Modelo:
         else:
             plt.xlim(left=self.tempos[0], right=self.tempos[-1])
             plt.plot(self.tempos, self.SIRs)
+
 
         ax.legend(["S", "I", "R"], loc='center right', bbox_to_anchor=(1.1, 0.5))
         ax.set_xlabel('Tempo')
@@ -296,8 +305,8 @@ class Modelo:
         if path and not x:
             plt.savefig(path, format="png", bbox_inches='tight')
         elif x:
-            inicio = path.split("\\")[-1]
-            plt.title(f'Raiz: {inicio.split(".png")[0]}')
+            inicio = path.split("/")[-1]
+            plt.title(f'Início: {inicio.split(".png")[0]}')
             plt.savefig(path, format="png", bbox_inches='tight')
         else:
             plt.show()
@@ -426,7 +435,7 @@ class Modelo:
 
             self.isolados = False
 
-    def busca_em_largura(self, inicio, niveis):
+    def busca_em_largura(self, inicio, niveis=dict()):
         fila = []
         visitados = {inicio}
         anterior = {}
@@ -538,7 +547,7 @@ class Modelo:
             print("Tipo de árvore inválida") if self.picos_infectados_arvores \
             else print("É necessário rodar o modelo sobre as árvores primeiro")
 
-    def busca_em_profundidade(self, v, anterior, visitados, niveis, nivel=0):
+    def busca_em_profundidade(self, v, anterior, visitados, niveis=dict(), nivel=0):
         visitados.add(v)
         niveis[v] = nivel
 
@@ -616,7 +625,8 @@ class Modelo:
         self.grafo = self.grafo_original 
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
-        resultados_grafo_original = open("./Resultados/picos_inicios_grafo_originall.txt", "r")
+        resultados_grafo_original = open("./Resultados/picos_inicios_grafo_originall.txt", "r", encoding="utf-8")
+
         if tipo_arvore == "largura":
             resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
         else:
@@ -665,7 +675,7 @@ class Modelo:
         #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         #resultados_lista.pop(0)
 
-        plt.gca().set_prop_cycle('color', ['0d66a3', "red"])
+        plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
         plt.plot([x for x in range(0, 159)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
@@ -681,12 +691,13 @@ class Modelo:
         plt.close()
 
     def printar_grafico_ID_MAXINFECT_arvores_largura_profundidade(self):
-
+        resultados_grafo_original = open("./Resultados/picos_inicios_grafo_originall.txt", "r", encoding="utf-8")
         resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
         resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
-        titulo = f'Picos de Infectados das Árvores de Busca em Largura e Profundidade'
+        
+        titulo = f'Picos de Infectados do Grafo Original e das Árvores de Busca em Largura e Profundidade'
 
-        resultados_lista = [x for x in range(160)]
+        resultados_lista = [x for x in range(159)]
 
         for linha in resultadosL:
             linha = linha.strip()
@@ -696,7 +707,7 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)] = [int(float(max_infect))]
+            resultados_lista[int(id)-1] = [int(float(max_infect))]
 
 
         for linha in resultadosP:
@@ -707,31 +718,45 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)].append(int(float(max_infect)))
+            resultados_lista[int(id)-1].append(int(float(max_infect)))
 
-        resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
+        #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
 
+        resultados_grafo_original.readline();resultados_grafo_original.readline();resultados_grafo_original.readline();
+        
+        for linha in resultados_grafo_original:
+            linha = linha.strip()
+            linha = linha.split(" ")
+            if linha == "":
+                break
+
+            nome_bairro = " ".join(linha[0:len(linha)-3])
+            pico, dia_pico, dia_fim = linha[len(linha)-3:len(linha)]
+            
+            resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(int(pico))
+
+        print(resultados_lista)
 
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
         fig.set_size_inches([15, 7.5])
 
         plt.xlim(left=-5, right=164)
-        plt.xticks([x for x in range(0, 160, 4)])
-        plt.yticks([x for x in range(0, 1000001, 100000)])
+        plt.xticks([x for x in range(1, 159, 4)])
+        plt.yticks([x for x in range(0, 1100001, 100000)])
         
-        plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
-        resultados_lista.pop(0)
+        #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        #resultados_lista.pop(0)
 
-        plt.gca().set_prop_cycle('color', ['green', '0d66a3'])
+        plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
 
         plt.plot([x for x in range(1, 160)], resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Grafo Original", "Largura", "Profundidade"], loc='center right', bbox_to_anchor=(1.130, 0.5))
+        ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
 
         plt.title(titulo)
-        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
+        ax.set_xlabel('ID do Bairro de Início')
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
@@ -1866,7 +1891,7 @@ class Modelo:
         angle = -360 * ((sir_t0_depois[0][0] + sir_t0_depois[0][1] + Sddd/2) / total2)
         explode = [0, 0, 1.5, 0, 0, 0, 0, 0, 0]
 
-        wedges, *_ = ax2.pie(x2, colors=colors_depois, radius=6, center=(4, 4), textprops={'fontsize': 18}, startangle=angle, explode=explode,
+        wedges, *_ = ax2.pie(x2, colors=colors_depois, radius=6, center=(4, 4), textprops={'fontsize': 20}, startangle=angle, explode=explode,
                 autopct=lambda p: '{:.0f}'.format(p * total2 / 100), wedgeprops={"linewidth": 0, "edgecolor": "white"}, frame=True, labels=labels_depois)
 
         theta1, theta2 = wedges[2].theta1, wedges[2].theta2
@@ -1994,6 +2019,7 @@ class Modelo:
         picos = open(path_picos, "r", encoding="utf-8")
 
         picos_por_arvore = dict()
+        picos_por_arvore_ad = dict()
 
         picos.readline();picos.readline();picos.readline();picos.readline()
 
@@ -2018,12 +2044,14 @@ class Modelo:
                         verticeB = linha[0:2]
 
                         pico, dia_pico, dia_fim = linha[2::]
-
-                        #picos_por_arvore[arvore_atual].append(int(pico))
+                        picos_por_arvore_ad[arvore_atual].append(int(pico))
                 else:
                     arvore_atual = linha.strip().split(" ", maxsplit=1)[1].split(":")[0]
                     picos_por_arvore[arvore_atual] = []
+                    picos_por_arvore_ad[arvore_atual] = []
 
+        print(len(picos_por_arvore["Grupo 1"]))
+        print(len(picos_por_arvore_ad["Grupo 1"]))
         #print(picos_por_arvore)
         #fig, ax = plt.subplots(3, 6)
         #df = pd.DataFrame(picos_por_arvore)
@@ -2032,27 +2060,41 @@ class Modelo:
         #picos_por_arvore = {"Grupos": [key for key in picos_por_arvore.keys()], "Picos": [picos_por_arvore[key] for key in picos_por_arvore.keys()]}
         #print(picos_por_arvore)
         picos_por_arvore = {key: picos_por_arvore[key] for key in sorted(picos_por_arvore.keys(), key=lambda x: int(x.split(" ")[1]))}
-        df = pd.DataFrame.from_dict({f'Início da Árvore de Busca em {tipo_arvore.title()}': list(picos_por_arvore.keys()), 'Pico': list(picos_por_arvore.values())})
+        df = pd.DataFrame.from_dict({f'Início da Árvore de Busca em {tipo_arvore.title()}': list(picos_por_arvore.keys()), 'Pico': list(picos_por_arvore.values()), "Tipo": "Remoção"})
         df = df.explode(column='Pico').reset_index(drop=True)
+
+        picos_por_arvore_ad = {key: picos_por_arvore_ad[key] for key in sorted(picos_por_arvore_ad.keys(), key=lambda x: int(x.split(" ")[1]))}
+        df2 = pd.DataFrame.from_dict({f'Início da Árvore de Busca em {tipo_arvore.title()}': list(picos_por_arvore_ad.keys()), 'Pico': list(picos_por_arvore_ad.values()), "Tipo": "Adição"})
+        df2 = df2.explode(column='Pico').reset_index(drop=True)
+        #print(df2)
         plt.figure(figsize=(14,7))
 
+        #df = pd.concat([df, df2])
         print(df)
         #g = sns.FacetGrid(df, col="Grupos") #col_wrap=4,  height=2, ylim=(0, 10))
         sns.boxplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", width=0.7, color="red").set(title='Pico de Infectados da Heurística')
-        sns.swarmplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", size=4)
-
+        sns.swarmplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", size=4) #hue="Tipo"
+        left, right = plt.xlim()
+        plt.plot([left, right], [83271, 83271], color="green", linewidth=2, label="Pico Original")
+        plt.legend(loc="upper left")
+        #sns.swarmplot(data=df2, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", size=4, color="green")
+        
         #g.map_dataframe(sns.boxplot, width=0.5, fliersize=10, color="red")
         #g.map_dataframe(sns.swarmplot, size=2)
             
-            #plt.show()
+        #plt.show()
         plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplot_heuristica_{tipo_arvore}_sem_adiçoes.png", format="png", dpi=300, bbox_inches="tight")
             
         plt.close()
 
-    def rodar_modelo_inicio_vertices(self, path_resultados):
-        arquivo_picos = open(f"{path_resultados}", "w", encoding="utf-8", buffering=1)
+    def rodar_modelo_inicio_vertices(self, path_resultados, path_sirt):
+        arquivo_picos = open(path_resultados, "w", encoding="utf-8", buffering=1)
+        SIRxTdeVerticesTXT = open(path_sirt, "w", encoding="utf-8", buffering=1)
+
         arquivo_picos.write("Picos por Inicio Grafo Original RJ\nInicio Pico Dia_do_Pico Fim_Espalhamento\n\n")
+        
         #! SALVAR SIRXT DE VERTICES PARA GRAFICO SIRT
+        
         for inicio in self.grafo.nodes():
             self.vertice_de_inicio = inicio
             pico = [0, 0, 0]
@@ -2069,13 +2111,221 @@ class Modelo:
             pico = [int(x/3) for x in pico]
             
             arquivo_picos.write(f"{inicio} {pico[0]} {pico[1]} {pico[2]}\n")
+                        
+            SIRxTdeVerticesTXT.write(f"{inicio}, {self.SIRxTdeVertices}\n")
 
+    def gerar_SIRxT_inicios_rj(self, path_sirt):
+        SIRxT = open(path_sirt, "r", encoding="utf-8")
+
+        for linha in SIRxT:
+            if linha:
+                inicio, dicionario_dados = linha.split(", ", maxsplit=1)
+                dicionario_dados = ast.literal_eval(dicionario_dados)
+                total_SIR = [0, 0, 0]
+                x = [i for i in range(1, 201)]
+                y = [[0, 0, 0] for i in range(200)]
+                path = f"./Resultados/SIRxT Grafo Original/{inicio}.png"
+                
+                for vertice, valores in dicionario_dados.items():
+                    for tempo, sir in valores.items():
+                        if tempo < 201:     # 2 bairros acima de 200 com 205, 209
+                            y[tempo-1] = [s+k for s, k in zip(sir, y[tempo-1])]
+                    for i in range(200 - tempo):
+                        y[tempo + i] = [s+k for s, k in zip(sir, y[tempo + i])]
+                    
+                self.printar_grafico_SIRxT(x, y, path)
+
+
+
+
+        #path = f""
+        #self.printar_grafico_SIRxT(x, y, path)
+
+
+    def gerar_grafos_arvores_florianopolis(self, tipo_arvore):
+        resultados_arvore = open(f"./Resultados/Florianopolis arvores/resultados_arvore_{tipo_arvore}.txt", "w", encoding="utf-8")
+        SIRxTdeVerticesTXT = open(f"./Resultados/Florianopolis arvores/SIRxTdeVerticesTXT_{tipo_arvore}.txt", "w", encoding="utf-8")
+
+        self.grafo_original = self.grafo.copy()
+        
+        menor_media = 99999999
+        arvore = 0
+        quant_arvores = len(self.grafo_original.nodes)
+        
+        for inicio in self.grafo_original.nodes:
+            self.estimar_tempo_restante(arvore, quant_arvores)
+            arvore += 1
+            soma_pico = 0
+            tempo_pico = 0
+            fim_pico = 0
+
+            anterior = dict()
+
+            if tipo_arvore == "largura":
+                anterior = self.busca_em_largura(inicio)
+            else:
+                visitados = set()
+                self.busca_em_profundidade(inicio, anterior, visitados)
+
+            self.grafo.remove_edges_from(list(self.grafo.edges()))
+
+            for vertice, ant in anterior.items():
+                self.grafo.add_weighted_edges_from([(ant, vertice, self.grafo_original.get_edge_data(ant, vertice)["beta"]), (vertice, ant, self.grafo_original.get_edge_data(vertice, ant)["beta"])], weight="beta")
+
+            for i in range(3):  
+                self.resetar_grafo()
+                # qtd_arestas_iguais = 0            # qtd arestas iguais a saude
+                # if inicio == "Saúde":
+                #     self.arestas_primeira_arvore = (self.grafo.copy()).edges()
+                # else:
+                #     for aresta in self.grafo.edges():
+                #         if aresta in self.arestas_primeira_arvore:
+                #             qtd_arestas_iguais += 1
+                #print(self.grafo.nodes[inicio]["id"], "| Arestas iguais à Saúde:", qtd_arestas_iguais, "/158")
+
+                print("Inicio:", inicio, "/ Iteração:", i+1)
+
+                self.avançar_tempo_movimentacao_dinamica_otimizado(1)
+                print("Pico:", self.pico_infectados)
+
+                soma_pico += self.pico_infectados
+                tempo_pico += self.tempo_pico
+                fim_pico += self.t
+
+            
+            tempo_pico = int(tempo_pico / 3)
+            media_pico = int(soma_pico / 3)
+            fim_pico = int(fim_pico / 3)
+
+            resultados_arvore.write(f"{inicio}, {media_pico}, {tempo_pico}, {fim_pico}\n")   
+            SIRxTdeVerticesTXT.write(f"{inicio}, {self.SIRxTdeVertices}\n")
+                
+            self.salvar_grafo_arvore(f"./Resultados/Florianopolis arvores/arvores/{inicio}.png")
+
+        resultados_arvore.close()
+        SIRxTdeVerticesTXT.close()
+        self.grafo = self.grafo_original 
+    
+    def printar_grafico_ID_MAXINFECT_arvores_original_florianopolis(self):
+        resultado_grafo_original = 83271
+        resultadosL = open(".\Resultados\Florianopolis arvores/resultados_arvore_largura.txt", "r")
+        resultadosP = open(".\Resultados\Florianopolis arvores/resultados_arvore_profundidade.txt", "r")
+        
+        titulo = f'Picos de Infectados do Grafo Original e das Árvores de Busca em Largura e Profundidade'
+
+        resultados_lista = [x for x in range(16)]
+
+        for linha in resultadosL:
+            linha = linha.strip()
+
+            if linha == "":
+                break
+
+            inicio, pico, dia_pico, dia_fim = linha.split(", ")
+
+            resultados_lista[int(inicio.split(" ")[1])-1] = [int(pico)]
+
+
+        for linha in resultadosP:
+            linha = linha.strip()
+
+            if linha == "":
+                break
+
+            inicio, pico, dia_pico, dia_fim = linha.split(", ")
+
+            resultados_lista[int(inicio.split(" ")[1])-1].append(int(pico))
+
+        #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
+
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+        fig.set_size_inches([15, 7.5])
+
+        plt.xlim(left=0, right=17)
+        plt.xticks([x for x in range(1, 17)])
+        plt.yticks([x for x in range(79000, 100001, 1000)])
+        
+        #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        #resultados_lista.pop(0)
+
+        plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
+
+        plt.plot([x for x in range(1, 17)], resultados_lista, "o")    # valores arvores
+        left, right = plt.xlim()
+        plt.plot([left, right], [83271, 83271], linewidth=2, label="Pico Original")
+
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
+
+        plt.title(titulo)
+        ax.set_xlabel('Grupo de Início da Árvore')
+        ax.set_ylabel('Pico de Infectados')
+
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        
+        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade 400 dias FINAL.png", format="png", dpi=300, bbox_inches='tight')
+
+
+    def printar_grafico_convergencia(self):
+        picos_delta = open("picos_discreto_final.txt", "r", encoding="utf-8")
+        picos = []
+        deltas = []
+
+        for linha in picos_delta:
+            delta, pico = linha.split(" ")
+
+            delta = float(delta.split("=")[1])
+            pico = float(pico)
+
+            picos.append(pico)     
+            deltas.append(delta)
+
+
+
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+        fig.set_size_inches([15, 7.5])
+
+        #plt.xlim(left=0, right=17)
+        plt.xticks([i for i in range(0,11)], deltas)
+        #plt.yticks([x for x in range(79000, 100001, 1000)])
+        #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
+        #resultados_lista.pop(0)
+
+        #plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
+
+        #deltas.reverse()
+
+        #cubic_interpolation_model = interp1d(deltas, picos, kind = "cubic", fill_value="extrapolate" )
+        #deltas.reverse()
+        
+        #x = np.linspace(mediax[0], mediax[-1], 500)
+        deltas = [str(i) for i in range(len(deltas))]
+        plt.plot(deltas, picos, "o")    # valores arvores
+       # plt.plot(x, cubic_interpolation_model(x))    # valores arvores
+
+  
+        left, right = plt.xlim()
+
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        #ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
+
+        plt.title("Convergência Pico de Infectados")
+        ax.set_xlabel('Delta t')        # colocar triangulo?
+        ax.set_ylabel('Pico de Infectados')
+
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        
+        plt.savefig(fr"C:\Users\rasen\Desktop\Convergencia Pico Infectados.png", format="png", dpi=300, bbox_inches='tight')
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -2085,6 +2335,7 @@ os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia 
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
 arquivo_final =  "./txts/normal (real)/arquivo_final.txt" #"./Txts/outros\zona sul/arquivo_final.txt"
+arquivo_final = "./Txts\outros/florianopolis teste/arquivo_final.txt"
 arquivo_final_flo = "../Instancia Florianopolis/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
@@ -2100,27 +2351,94 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt.gerar_arquivo_destino()
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final, flo=False)
+m = Modelo(arquivo_final)
+m.printar_estados_vertices()
+#m.vertice_de_inicio = "Flamengo"
+#m.resetar_grafo()
+
+# m.avançar_tempo_movimentacao_dinamica_otimizado(printar=1)
+# print(m.pico_infectados)
+# m.resetar_grafo()
+
+#m.printar_grafico_convergencia()
+
+m.avançar_tempo_movimentacao_dinamica(20)
+print(m.SIRxTdeVertices)
+m.printar_estados_vertices()
+m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=10, v="Itacorubi")
+
+
+
+# seila = open("picos_discreto.txt", "w", buffering=1)
+# sirs = open("sirs_discreto.txt", "a", buffering=1)
+
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(1, 200)
+# seila.write(f"dt=1 {m.pico_infectados}\n")
+# sirs.write(f"dt=1 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.5, 200)
+# seila.write(f"dt=0.5 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.5 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.25, 200)
+# seila.write(f"dt=0.25 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.25 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.125, 200)
+# seila.write(f"dt=0.125 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.125 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.0625, 200)
+# seila.write(f"dt=0.0625 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.0625 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.03125, 200)
+# seila.write(f"dt=0.03125 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.03125 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.015625, 200)
+# seila.write(f"dt=0.015625 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.015625 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.0078125, 200)
+# seila.write(f"dt=0.0078125 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.0078125 {m.SIRs}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.00390625, 200)
+# seila.write(f"dt=0.00390625 {m.pico_infectados}\n")
+# sirs.write(f"dt=0.00390625 {m.SIRs}\n")
+
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.001953125, 200)
+# seila.write(f"dt=0.001953125 {m.pico_infectados}\n")
+# m.resetar_grafo()
+# m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.0009765625, 200)
+# seila.write(f"dt=0.0009765625 {m.pico_infectados}\n")
+# m.resetar_grafo()
+
+
 #print(m.grafo.edges(data=True))
 #m.vertice_de_inicio = "Flamengo"
 #m.resetar_grafo()
 #m.avançar_tempo_movimentacao_dinamica_otimizado()
 #m.printar_grafo()
-path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
-path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
+#path_log = "./Resultados/heuristica/SIR_vertice_por_tempo_heuristica"
+#path_picos = "./Resultados/heuristica/picos_por_arvores_e_arestas"
 #m.heuristica_arvores_vizinhas("largura", path_log, path_picos)
 #m.heuristica_arvores_vizinhas("profundidade", path_log, path_picos)
-#m.boxplot_heuristica_floripa(r"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica\picos_por_arvores_e_arestas_profundidade.txt", "profundidade")
-#m.rodar_modelo_inicio_vertices("./Resultados/picos_inicios_grafo_original.txt")
+#m.rodar_modelo_inicio_vertices("./Resultados/picos_inicios_grafo_original.txt", "./Resultados/SIRxT_inicios_grafo_original.txt")
 
-m.printar_grafico_ID_MAXINFECT_arvore("largura")
+#m.gerar_SIRxT_inicios_rj(".\Resultados\SIRxT_inicios_grafo_originall.txt")
 
+#m.avançar_tempo_movimentacao_dinamica_otimizado(1)
+#print(m.pico_infectados)
+#m.boxplot_heuristica_floripa(r"./Resultados/heuristica/com teste nos ciclos/picos_por_arvores_e_arestas_profundidade.txt", "profundidade")
+#m.printar_grafico_ID_MAXINFECT_arvores_original_florianopolis()
+#m.printar_grafico_SIRxT(path="./Resultados/Grafico SIRxT flo.png")
 
+#m.gerar_grafos_arvores_florianopolis("profundidade")
 
-
-
-
-
+#m.printar_grafico_ID_MAXINFECT_arvores_original_florianopolis()
 
 
 #?visitados = set()

@@ -1,3 +1,6 @@
+S+I != total agrupamentos?
+
+
 Estou te mandando os dois grafos de Florianópolis que usei, de 12 e 16 vértices. Os dois estão num formato tipo:
 N M
 S0 S1 S2 ... S(N-1)
