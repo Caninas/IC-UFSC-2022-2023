@@ -2321,6 +2321,63 @@ class Modelo:
         
         plt.savefig(fr"C:\Users\rasen\Desktop\Convergencia Pico Infectados.png", format="png", dpi=300, bbox_inches='tight')
 
+    def printar_grafico_SIRxT_TXT(self, path):
+        SIRxT = open(path, "r", encoding="utf-8")
+        x = []
+        y = []
+
+                            
+        path = fr"C:\Users/rasen\Desktop\EAMat/picos_mat.png"
+        print(y)
+        fig = plt.figure(1)#.set_fig
+        ax = fig.add_subplot(111)
+        fig.set_size_inches([20, 5])
+
+        #plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        #plt.xlim(left=1, right=len(x))
+        
+
+        ax.legend(["S", "I", "R"], loc='center right', bbox_to_anchor=(1.1, 0.5))
+        plt.title("Infectados ao longo do tempo")
+        ax.set_xlabel('Tempo (dias)')
+        ax.set_ylabel('Infectados')
+
+
+        for linha in SIRxT:
+            if linha:
+                deltaT, lista_dados = linha.split(" ", maxsplit=1)
+                deltaT = float(deltaT.split("=")[1])
+                lista_dados = ast.literal_eval(lista_dados)
+                
+
+                #xx = np.linspace(1, 200, int(200/deltaT))
+                xx = [i for i in range(1, 121)]
+                # y = [sir[1] for sir in lista_dados]
+                # y = np.linspace(y[0], y[-1], 200)
+                yy = [lista_dados[int(i/deltaT)][1] for i in range(120)]
+
+                x.append(xx)
+                y.append(yy)
+                plt.plot(xx, yy, label=deltaT)
+                # for vertice, valores in dicionario_dados.items():
+                #     for tempo, sir in valores.items():
+                #         if tempo < 201:     # 2 bairros acima de 200 com 205, 209
+                #             y[tempo-1] = [s+k for s, k in zip(sir, y[tempo-1])]
+                #     for i in range(200 - tempo):
+                #         y[tempo + i] = [s+k for s, k in zip(sir, y[tempo + i])]
+
+
+        #inicio = path.split("/")[-1]
+        #plt.title(f'Início: {inicio.split(".png")[0]}')
+        
+        plt.legend(title="$\Delta{t}$")
+        plt.savefig(path, format="png", dpi=1000, bbox_inches='tight')
+
+        plt.close()
+
+
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
@@ -2352,20 +2409,20 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
 m = Modelo(arquivo_final)
-m.printar_estados_vertices()
+#m.printar_estados_vertices()
 #m.vertice_de_inicio = "Flamengo"
 #m.resetar_grafo()
 
 # m.avançar_tempo_movimentacao_dinamica_otimizado(printar=1)
 # print(m.pico_infectados)
 # m.resetar_grafo()
+m.printar_grafico_SIRxT_TXT(r"C:\Users\rasen\Desktop\EAMat/sirs_discreto_final.txt")
 
 #m.printar_grafico_convergencia()
-
-m.avançar_tempo_movimentacao_dinamica(20)
-print(m.SIRxTdeVertices)
-m.printar_estados_vertices()
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=10, v="Itacorubi")
+# m.avançar_tempo_movimentacao_dinamica(20)
+# print(m.SIRxTdeVertices)
+# m.printar_estados_vertices()
+# m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=10, v="Itacorubi")
 
 
 
