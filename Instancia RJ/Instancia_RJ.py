@@ -1,6 +1,7 @@
 import os
 import sys
 import networkx as nx
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
 import pydot
@@ -141,6 +142,7 @@ class Modelo:
             self.grafo.nodes[vertice]["SIRdddantes"] = {}
             
             self.SIRs = []
+            self.SIRxTdeVertices = {}
             self.tempos = []
             self.t = 1
             self.pico_infectados = 0
@@ -2292,7 +2294,7 @@ class Modelo:
         fig.set_size_inches([15, 7.5])
 
         #plt.xlim(left=0, right=17)
-        plt.xticks([i for i in range(0,11)], deltas)
+        plt.xticks([i for i in range(0, len(deltas))], deltas)
         #plt.yticks([x for x in range(79000, 100001, 1000)])
         #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         #resultados_lista.pop(0)
@@ -2306,7 +2308,10 @@ class Modelo:
         
         #x = np.linspace(mediax[0], mediax[-1], 500)
         deltas = [str(i) for i in range(len(deltas))]
-        plt.plot(deltas, picos, "o")    # valores arvores
+        plt.plot(deltas, picos, "o", ms=7, color="blue")    # valores arvores
+        for i in range(len(deltas)):
+            if i:
+                plt.text(float(deltas[i]), picos[i]+300, f"{'+' if picos[i] > picos[i-1] else ''}{((picos[i]/picos[i-1]) * 100) - 100:.2f}%")
        # plt.plot(x, cubic_interpolation_model(x))    # valores arvores
 
   
@@ -2316,13 +2321,14 @@ class Modelo:
 
         #ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
 
-        plt.title("Convergência Pico de Infectados")
-        ax.set_xlabel('Delta t')        # colocar triangulo?
+        plt.title("Convergência do Pico de Infectados")
+        
+        ax.set_xlabel(r'$\Delta{t}$')        # colocar triangulo?
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         
-        plt.savefig(fr"C:\Users\rasen\Desktop\Convergencia Pico Infectados.png", format="png", dpi=300, bbox_inches='tight')
+        plt.savefig(fr"C:\Users\rasen\Desktop\Convergencia Pico Infectados2.png", format="png", dpi=300, bbox_inches='tight')
 
     def printar_grafico_SIRxT_TXT(self, path):
         SIRxT = open(path, "r", encoding="utf-8")
@@ -2380,6 +2386,33 @@ class Modelo:
 
         plt.close()
 
+    def printar_grafico_delta_distanciamento(self):
+        x, y = [], []
+        for i in range(6):
+            self.alpha = i/5        # fraçao de pessoas que respeitam o distanciamento, fator de distanciamento
+            
+            self.avançar_tempo_movimentacao_dinamica_nao_discreto(1, 200)       # mudar delta t 0.0625
+            x.append(str(self.alpha))
+            y.append(self.pico_infectados)
+            self.resetar_grafo()
+
+
+        fig = plt.figure(1)#.set_fig
+        ax = fig.add_subplot(111)
+        fig.set_size_inches([20, 5])
+
+        #plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
+
+        #plt.xlim(left=1, right=len(x))
+
+        plt.title("Pico de Infectados com diferentes fatores de distanciamento")
+        ax.set_xlabel(r'Fator de distanciamento ($\alpha$)')
+        ax.set_ylabel('Infectados')
+
+        b = plt.bar(x, y, color=["#020024", "#070764", "#090979", "#055fb2", "#0045ff", "#00d4ff"])
+        ax.bar_label(b, fmt='%.1i', fontsize=14)     
+        plt.show()
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
@@ -2395,7 +2428,7 @@ os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Insta
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
 arquivo_final =  "./txts/normal (real)/arquivo_final.txt" #"./Txts/outros\zona sul/arquivo_final.txt"
-arquivo_final = "./Txts\outros/florianopolis teste/arquivo_final.txt"
+#arquivo_final = "./Txts\outros/florianopolis teste/arquivo_final.txt"
 arquivo_final_flo = "../Instancia Florianopolis/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
 tabela_populaçao = "./tabelas/Tabela pop por idade e grupos de idade (2973).xls"
@@ -2411,17 +2444,19 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt.gerar_arquivo_destino()
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final_flo, True)
+m = Modelo(arquivo_final)
 #m.printar_estados_vertices()
-#m.vertice_de_inicio = "Flamengo"
-#m.resetar_grafo()
+m.vertice_de_inicio = "Flamengo"
+m.resetar_grafo()
+
+m.printar_grafico_delta_distanciamento()
 
 # m.avançar_tempo_movimentacao_dinamica_otimizado(printar=1)
 # print(m.pico_infectados)
 # m.resetar_grafo()
 #m.printar_grafico_SIRxT_TXT(r"C:\Users\rasen\Desktop\EAMat/sirs_discreto_final.txt")
-m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.0625, 200)
-m.printar_grafico_SIRxT()
+#m.avançar_tempo_movimentacao_dinamica_nao_discreto(1, 200)
+#m.printar_grafico_convergencia()
 #m.printar_grafico_convergencia()
 # m.avançar_tempo_movimentacao_dinamica(20)
 # print(m.SIRxTdeVertices)
