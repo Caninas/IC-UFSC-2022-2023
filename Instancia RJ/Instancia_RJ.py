@@ -84,8 +84,8 @@ class Modelo:
 
             if nome == self.vertice_de_inicio:
                 I = floor(self.frac_infect_inicial * populaçao)
-            elif nome == "Trindade":
-                I = 200
+            # elif nome == "Trindade":
+            #     I = 200
             else:
                 I = 0
             #I = floor(self.frac_infect_inicial * populaçao)    # distribuir igualmente
@@ -1130,61 +1130,66 @@ class Modelo:
           # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
 
         for tempoAtual in range(1, int(t/deltaT) + 1):
-            print(round(deltaT * tempoAtual, ndigits=1))
+            print(deltaT * tempoAtual)
             # distribuiçao de pessoas
             for node in list(self.grafo.nodes(data=True)):
                 nome, atributos = node
 
-                try:
+                if tempoAtual != 1:
                     self.SIRxTdeVertices[nome][tempoAtual] = [
                         atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
                         atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
                         atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
                     ]
-                except:
+                else:
                     self.SIRxTdeVertices[nome] = dict()
                     self.SIRxTdeVertices[nome][tempoAtual] = [
                         atributos["SIRd"]["S"] + atributos["SIRdd"]["S"],
                         atributos["SIRd"]["I"] + atributos["SIRdd"]["I"],
                         atributos["SIRd"]["R"] + atributos["SIRdd"]["R"]
                     ]
+                
+                if self.floripa:
+                    for vizinho in self.grafo.edges(nome, data=True):
+                        S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * vizinho[2]["beta"])
+                        I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * vizinho[2]["beta"])
+                        R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * vizinho[2]["beta"])
 
-                #? ALTERAR?
-                S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
-                I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
-                R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+                        atributos["SIRdd"]["S"] -= S_2pontos_saindo
+                        atributos["SIRdd"]["I"] -= I_2pontos_saindo
+                        atributos["SIRdd"]["R"] -= R_2pontos_saindo
 
-                atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
-                atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+                
+                else:
+                    S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * atributos["beta"])
+                    I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * atributos["beta"])
+                    R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * atributos["beta"])
+
+                    atributos["SIRdd"]["S"] -= S_2pontos_saindo * len(self.grafo.edges(nome))
+                    atributos["SIRdd"]["I"] -= I_2pontos_saindo * len(self.grafo.edges(nome))
+                    atributos["SIRdd"]["R"] -= R_2pontos_saindo * len(self.grafo.edges(nome))
 
 
-                for vizinho in self.grafo.edges(nome):
-                    self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
+                    for vizinho in self.grafo.edges(nome):
+                        self.grafo.nodes[vizinho[1]]["SIRddd"][nome] = {"S": S_2pontos_saindo, "I": I_2pontos_saindo, "R": R_2pontos_saindo}
 
 
-            self.tempos.append(round(deltaT * tempoAtual, ndigits=1))
+            self.tempos.append(deltaT * tempoAtual)
+            self.SIRs.append([])
+            soma_SIR = [0, 0, 0]
 
             for node in list(self.grafo.nodes(data=True)):
-                # x = tempo
-                # y = [S, I, R]
                 nome, atributos = node
 
-
-                #? COLOCAR ESSE LOOP NO LOOP SEGUINTE
                 atributos["SIRdddantes"]["S"] = atributos["SIRdddantes"]["I"] = atributos["SIRdddantes"]["R"] = 0
 
                 for vizinho in atributos["SIRddd"].values():
                     atributos["SIRdddantes"]["S"] += vizinho["S"]
                     atributos["SIRdddantes"]["I"] += vizinho["I"]
                     atributos["SIRdddantes"]["R"] += vizinho["R"]
+                    
 
-            self.SIRs.append([])
-            soma_SIR = [0, 0, 0]
-
-            for node in list(self.grafo.nodes(data=True)):
-                nome, atributos = node
-                #? AQUI
                 # guardando valores SIR para usar no grafico
                 soma_SIR[0] += atributos["SIRd"]["S"] + atributos["SIRdd"]["S"] + atributos["SIRdddantes"]["S"]
                 soma_SIR[1] += atributos["SIRd"]["I"] + atributos["SIRdd"]["I"] + atributos["SIRdddantes"]["I"]
@@ -1539,9 +1544,7 @@ class Modelo:
                     ]
 
                 if self.floripa:
-                    #print(self.grafo.edges(data=True))
                     for vizinho in self.grafo.edges(nome, data=True):
-                        #print(vizinho)
                         S_2pontos_saindo = floor(atributos["SIRdd"]["S"] * vizinho[2]["beta"])
                         I_2pontos_saindo = floor(atributos["SIRdd"]["I"] * vizinho[2]["beta"])
                         R_2pontos_saindo = floor(atributos["SIRdd"]["R"] * vizinho[2]["beta"])
@@ -2408,7 +2411,7 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt.gerar_arquivo_destino()
 
 # MUDAR GERAÇÃO DOS VALORES INICIAIS
-m = Modelo(arquivo_final)
+m = Modelo(arquivo_final_flo, True)
 #m.printar_estados_vertices()
 #m.vertice_de_inicio = "Flamengo"
 #m.resetar_grafo()
@@ -2416,8 +2419,9 @@ m = Modelo(arquivo_final)
 # m.avançar_tempo_movimentacao_dinamica_otimizado(printar=1)
 # print(m.pico_infectados)
 # m.resetar_grafo()
-m.printar_grafico_SIRxT_TXT(r"C:\Users\rasen\Desktop\EAMat/sirs_discreto_final.txt")
-
+#m.printar_grafico_SIRxT_TXT(r"C:\Users\rasen\Desktop\EAMat/sirs_discreto_final.txt")
+m.avançar_tempo_movimentacao_dinamica_nao_discreto(0.0625, 200)
+m.printar_grafico_SIRxT()
 #m.printar_grafico_convergencia()
 # m.avançar_tempo_movimentacao_dinamica(20)
 # print(m.SIRxTdeVertices)
