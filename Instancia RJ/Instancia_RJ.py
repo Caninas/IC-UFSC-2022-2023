@@ -2386,12 +2386,14 @@ class Modelo:
 
         plt.close()
 
-    def printar_grafico_delta_distanciamento(self):
+    def printar_grafico_delta_distanciamento(self, path):
         x, y = [], []
-        for i in range(6):
+        delta = 1
+
+        for i in range(1, 6):
             self.alpha = i/5        # fraçao de pessoas que respeitam o distanciamento, fator de distanciamento
             
-            self.avançar_tempo_movimentacao_dinamica_nao_discreto(1, 200)       # mudar delta t 0.0625
+            self.avançar_tempo_movimentacao_dinamica_nao_discreto(delta, 200)       # mudar delta t 0.0625
             x.append(str(self.alpha))
             y.append(self.pico_infectados)
             self.resetar_grafo()
@@ -2411,14 +2413,16 @@ class Modelo:
         ax.set_ylabel('Infectados')
 
         b = plt.bar(x, y, color=["#020024", "#070764", "#090979", "#055fb2", "#0045ff", "#00d4ff"])
-        ax.bar_label(b, fmt='%.1i', fontsize=14)     
+        ax.bar_label(b, fmt='%.1i', fontsize=14)
+        
+        plt.savefig(f"{path}/Pico infectados distanciamento delta {delta}.png", format="png", dpi=1000, bbox_inches='tight') 
         plt.show()
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-#os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ")
+os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+#os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -2449,7 +2453,7 @@ m = Modelo(arquivo_final)
 m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
-m.printar_grafico_delta_distanciamento()
+m.printar_grafico_delta_distanciamento(r"C:\Users\rasen\Desktop")
 
 # m.avançar_tempo_movimentacao_dinamica_otimizado(printar=1)
 # print(m.pico_infectados)
