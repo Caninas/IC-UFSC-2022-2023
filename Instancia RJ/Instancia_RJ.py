@@ -695,7 +695,7 @@ class Modelo:
     def printar_grafico_ID_MAXINFECT_arvores_largura_profundidade(self):
         #./Resultados/picos_inicios_grafo_original.txt
         #
-        resultados_grafo_original = open(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\picos_inicios_grafo_originall.txt", "r", encoding="utf-8")
+        resultados_grafo_original = open(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ\Resultados\picos_inicios_grafo_original.txt", "r", encoding="utf-8")
         resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
         resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
         
@@ -711,7 +711,7 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)-1] = [int(float(max_infect))]
+            resultados_lista[int(id)-1] = [sqrt(int(float(max_infect)))]
 
 
         for linha in resultadosP:
@@ -722,7 +722,7 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)-1].append(int(float(max_infect)))
+            resultados_lista[int(id)-1].append(sqrt(int(float(max_infect))))
 
         #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
 
@@ -737,7 +737,7 @@ class Modelo:
             nome_bairro = " ".join(linha[0:len(linha)-3])
             pico, dia_pico, dia_fim = linha[len(linha)-3:len(linha)]
             
-            resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(int(pico))
+            resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(sqrt(int(pico)))
 
         #print(resultados_lista)
         matplotlib.rc('font', size=11)
@@ -752,7 +752,7 @@ class Modelo:
 
         plt.xlim(left=-2, right=160)
         #plt.xticks([x for x in range(0, 160, 4)])
-        plt.yticks([x for x in range(0, 1100001, 100000)])
+        #plt.yticks([x for x in range(0, 1100001, 100000)])
 
 
 
@@ -773,27 +773,24 @@ class Modelo:
         x = [id_bairros[i] if id_bairros[i] in bairros_selecionados else i for i in range(1, len(id_bairros)+1)]
         print(x)
 
-        ticks = []
-        for i, bairro in enumerate(x):
-            #print(i)
-            if type(bairro) == str:
-                ticks.append(i)
-            elif bairro % 4 == 1:
-                print(bairro)
-                ticks.append(bairro-1)
+        # ticks = []
+        # for i, bairro in enumerate(x):
+        #     #print(i)
+        #     if type(bairro) == str:
+        #         ticks.append(i)
+        #     elif bairro % 4 == 1:
+        #         ticks.append(bairro-1)
         ticks = [0, 4, 7, 12, 16, 20, 24, 28, 32, 36, 40, 44, 49, 52, 56, 60, 64, 68, 73, 76, 80, 82, 84, 88, 92, 94, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 138, 140, 144, 148, 150, 152, 156]
         plt.xticks(ticks)
         #print([i if i % 4 == 1 or type(i) == str for i in x])
         
 
 
-        print(ticks)
-        #x.sort()
         plt.plot(x, resultados_lista, "o")    # valores arvores
         plt.xticks(rotation='vertical', fontsize=10)
+
         #ax.tick_params(axis='x', rotation=90)
         #plt.gca().set_xlabel('Test', rotation='vertical')
-
         # maxsize = max([t.get_window_extent().width for t in plt.gca().get_xticklabels()])
         # m = 0.2 # inch margin
         # s = maxsize/plt.gcf().dpi*170+2*m
@@ -801,15 +798,13 @@ class Modelo:
         # plt.gcf().subplots_adjust(left=margin, right=1.-margin)
         # plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
 
-        #plt.tight_layout()
-        #plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='upper right')
-
+        #plt.grid()
         plt.title(titulo)
-        #ax.set_xlabel('ID do Bairro de Início')
-        ax.set_ylabel('Pico de Infectados')
+        ax.set_xlabel('Nome/ID do Bairro de Início')
+        ax.set_ylabel('Pico de Infectados (sqrt)')
 
         plt.subplots_adjust(bottom=0.2)
         plt.show()
@@ -2519,7 +2514,7 @@ class Modelo:
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.set_xlabel('Tempo')
-        ax.set_ylabel('Pessoas')
+        ax.set_ylabel('Pessoas (sqrt)')
 
        
         # for i in range(len(self.tempos), 201):    # igualar a 200
@@ -2573,8 +2568,10 @@ class Modelo:
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
 
-os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
-#os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ")
+try:
+    os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+except FileNotFoundError:
+    os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ")
 
 # "./txts/normal (real)/adjacencias.txt"
 # "./txts/zona sul/arquivo_final.txt"
@@ -2608,7 +2605,7 @@ m.resetar_grafo()
 #m.label_bolas()
 # C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
 # C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\SIR_vertice_por_tempo_LARGURA.txt
-#m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\com betas\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
+#m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
 
 m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
