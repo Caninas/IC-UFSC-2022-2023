@@ -745,15 +745,14 @@ class Modelo:
         
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
-        fig.set_size_inches([10, 30])
+        fig.set_size_inches([15, 10])
         #plt.grid()
-        #[tick.set_fontsize(13) for tick in ax.get_xticklabels()]
+        [tick.set_fontsize(13) for tick in ax.get_xticklabels()]
         [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
 
-        #plt.xlim(left=-2, right=160)
-        #plt.xticks([x for x in range(1, 159, 4)])
-        #plt.yticks([x for x in range(0, 1100001, 100000)])
-        plt.xticks([x for x in range(0, 1100001, 100000)])
+        plt.xlim(left=-2, right=160)
+        #plt.xticks([x for x in range(0, 160, 4)])
+        plt.yticks([x for x in range(0, 1100001, 100000)])
 
 
 
@@ -763,12 +762,36 @@ class Modelo:
         plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
 
         id_bairros = {x[1]["id"]:x[0] for x in self.grafo.nodes(data=True)}
-        x = [id_bairros[i] for i in range(1, len(id_bairros)+1)]
-        #print(x)
+
+        bairros_selecionados = set(("Saúde", "Cidade Nova", "Barra de Guaratiba", "Jacaré", "Vaz Lobo", "Vista Alegre", "Cocotá", "Deodoro", "Padre Miguel"))
+        # print(id_bairros[74])
+        # print(id_bairros[95])
+        # print(id_bairros[133])
+        # print(id_bairros[139])
+
+        print(bairros_selecionados)
+        x = [id_bairros[i] if id_bairros[i] in bairros_selecionados else i for i in range(1, len(id_bairros)+1)]
+        print(x)
+
+        ticks = []
+        for i, bairro in enumerate(x):
+            #print(i)
+            if type(bairro) == str:
+                ticks.append(i)
+            elif bairro % 4 == 1:
+                print(bairro)
+                ticks.append(bairro-1)
+        ticks = [0, 4, 7, 12, 16, 20, 24, 28, 32, 36, 40, 44, 49, 52, 56, 60, 64, 68, 73, 76, 80, 82, 84, 88, 92, 94, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 138, 140, 144, 148, 150, 152, 156]
+        plt.xticks(ticks)
+        #print([i if i % 4 == 1 or type(i) == str for i in x])
+        
+
+
+        print(ticks)
         #x.sort()
-        plt.plot(resultados_lista,x, "o")    # valores arvores
-        #plt.xticks(rotation='vertical', fontsize=8)
-        ax.tick_params(axis='x', rotation=90)
+        plt.plot(x, resultados_lista, "o")    # valores arvores
+        plt.xticks(rotation='vertical', fontsize=10)
+        #ax.tick_params(axis='x', rotation=90)
         #plt.gca().set_xlabel('Test', rotation='vertical')
 
         # maxsize = max([t.get_window_extent().width for t in plt.gca().get_xticklabels()])
@@ -780,17 +803,17 @@ class Modelo:
 
         #plt.tight_layout()
         #plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
-        plt.gca().get_xaxis().get_major_formatter().set_scientific(False)
+        plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='upper right')
 
         plt.title(titulo)
-        #ax.set_ylabel('ID do Bairro de Início')
-        ax.set_xlabel('Pico de Infectados')
+        #ax.set_xlabel('ID do Bairro de Início')
+        ax.set_ylabel('Pico de Infectados')
 
-        plt.subplots_adjust(left=0.1, right=0.9, top=0.95, bottom=0.25)
+        plt.subplots_adjust(bottom=0.2)
         plt.show()
-        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade 400 dias 1.png", format="png", dpi=300)
+        #plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade 400 dias 1.png", format="png", dpi=300)
 
     def avançar_tempo(self, t):
         #self.printar_estados_vertices()
@@ -2586,6 +2609,7 @@ m.resetar_grafo()
 # C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
 # C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\SIR_vertice_por_tempo_LARGURA.txt
 #m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\com betas\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
+
 m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
 #m.printar_grafico_delta_distanciamento(r"C:\Users\rasen\Desktop")
