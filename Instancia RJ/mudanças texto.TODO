@@ -40,15 +40,31 @@ Alvaro:
 		✔ quanto mais linear melhor. vertice de inicio com conexao a uma ponta tambem é melhor @done (5/28/2023, 1:26:20 AM)
 		✔ Reecrever OK tudo com novo modelo (Fazer experimentos 4.1 antes com novo modelo) SIM @done (5/28/2023, 1:26:34 AM)
 		✔ grafico pizza mostrando pessoas q vieram de outros @done (5/29/2023, 6:08:49 PM)
+		
+✔ Largura pico é apenas o do maior? diferença n funciona pois o pico quando chega no pico a diferença de t para t-1 é pequena @done (8/26/2023, 2:38:23 AM)
+	✔ andar frente e tras ate diferença ficar maior que 5000 e so depois contabilizar >5000 para terminar. @done (8/26/2023, 2:38:23 AM)
+✔ aumentar fonte grafo rj completo figura 2 (gerar varios indexado 0-n guardar em pasta com txt com pos de cada) @done (6/2/2023, 9:35:47 PM)
+✔ terminar algoritmo heuristica @done (6/2/2023, 6:30:07 PM)
+	✔ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo))) @done (6/2/2023, 6:30:13 PM)
+	✔ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo @done (6/2/2023, 6:30:16 PM)
+✔ mudar grafico pizza novo @done (5/31/2023, 9:21:30 PM)
+	✔ fazer comparação antes e depois movimentaçao @done (6/6/2023, 4:19:39 PM)
+✔ gerar picos grafo original inicios @done (6/7/2023, 2:24:44 AM)
+	✔ pico grafo original com inicio da infecçao X vertice de inicio da arvore, profundidade e largura @done (6/8/2023, 1:08:19 AM)
+✔ arvore em largura heuristica @done (6/7/2023, 5:50:08 PM)
+✔ gerar grafico SIRT arvore em profundidade inicio flamengo e colocar do lado do grafo original incio flamengo @done (6/7/2023, 9:02:09 PM)
+✔ boxblot sem adiçoes @done (6/7/2023, 6:01:15 PM)
+✔ pintar pontos boxplot com adiçoes de outra cor para diferenciar de remoçoes @done (6/8/2023, 2:16:09 AM)
+✔ gerar SIRxT grafo original todos os inicios @done (6/9/2023, 2:18:39 PM)
 
-		
-		
-		
-☐ Largura pico é apenas o do maior? diferença n funciona pois o pico quando chega no pico a diferença de t para t-1 é pequena
-	☐ andar frente e tras ate diferença ficar maior que 5000 e so depois contabilizar >5000 para terminar.
+
+SBPO:
+	☐ Citaçoes novas (2 famosos, de preferencia usando grafo)
+	☐ Titulo gráfico SIRxT
+	☐ Falar gráfico picos: de 3 em 3 ou de 4 em 4
+
 
 ☐ tabela pagina 14 com semelhanças arestas fenomeno 3
-
 
 ☐ Fazer tabela de arvores (usar csv? para importar para excel facilmente)
 arvore
@@ -57,44 +73,23 @@ dia fim do espalhamento (analisar pelo SIRXTvertices)
 dia pico	(resultados)
 encontrar largura pico modulo
 
-
-
-
-✔ aumentar fonte grafo rj completo figura 2 (gerar varios indexado 0-n guardar em pasta com txt com pos de cada) @done (6/2/2023, 9:35:47 PM)
-✔ terminar algoritmo heuristica @done (6/2/2023, 6:30:07 PM)
-	✔ Fazer calculo tempo arvores vizinhas (arvores*(1*tempo_modelo + vertices_caminho-1*(tempo_modelo))) @done (6/2/2023, 6:30:13 PM)
-	✔ arvore vizinha inserir aresta cria ciclo, remover originais, testa para cada uma das que eu posso remover do ciclo @done (6/2/2023, 6:30:16 PM)
-✔ mudar grafico pizza novo @done (5/31/2023, 9:21:30 PM)
-	✔ fazer comparação antes e depois movimentaçao @done (6/6/2023, 4:19:39 PM)
-
-✔ gerar picos grafo original inicios @done (6/7/2023, 2:24:44 AM)
-	✔ pico grafo original com inicio da infecçao X vertice de inicio da arvore, profundidade e largura @done (6/8/2023, 1:08:19 AM)
-✔ arvore em largura heuristica @done (6/7/2023, 5:50:08 PM)
-✔ gerar grafico SIRT arvore em profundidade inicio flamengo e colocar do lado do grafo original incio flamengo @done (6/7/2023, 9:02:09 PM)
-✔ boxblot sem adiçoes @done (6/7/2023, 6:01:15 PM)
-✔ pintar pontos boxplot com adiçoes de outra cor para diferenciar de remoçoes @done (6/8/2023, 2:16:09 AM)
-
-✔ gerar SIRxT grafo original todos os inicios @done (6/9/2023, 2:18:39 PM)
-
 ☐ escrever o porque de pontos nao espalhados grafo original inicios
 		populaçao X beta baixo , ou vizinhos assim (olhar isso)
 
 talvez fique mais concentrado em larguras, na profundidade espalha mais igualmente
 
-
-
-
 ☐ testar sobre complemento de arvores
+
 ☐ cursos de verao calculo 2
 
 
 Pricila:
 
-☐ Comparar numeros finais com formula derivada de cada SIR para calcular o erro
-☐ Trabalhar com grafo menor (pedir floripa)
-☐ Problema menor para validar os erros
-
-
+	
+	
+✔ Comparar numeros finais com formula derivada de cada SIR para calcular o erro @done (8/26/2023, 2:39:15 AM)
+✔ Trabalhar com grafo menor (pedir floripa) @done (8/26/2023, 2:39:05 AM)
+✔ Problema menor para validar os erros @done (8/26/2023, 2:39:07 AM)
 ✔ Ajeitar grafo zona sul com e sem botafogo pra direita @done (5/15/2023, 8:45:39 PM)
 ✔ Mandar pdf da explicação das fórmulas, grafos @done (5/15/2023, 8:45:41 PM)
 ✔ colocar referencia livro hethcote primeiro artigo @done (5/18/2023, 4:58:55 PM)

@@ -711,7 +711,8 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)-1] = [sqrt(int(float(max_infect)))]
+            #resultados_lista[int(id)-1] = [sqrt(int(float(max_infect)))]
+            resultados_lista[int(id)-1] = [int(float(max_infect))]
 
 
         for linha in resultadosP:
@@ -722,7 +723,8 @@ class Modelo:
 
             id, dia_pico, max_infect = linha.split(", ")
 
-            resultados_lista[int(id)-1].append(sqrt(int(float(max_infect))))
+            #resultados_lista[int(id)-1].append(sqrt(int(float(max_infect))))
+            resultados_lista[int(id)-1].append(int(float(max_infect)))
 
         #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
 
@@ -737,74 +739,65 @@ class Modelo:
             nome_bairro = " ".join(linha[0:len(linha)-3])
             pico, dia_pico, dia_fim = linha[len(linha)-3:len(linha)]
             
-            resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(sqrt(int(pico)))
+            #resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(sqrt(int(pico)))
+            resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(int(pico))
 
-        #print(resultados_lista)
         matplotlib.rc('font', size=11)
         matplotlib.rc('axes', titlesize=14, labelsize=15)
         
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
-        fig.set_size_inches([15, 10])
-        #plt.grid()
+        fig.set_size_inches([15.2, 10])
+
         [tick.set_fontsize(13) for tick in ax.get_xticklabels()]
         [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
 
-        plt.xlim(left=-2, right=160)
-        #plt.xticks([x for x in range(0, 160, 4)])
-        #plt.yticks([x for x in range(0, 1100001, 100000)])
-
-
-
-        #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
-        #resultados_lista.pop(0)
 
         plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
 
         id_bairros = {x[1]["id"]:x[0] for x in self.grafo.nodes(data=True)}
 
         bairros_selecionados = set(("Saúde", "Cidade Nova", "Barra de Guaratiba", "Jacaré", "Vaz Lobo", "Vista Alegre", "Cocotá", "Deodoro", "Padre Miguel"))
-        # print(id_bairros[74])
-        # print(id_bairros[95])
-        # print(id_bairros[133])
-        # print(id_bairros[139])
 
-        print(bairros_selecionados)
-        x = [id_bairros[i] if id_bairros[i] in bairros_selecionados else i for i in range(1, len(id_bairros)+1)]
-        print(x)
-
+        x = [id_bairros[id+1] for id in range(len(id_bairros))]
+        
         # ticks = []
         # for i, bairro in enumerate(x):
         #     #print(i)
-        #     if type(bairro) == str:
+        #     # if type(bairro) == str:
+        #     #     ticks.append(i)
+        #     if id_bairros[i+1] in bairros_selecionados:
+        #         print(i)
+        #     if i % 3 == 0:
         #         ticks.append(i)
-        #     elif bairro % 4 == 1:
-        #         ticks.append(bairro-1)
-        ticks = [0, 4, 7, 12, 16, 20, 24, 28, 32, 36, 40, 44, 49, 52, 56, 60, 64, 68, 73, 76, 80, 82, 84, 88, 92, 94, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 138, 140, 144, 148, 150, 152, 156]
-        plt.xticks(ticks)
-        #print([i if i % 4 == 1 or type(i) == str for i in x])
+        # print(ticks)
+
+        ticks = [0, 3, 7, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 49,
+                51, 54, 57, 60, 63, 66, 69, 73, 75, 78, 82, 84, 87, 90, 94, 96,
+                99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 
+                135, 138, 141, 144, 147, 150, 153, 156]
+        # ticks = [0, 4, 7, 12, 16, 20, 24, 28, 32, 36, 40, 44, 49, 52, 56, 60, 
+        #         64, 68, 73, 76, 80, 82, 84, 88, 92, 94, 96, 100, 104, 108, 112, 116,
+        #         120, 124, 128, 132, 136, 138, 140, 144, 148, 150, 152, 156]
         
-
-
+        #fig.autofmt_xdate()
+        plt.xticks(ticks, rotation=90, fontsize=10)
+        plt.xlim(left=-2, right=160)
+        
         plt.plot(x, resultados_lista, "o")    # valores arvores
-        plt.xticks(rotation='vertical', fontsize=10)
 
-        #ax.tick_params(axis='x', rotation=90)
-        #plt.gca().set_xlabel('Test', rotation='vertical')
-        # maxsize = max([t.get_window_extent().width for t in plt.gca().get_xticklabels()])
-        # m = 0.2 # inch margin
-        # s = maxsize/plt.gcf().dpi*170+2*m
-        # margin = m/plt.gcf().get_size_inches()[0]
-        # plt.gcf().subplots_adjust(left=margin, right=1.-margin)
-        # plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
+        for bairro in bairros_selecionados:
+            for tick in range(len(ax.get_xticklabels())):
+                if ax.get_xticklabels()[tick].get_text() == bairro:
+                    ax.get_xticklabels()[tick].set_weight(600)
 
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='upper right')
         #plt.grid()
         plt.title(titulo)
-        ax.set_xlabel('Nome/ID do Bairro de Início')
-        ax.set_ylabel('Pico de Infectados (sqrt)')
+        ax.set_xlabel('Nome do Bairro de Início')
+        ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(bottom=0.2)
         plt.show()
