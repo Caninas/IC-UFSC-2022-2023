@@ -16,6 +16,22 @@ import time
 import pandas as pd
 import openpyxl
 import seaborn as sns
+matplotlib.rc('text', usetex=True)
+plt.rc('text.latex', preamble=r'\usepackage{textcmds}'
+       r'\usepackage{stackengine}'
+       r"\usepackage{amsmath}"
+        r"\usepackage{calc}"
+        r"\usepackage[utf8]{inputenc}"
+        r"\usepackage{accents}"
+        r"\newcommand{\dbtilde}[1]{\accentset{\approx}{#1}}"
+        r"\newcommand\tsup[2][2]{%"
+    r"\def\useanchorwidth{T}%"
+    r'\ifnum#1>1%'
+    r"\stackon[-.5pt]{\tsup[\numexpr#1-1\relax]{#2}}{\scriptscriptstyle\sim}%"
+    r"\else%"
+    r"\stackon[.5pt]{#2}{\scriptscriptstyle\sim}%"
+    r"\fi%"
+    r"}" )
 
 from scipy.interpolate import interp1d
 #from blessed import Terminal
@@ -1927,7 +1943,7 @@ class Modelo:
 
         #colors_depois = ["blue", "#0202a6", "#3b96ff", "#1aa103", "#0e6100", "#55eb3b", "red", "#8c0000", "#f73e3e"]
         colors_depois = ["blue", "#0C46E8", "#0D8CFF", "#33691E", "#39AB33", "#6AC230", "#BF1900", "red", "#f73e3e"]
-        labels_depois = [r"$\dot{\mathcal{S}}$", r"$\ddot{\mathcal{S}}$", r"$\dddot{\mathcal{S}}$", r"$\dot{\mathcal{I}}$", r"$\ddot{\mathcal{I}}$", r"$\dddot{\mathcal{I}}$", r"$\dot{\mathcal{R}}$", r"$\ddot{\mathcal{R}}$", r"$\dddot{\mathcal{R}}$"]
+        labels_depois = [r"$\bar{\mathcal{S}}$", r"$\mathcal{\tsup[1]{S}}$", r"$\tsup[1]{\mathcal{S}}$", r"$\bar{\mathcal{I}}$", r"$\tsup{$\mathcal{I}$}$", r"$\tsup{$\mathcal{I}$}$", r"$\bar{\mathcal{R}}$", r"$\tsup{$\mathcal{R}$}$", r"$\tsup{$\mathcal{R}$}$"]
         x2 = [sir_t0_depois[0][0], sir_t0_depois[0][1], Sddd, sir_t0_depois[1][0], sir_t0_depois[1][1], Iddd, sir_t0_depois[2][0], sir_t0_depois[2][1], Rddd]
         total2 = sum(x2)
 
@@ -2510,6 +2526,7 @@ class Modelo:
         ax.set_ylabel('Pessoas (sqrt)')
 
        
+        plt.xticks([])
         # for i in range(len(self.tempos), 201):    # igualar a 200
         #     self.tempos.append(i)
         #     self.SIRs.append(self.SIRs[-1])
@@ -2521,7 +2538,7 @@ class Modelo:
                     11283, 4895326], [1410175, 9767, 4897143], [1409936, 8419, 4898730], [1409762, 7216, 4900107], [1409600, 6205, 4901280], [1409457, 5334, 4902294], [1409349, 4574, 4903162], [1409271, 3902, 4903912], [1409197, 3320, 4904568], [1409134, 2826, 4905125], [1409091, 2380, 4905614], [1409060, 1981, 4906044], [1409035, 1663, 4906387], [1409014, 1389, 4906682], [1408996, 1162, 4906927], [1408986, 959, 4907140], [1408982, 775, 4907328], [1408976, 620, 4907489], [1408974, 502, 4907609], [1408974, 402, 4907709], [1408974, 320, 4907791], [1408974, 251, 4907860], [1408974, 191, 4907920], [1408974, 153, 4907958], [1408974, 118, 4907993], [1408974, 94, 4908017], [1408974, 76, 4908035], [1408974, 59, 4908052], [1408974, 44, 4908067], [1408974, 32, 4908079], [1408974, 25, 4908086], [1408974, 19, 4908092], [1408974, 14, 4908097], [1408974, 9, 4908102], [1408974, 6, 4908105], [1408974, 4, 4908107], [1408974, 2, 4908109], [1408974, 1, 4908110], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111]]
         
 
-        yy = [[int(sqrt(sir[0])), int(sqrt(sir[1])), int(sqrt(sir[2]))] for sir in y]
+        #yy = [[int(sqrt(sir[0])), int(sqrt(sir[1])), int(sqrt(sir[2]))] for sir in y]
         plt.xlim(left=1, right=200)
         plot1 = plt.plot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 
                     62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 
@@ -2599,8 +2616,10 @@ m.resetar_grafo()
 # C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
 # C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\SIR_vertice_por_tempo_LARGURA.txt
 #m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
+m.avançar_tempo_movimentacao_dinamica(30)
+m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
 
-m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
+#m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
 #m.printar_grafico_delta_distanciamento(r"C:\Users\rasen\Desktop")
 
@@ -2613,7 +2632,6 @@ m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 # m.avançar_tempo_movimentacao_dinamica(20)
 # print(m.SIRxTdeVertices)
 # m.printar_estados_vertices()
-# m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=10, v="Itacorubi")
 
 
 
