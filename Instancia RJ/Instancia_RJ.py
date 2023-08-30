@@ -17,21 +17,7 @@ import pandas as pd
 import openpyxl
 import seaborn as sns
 matplotlib.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r'\usepackage{textcmds}'
-       r'\usepackage{stackengine}'
-       r"\usepackage{amsmath}"
-        r"\usepackage{calc}"
-        r"\usepackage[utf8]{inputenc}"
-        r"\usepackage{accents}"
-        r"\newcommand{\dbtilde}[1]{\accentset{\approx}{#1}}"
-        r"\newcommand\tsup[2][2]{%"
-    r"\def\useanchorwidth{T}%"
-    r'\ifnum#1>1%'
-    r"\stackon[-.5pt]{\tsup[\numexpr#1-1\relax]{#2}}{\scriptscriptstyle\sim}%"
-    r"\else%"
-    r"\stackon[.5pt]{#2}{\scriptscriptstyle\sim}%"
-    r"\fi%"
-    r"}" )
+plt.rc('text.latex', preamble=r"\usepackage{stackengine} \usepackage{amsmath} \usepackage{calc} \usepackage[utf8]{inputenc} \stackMath \newcommand\tsup[2][2]{ \def\useanchorwidth{T} \ifnum#1>1 \stackon[-.5pt]{\tsup[\numexpr#1-1\relax]{#2}}{\scriptscriptstyle\sim} \else \stackon[.5pt]{#2}{\scriptscriptstyle\sim} \fi}")
 
 from scipy.interpolate import interp1d
 #from blessed import Terminal
@@ -1878,7 +1864,6 @@ class Modelo:
     def printar_grafico_SIR_t0_VerticePizza(self, path=None, dia=1, v="Flamengo"):
         vertice = v
 
-
         sir_t0_antes = self.SIRxTdeVertices[vertice][dia][0]
         
         sir_t0_depois = self.SIRxTdeVertices[vertice][dia][1]
@@ -1925,7 +1910,7 @@ class Modelo:
         bottom = 1
         width = 0.2
 
-        for j, (bairro, dici) in enumerate(reversed(sir_t0_depois[3][0].items())):
+        for j, (bairro, dici) in enumerate((sir_t0_depois[3][0].items())):
             Sddd += dici["S"]
             Iddd += dici["I"]
             Rddd += dici["R"]
@@ -1943,7 +1928,7 @@ class Modelo:
 
         #colors_depois = ["blue", "#0202a6", "#3b96ff", "#1aa103", "#0e6100", "#55eb3b", "red", "#8c0000", "#f73e3e"]
         colors_depois = ["blue", "#0C46E8", "#0D8CFF", "#33691E", "#39AB33", "#6AC230", "#BF1900", "red", "#f73e3e"]
-        labels_depois = [r"$\bar{\mathcal{S}}$", r"$\mathcal{\tsup[1]{S}}$", r"$\tsup[1]{\mathcal{S}}$", r"$\bar{\mathcal{I}}$", r"$\tsup{$\mathcal{I}$}$", r"$\tsup{$\mathcal{I}$}$", r"$\bar{\mathcal{R}}$", r"$\tsup{$\mathcal{R}$}$", r"$\tsup{$\mathcal{R}$}$"]
+        labels_depois = [r"$\bar{\mathcal{S}}$", r"$\tsup[1]{\mathcal{S}}$", r"$\tsup{\mathcal{S}}$", r"$\bar{\mathcal{I}}$", r"$\tsup[1]{\mathcal{I}}$", r"$\tsup{\mathcal{I}}$", r"$\bar{\mathcal{R}}$", r"$\tsup[1]{\mathcal{R}}$", r"$\tsup{\mathcal{R}}$"]
         x2 = [sir_t0_depois[0][0], sir_t0_depois[0][1], Sddd, sir_t0_depois[1][0], sir_t0_depois[1][1], Iddd, sir_t0_depois[2][0], sir_t0_depois[2][1], Rddd]
         total2 = sum(x2)
 
@@ -2523,7 +2508,7 @@ class Modelo:
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.set_xlabel('Tempo')
-        ax.set_ylabel('Pessoas (sqrt)')
+        ax.set_ylabel('Pessoas (normalizadas)')
 
        
         plt.xticks([])
@@ -2532,13 +2517,18 @@ class Modelo:
         #     self.SIRs.append(self.SIRs[-1])
 
 
+        # y modelo original
         y = [[6314583, 2502, 0], [6313868, 2852, 365], [6313068, 3208, 809], [6312074, 3693, 1318], [6310893, 4293, 1899], [6309526, 4973, 2586], [6307899, 5807, 3379], [6306044, 6743, 4298], [6303761, 7974, 5350], [6301066, 9434, 6585], [6297826, 11224, 8035], [6294077, 13250, 9758], [6289590, 15714, 11781], [6284256, 18662, 14167], [6278001, 22095, 16989], [6270603, 26163, 20319], [6261822, 31018, 24245], [6251608, 36596, 28881], [6239625, 43166, 34294], [6225921, 50447, 40717], [6209909, 58990, 48186], [6191657, 68513, 56915], [6170954, 79092, 67039], [6147781, 90607, 78697], [6122055, 102991, 92039], [6093583, 116311, 107191], [6062707, 130095, 124283], [6029500, 144200, 143385], [5994140, 158418, 164527], [5957025, 172284, 187776], [5918251, 185756, 213078], [5877893, 198857, 240335], [5836628, 210908, 269549], [5794514, 222124, 300447], [5751803, 232259, 333023], [5708381, 241629, 367075], [5664540, 250056, 402489], [5620280, 257659, 439146], [5575825, 264363, 476897], [5530534, 270890, 515661], [5484228, 277504, 555353], [5436857, 284230, 595998], [5388143, 291274, 637668], [5337583, 299192, 680310], [5284422, 308528, 724135], [5228995, 318735, 769355], [5170841, 330201, 816043], [5109538, 343123, 864424], [5044649, 357778, 914658], [4976018, 374032, 967035], [4903451, 391826, 1021808], [4826833, 411095, 1079157], [4746664, 431143, 1139278], [4661805, 452960, 1202320], [4573348, 475218, 1268519], [4481468, 497637, 1337980], [4386020, 520391, 1410674], [4287607, 542839, 1486639], [4185503, 565728, 1565854], [4080546, 588131, 1648408], [3972604, 610257, 1734224], [3861736, 632118, 1823231], [3747958, 653735, 1915392], [3631149, 675229, 2010707], [3511320, 696624, 2109141], [3389278, 717140, 2210667], [3264437, 737453, 2315195], [3137743, 756688, 2422654], [3009864, 774369, 2532852], [2881871, 789539, 2645675], [2755549, 800846, 2760690], [2631260, 808462, 2877363], [2511758, 810202, 2995125], [2397498, 806440, 
                     3113147], [2290151, 796342, 3230592], [2190832, 779638, 3346615], [2099552, 757344, 3460189], [2016788, 729783, 3570514], [1942298, 697922, 3676865], [1875955, 662531, 3778599], [1817194, 624700, 3875191], [1765582, 585231, 3966272], [1720183, 545257, 4051645], [1680297, 505600, 4131188], [1645546, 466550, 4204989], [1615171, 428830, 4273084], [1588587, 392786, 4335712], [1565560, 358417, 4393108], [1545238, 326335, 4445512], [1527606, 296194, 4493285], [1512207, 268220, 4536658], [1498630, 242467, 4575988], [1486854, 218642, 4611589], [1476547, 196852, 4643686], [1467676, 176780, 4672629], [1459787, 158626, 4698672], [1452907, 142120, 4722058], [1446874, 127158, 4743053], [1441638, 113575, 4761872], [1437146, 101226, 4778713], [1433126, 90184, 4793775], [1429661, 80230, 4807194], [1426716, 71168, 4819201], [1424099, 63118, 4829868], [1421878, 55839, 4839368], [1419995, 49288, 4847802], [1418315, 43480, 4855290], [1416896, 38287, 
                     4861902], [1415662, 33677, 4867746], [1414628, 29539, 4872918], [1413719, 25884, 4877482], [1412935, 22658, 4881492], [1412261, 19797, 4885027], [1411705, 17238, 4888142], [1411234, 14992, 4890859], [1410833, 13010, 4893242], [1410476, 
                     11283, 4895326], [1410175, 9767, 4897143], [1409936, 8419, 4898730], [1409762, 7216, 4900107], [1409600, 6205, 4901280], [1409457, 5334, 4902294], [1409349, 4574, 4903162], [1409271, 3902, 4903912], [1409197, 3320, 4904568], [1409134, 2826, 4905125], [1409091, 2380, 4905614], [1409060, 1981, 4906044], [1409035, 1663, 4906387], [1409014, 1389, 4906682], [1408996, 1162, 4906927], [1408986, 959, 4907140], [1408982, 775, 4907328], [1408976, 620, 4907489], [1408974, 502, 4907609], [1408974, 402, 4907709], [1408974, 320, 4907791], [1408974, 251, 4907860], [1408974, 191, 4907920], [1408974, 153, 4907958], [1408974, 118, 4907993], [1408974, 94, 4908017], [1408974, 76, 4908035], [1408974, 59, 4908052], [1408974, 44, 4908067], [1408974, 32, 4908079], [1408974, 25, 4908086], [1408974, 19, 4908092], [1408974, 14, 4908097], [1408974, 9, 4908102], [1408974, 6, 4908105], [1408974, 4, 4908107], [1408974, 2, 4908109], [1408974, 1, 4908110], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111], [1408974, 0, 4908111]]
         
+        pop_total = y[0][0] + y[0][1] + y[0][2]
+        print(pop_total) 
+        #for sir in y:
+            
 
-        #yy = [[int(sqrt(sir[0])), int(sqrt(sir[1])), int(sqrt(sir[2]))] for sir in y]
+        yy = [[int(sqrt(sir[0])), int(sqrt(sir[1])), int(sqrt(sir[2]))] for sir in y]
         plt.xlim(left=1, right=200)
         plot1 = plt.plot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 
                     62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 
@@ -2552,11 +2542,13 @@ class Modelo:
                 inicio, dicionario_dados = linha.split(", ", maxsplit=(1))
                 if inicio == "Flamengo":
                     dicionario_dados = ast.literal_eval(dicionario_dados)
-                    print(y)
+                    #print(y)
                     for vertice, valores in dicionario_dados.items():
                         for tempo, sir in valores.items():
                             y[tempo-1] = [s+k for s, k in zip(sir, y[tempo-1])]
-        print(y)
+
+        pop_total = y[0][0] + y[0][1] + y[0][2]
+        print(pop_total)
         y = [[int(sqrt(sir[0])), int(sqrt(sir[1])), int(sqrt(sir[2]))] for sir in y]
 
         #inicio = path.split("/")[-1]
@@ -2590,7 +2582,7 @@ except FileNotFoundError:
 # "./txts/outros/zona sul/arquivo_final_otimizado_circulo.txt"
 # "./txts/zona sul modificada menor/adjacencias_zona_sul_sem_botafogo.txt"
 arquivo_adjacencias = "./Txts\outros\zona sul modificada ciclos/adjacencias_zona_sul.txt"
-arquivo_final =  "./txts/normal (real)/arquivo_final.txt" #"./Txts/outros\zona sul/arquivo_final.txt"
+arquivo_final =  "./Txts/outros\zona sul/arquivo_final.txt" #"./txts/normal (real)/arquivo_final.txt" 
 #arquivo_final = "./Txts\outros/florianopolis teste/arquivo_final.txt"
 arquivo_final_flo = "../Instancia Florianopolis/arquivo_final.txt"
 arquivo_ID_nomes = "./txts/nova relaçao ID - bairros.txt"
@@ -2613,11 +2605,11 @@ m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
 #m.label_bolas()
-# C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
 # C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\SIR_vertice_por_tempo_LARGURA.txt
-#m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
-m.avançar_tempo_movimentacao_dinamica(30)
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
+# C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
+m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
+#m.avançar_tempo_movimentacao_dinamica(30)
+#m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
 
 #m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
