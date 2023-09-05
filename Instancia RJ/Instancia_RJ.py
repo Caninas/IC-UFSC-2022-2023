@@ -16,8 +16,8 @@ import time
 import pandas as pd
 import openpyxl
 import seaborn as sns
-matplotlib.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{stackengine} \usepackage{amsmath} \usepackage{calc} \usepackage[utf8]{inputenc} \stackMath \newcommand\tsup[2][2]{ \def\useanchorwidth{T} \ifnum#1>1 \stackon[-.5pt]{\tsup[\numexpr#1-1\relax]{#2}}{\scriptscriptstyle\sim} \else \stackon[.5pt]{#2}{\scriptscriptstyle\sim} \fi}")
+# matplotlib.rc('text', usetex=True)
+# plt.rc('text.latex', preamble=r"\usepackage{stackengine} \usepackage{amsmath} \usepackage{calc} \usepackage[utf8]{inputenc} \stackMath \newcommand\tsup[2][2]{ \def\useanchorwidth{T} \ifnum#1>1 \stackon[-.5pt]{\tsup[\numexpr#1-1\relax]{#2}}{\scriptscriptstyle\sim} \else \stackon[.5pt]{#2}{\scriptscriptstyle\sim} \fi}")
 
 from scipy.interpolate import interp1d
 #from blessed import Terminal
@@ -1928,7 +1928,8 @@ class Modelo:
 
         #colors_depois = ["blue", "#0202a6", "#3b96ff", "#1aa103", "#0e6100", "#55eb3b", "red", "#8c0000", "#f73e3e"]
         colors_depois = ["blue", "#0C46E8", "#0D8CFF", "#33691E", "#39AB33", "#6AC230", "#BF1900", "red", "#f73e3e"]
-        labels_depois = [r"$\bar{\mathcal{S}}$", r"$\tsup[1]{\mathcal{S}}$", r"$\tsup{\mathcal{S}}$", r"$\bar{\mathcal{I}}$", r"$\tsup[1]{\mathcal{I}}$", r"$\tsup{\mathcal{I}}$", r"$\bar{\mathcal{R}}$", r"$\tsup[1]{\mathcal{R}}$", r"$\tsup{\mathcal{R}}$"]
+        labels_depois = [r"$\mathcal{\dot{S}}$", r"$\mathcal{\ddot{S}}$", r"$\mathcal{\dddot{S}}$", r"$\mathcal{\dot{I}}$", r"$\mathcal{\ddot{I}}$", r"$\mathcal{\dddot{I}}$", r"$\dot{\mathcal{R}}$", r"$\mathcal{\ddot{R}}$", r"$\mathcal{\dddot{R}}$"]
+        #labels_depois = [r"$\bar{\mathcal{S}}$", r"$\tsup[1]{\mathcal{S}}$", r"$\tsup{\mathcal{S}}$", r"$\bar{\mathcal{I}}$", r"$\tsup[1]{\mathcal{I}}$", r"$\tsup{\mathcal{I}}$", r"$\bar{\mathcal{R}}$", r"$\tsup[1]{\mathcal{R}}$", r"$\tsup{\mathcal{R}}$"]
         x2 = [sir_t0_depois[0][0], sir_t0_depois[0][1], Sddd, sir_t0_depois[1][0], sir_t0_depois[1][1], Iddd, sir_t0_depois[2][0], sir_t0_depois[2][1], Rddd]
         total2 = sum(x2)
 
@@ -2508,10 +2509,10 @@ class Modelo:
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
         ax.set_xlabel('Tempo')
-        ax.set_ylabel('Pessoas (normalizadas)')
+        ax.set_ylabel('Número de pessoas (normalizado)')
 
        
-        #plt.xticks([])
+        plt.yticks([i/10 for i in range(0, 11)])
         # for i in range(len(self.tempos), 201):    # igualar a 200
         #     self.tempos.append(i)
         #     self.SIRs.append(self.SIRs[-1])
@@ -2613,9 +2614,10 @@ m.resetar_grafo()
 #m.label_bolas()
 # C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\SIR_vertice_por_tempo_LARGURA.txt
 # C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
-m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
+#C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
+#m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\com betas\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
 m.avançar_tempo_movimentacao_dinamica(30)
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza1.png", dia=30, v="Flamengo")
+m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza_composiçao_notaçao_antiga.png", dia=30, v="Flamengo")
 
 #m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
