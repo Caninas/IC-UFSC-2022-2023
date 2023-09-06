@@ -1,4 +1,49 @@
-Intro
+Me chamo Pedro, sou bolsista de iniciação cientifica orientado pelo professores alvaro e priscila
+
+Nosso trabalho realiza um estudo sobre diferentes topologias em um grafo de infecção com objetivo de controlar uma doença
+
+Um grande motivador para a realizaçao dele foi a recente pandemia de covid-19, onde tinhamos urgencia para tomada de decisoes 
+para diminuir o efeito da doença. Nesse contexto reesurge a importancia de se poder modelar o problema, com o objetivo de prever
+o comportamento de uma doença e tomar decisoes de forma inteligente
+
+Os modelos epidemiologicos podem ser utilizados para esse fim. Eles definem grupos de pessoas, dependendo do seu estado em relaçao a doença.
+Existem diferentes modelos, mas no nosso caso utilizamos o modelo SIR, que divide as pessoas em Suscetiveis, aqueles que podem pegar a doença, infectados, aqueles 
+que estao transmitindo a doença, e recuperados, aqueles que já se curaram da doença. Além disso um modelo define uma dinamica entre grupo. 
+No modelo sir ela funciona da seguinte forma: Os suscetiveis se tornam infectados, os infectados se tornam recuperados.
+
+Nesse trabalho utilizamos esse modelo epidemiologico adaptado, aplicando-o em grafos, desenvolvido em 2020 pelo meu orientador alvaro
+
+mas o que é um grafo? Um grafo é composto por vértices e arestas. Na direita temos um exemplo de um grafo dos bairros do entorno da UFSC
+Os vértices são as bolinhas, que representam bairros e as arestas são as conexões entre esses bairros.
+
+Para nossos experimentos utilizamos essa mesma ideia onde temos bairros e conexões entre eles. Cada bairro contém um certa quantidade de pessoas
+que irão pertencer a um desses grupos SIR. Além disso nosso modelo considera um certo distanciamento social, tendo pessoas que respeitam ele, representados 
+pelas letras com um ponto em cima, e pessoas que não respeitam, representadas com 2 pontos em cima.
+Existe também uma movimentaçao de pessoas. As pessoas que respeitam o ditanciamento social iraõ sair com menos frequencia e apenas dentro do proprio vértice 
+Já as pessoas que nao respeitam irão sair com maior frequencia e poderão ir para bairros adjacentes de seu bairro
+
+Mas para esse modelo funcionar ainda falta uma coisa, definir quantas pessoas se infectam ou se recuperam, ou seja, definir quantitativamente a dinamica entre
+os grupos SIR. Para isso é utilizado um sistema de edos discretizada. Cada vértice do nosso grafo tera um sistema de equaçoes que regem a sua população
+
+EXPLICAR EQUAÇOES?
+
+
+Nosso objetivo com tudo isso ter a possibilidade de simular o espalhamento de uma doença dentro de um grafo e observar o comportamento dela
+PQ com isso podemos realizar alteraçoes topológicas no grafo, espelhando por exemplo um isolamento de pessoas, e comparar os resultados com o grafo original, 
+com o objetivo de tentar diminuir o pico de infectados
+---- 2:40 min até aqui
+
+
+
+
+---- Conclusao
+Esses resultados indicam que, na maioria dos cassos, restringir a topologia de um grafo de infecção resulta em um pico de infectados menor. No mundo real isso significa
+menos pessoas infectadas ao mesmo tempo, deixando hospitais com maior disponibilidade de atendimento, podendo tratar cada paciente de acordo com seu quadro clinico
+
+
+
+
+
 modelar situações do mundo real
 tentar entender como certas ações afetam o mundo
 
