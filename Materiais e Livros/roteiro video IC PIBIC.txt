@@ -1,4 +1,4 @@
-Me chamo Pedro, sou bolsista de iniciação cientifica orientado pelo professores alvaro e priscila
+Me chamo Pedro, sou bolsista de iniciação cientifica e fui orientado pelos professores alvaro e priscila
 
 Nosso trabalho realiza um estudo sobre diferentes topologias em um grafo de infecção com objetivo de controlar uma doença
 
@@ -29,18 +29,19 @@ EXPLICAR EQUAÇOES?
 
 
 Nosso objetivo com tudo isso ter a possibilidade de simular o espalhamento de uma doença dentro de um grafo e observar o comportamento dela
-PQ com isso podemos realizar alteraçoes topológicas no grafo, espelhando por exemplo um isolamento de pessoas, e comparar os resultados com o grafo original, 
-com o objetivo de tentar diminuir o pico de infectados
+PQ com isso podemos realizar alteraçoes topológicas no grafo manualmente ou atraves de algoritmos, espelhando por exemplo um isolamento de pessoas, e comparar os novos 
+resultados obtidos com o grafo original, com o objetivo de tentar diminuir o pico de infectados
+
+Para nossos experimentos utilizamos dois grafos, o simplificado de florinopolis e o grafo completo da cidade do rio de janeiro
 ---- 2:40 min até aqui
+---- Resultados
 
 
-
-
----- Conclusao
+---- Conclusão
 Esses resultados indicam que, na maioria dos cassos, restringir a topologia de um grafo de infecção resulta em um pico de infectados menor. No mundo real isso significa
 menos pessoas infectadas ao mesmo tempo, deixando hospitais com maior disponibilidade de atendimento, podendo tratar cada paciente de acordo com seu quadro clinico
 
-
+---- Considerações Finais
 
 
 
