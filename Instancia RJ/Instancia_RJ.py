@@ -285,7 +285,9 @@ class Modelo:
         ax = fig.add_subplot(111)
         fig.set_size_inches([9, 6])
 
-
+        matplotlib.rc('font', size=11)
+        matplotlib.rc('axes', titlesize=15, labelsize=15)
+        
         plt.gca().set_prop_cycle('color', ['red', '#55eb3b', 'blue'])
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
        
@@ -301,19 +303,25 @@ class Modelo:
             plt.plot(self.tempos, self.SIRs)
 
 
-        ax.legend(["S", "I", "R"], loc='center right', bbox_to_anchor=(1.1, 0.5))
-        ax.set_xlabel('Tempo')
-        ax.set_ylabel('Pessoas')
+        ax.legend(["S", "I", "R"], loc='upper right')
+        ax.set_xlabel('Tempo', fontsize=14)
+        ax.set_ylabel('Pessoas', fontsize=14)
 
+
+        [tick.set_fontsize(13) for tick in ax.get_xticklabels()]
+        [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
 
         if path and not x:
-            plt.savefig(path, format="png", bbox_inches='tight')
+            plt.savefig(path, format="png", dpi=300, bbox_inches='tight')
         elif x:
-            inicio = path.split("/")[-1]
-            plt.title(f'Início: {inicio.split(".png")[0]}')
-            plt.savefig(path, format="png", bbox_inches='tight')
+            #inicio = path.split("/")[-1]
+            #plt.title(f'Início: {inicio.split(".png")[0]}')
+            
+            plt.title(path)
+            plt.savefig("seila.png", format="png", dpi=300, bbox_inches='tight')
         else:
             plt.show()
+
         plt.close()
 
     def mergesort(self, array):
@@ -629,18 +637,17 @@ class Modelo:
         self.grafo = self.grafo_original 
 
     def printar_grafico_ID_MAXINFECT_arvore(self, tipo_arvore):
-        resultados_grafo_original = open("./Resultados/picos_inicios_grafo_originall.txt", "r", encoding="utf-8")
+        resultados_grafo_original = open("./Resultados/picos_inicios_grafo_original.txt", "r", encoding="utf-8")
 
         if tipo_arvore == "largura":
-            resultados = open("./Resultados/resultados_arvore_largura.txt", "r")
+            resultados_arvore = open("./Resultados/resultados_arvore_largura.txt", "r")
         else:
-            resultados = open("./Resultados/resultados_arvore_profundidade.txt", "r")
+            resultados_arvore = open("./Resultados/resultados_arvore_profundidade.txt", "r")
 
-        titulo = f'Picos de Infectados das Árvores de Busca em {tipo_arvore.title()}'
+        titulo = f'Picos de Infectados das Árvores de Busca em {tipo_arvore.title()} e Grafo Original'
         resultados_lista = [x for x in range(159)]
 
-
-        for linha in resultados:
+        for linha in resultados_arvore:
             linha = linha.strip()
 
             if linha == "":
@@ -661,42 +668,58 @@ class Modelo:
 
             nome_bairro = " ".join(linha[0:len(linha)-3])
             pico, dia_pico, dia_fim = linha[len(linha)-3:len(linha)]
-            print(nome_bairro)
             resultados_lista[self.grafo.nodes[nome_bairro]["id"] - 1].append(int(pico))
         
-        print(resultados_lista)
-        
         #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
-
+        matplotlib.rc('font', size=11)
+        matplotlib.rc('axes', titlesize=14, labelsize=15)
+        
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
-        fig.set_size_inches([15, 7.5])
+        fig.set_size_inches([16, 9])
 
-        plt.xlim(left=-5, right=164)
-        plt.xticks([x for x in range(0, 159, 4)])
-        plt.yticks([x for x in range(0, 1000001, 100000)])
-        
-        #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
-        #resultados_lista.pop(0)
+        [tick.set_fontsize(13) for tick in ax.get_xticklabels()]
+        [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
+
 
         plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
-        plt.plot([x for x in range(0, 159)], resultados_lista, "o")    # valores arvores
+
+        id_bairros = {x[1]["id"]:x[0] for x in self.grafo.nodes(data=True)}
+
+        #bairros_selecionados = set(("Saúde", "Cidade Nova", "Barra de Guaratiba", "Jacaré", "Vaz Lobo", "Vista Alegre", "Cocotá", "Deodoro", "Padre Miguel"))
+
+        x = [id_bairros[id+1] for id in range(len(id_bairros))]
+        
+        ticks = []
+        for i, bairro in enumerate(x):
+            # if id_bairros[i+1] in bairros_selecionados:
+            #     print(i)
+            if i % 3 == 0:
+                ticks.append(i)
+
+        plt.xticks(ticks, rotation=90, fontsize=10)
+        plt.xlim(left=-2, right=160)
+
+        cor_arvore = '0d66a3' if tipo_arvore == "profundidade" else 'green'
+        plt.gca().set_prop_cycle('color', [cor_arvore, "red"])
+
+        plt.plot(x, resultados_lista, "o")    # valores arvores
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Grafo Original", tipo_arvore.title()], loc='center right', bbox_to_anchor=(1.130, 0.5))
+        ax.legend([tipo_arvore.title(), "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
+        ax.legend([tipo_arvore.title(), "Grafo Original"], loc='upper right')
 
         plt.title(titulo)
-        ax.set_xlabel('ID de Início da Árvore (0 = Grafo Original)')
+        ax.set_xlabel('Nome do Bairro de Início')
         ax.set_ylabel('Pico de Infectados')
 
-        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-        plt.show()
-        #plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores {tipo_arvore.title()} FINAL.png", format="png", dpi=300)
+        plt.subplots_adjust(bottom=0.2)
+        #plt.show()
+        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores {tipo_arvore.title()} novo.png", format="png", dpi=300, bbox_inches="tight")
         plt.close()
 
     def printar_grafico_ID_MAXINFECT_arvores_largura_profundidade(self):
         #./Resultados/picos_inicios_grafo_original.txt
-        #
         resultados_grafo_original = open(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ\Resultados\picos_inicios_grafo_original.txt", "r", encoding="utf-8")
         resultadosL = open("./Resultados/resultados_arvore_largura.txt", "r")
         resultadosP = open("./Resultados/resultados_arvore_profundidade.txt", "r")
@@ -749,7 +772,7 @@ class Modelo:
         
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
-        fig.set_size_inches([15.2, 10])
+        fig.set_size_inches([16, 9])
 
         [tick.set_fontsize(13) for tick in ax.get_xticklabels()]
         [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
@@ -759,25 +782,22 @@ class Modelo:
 
         id_bairros = {x[1]["id"]:x[0] for x in self.grafo.nodes(data=True)}
 
-        bairros_selecionados = set(("Saúde", "Cidade Nova", "Barra de Guaratiba", "Jacaré", "Vaz Lobo", "Vista Alegre", "Cocotá", "Deodoro", "Padre Miguel"))
+        #bairros_selecionados = set(("Saúde", "Cidade Nova", "Barra de Guaratiba", "Jacaré", "Vaz Lobo", "Vista Alegre", "Cocotá", "Deodoro", "Padre Miguel"))
 
         x = [id_bairros[id+1] for id in range(len(id_bairros))]
         
-        # ticks = []
-        # for i, bairro in enumerate(x):
-        #     #print(i)
-        #     # if type(bairro) == str:
-        #     #     ticks.append(i)
-        #     if id_bairros[i+1] in bairros_selecionados:
-        #         print(i)
-        #     if i % 3 == 0:
-        #         ticks.append(i)
+        ticks = []
+        for i, bairro in enumerate(x):
+            # if id_bairros[i+1] in bairros_selecionados:
+            #     print(i)
+            if i % 3 == 0:
+                ticks.append(i)
         # print(ticks)
 
-        ticks = [0, 3, 7, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 49,
-                51, 54, 57, 60, 63, 66, 69, 73, 75, 78, 82, 84, 87, 90, 94, 96,
-                99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 
-                135, 138, 141, 144, 147, 150, 153, 156]
+        # ticks = [0, 3, 7, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 49,
+        #         51, 54, 57, 60, 63, 66, 69, 73, 75, 78, 82, 84, 87, 90, 94, 96,
+        #         99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 
+        #         135, 138, 141, 144, 147, 150, 153, 156]
         # ticks = [0, 4, 7, 12, 16, 20, 24, 28, 32, 36, 40, 44, 49, 52, 56, 60, 
         #         64, 68, 73, 76, 80, 82, 84, 88, 92, 94, 96, 100, 104, 108, 112, 116,
         #         120, 124, 128, 132, 136, 138, 140, 144, 148, 150, 152, 156]
@@ -788,10 +808,10 @@ class Modelo:
         
         plt.plot(x, resultados_lista, "o")    # valores arvores
 
-        for bairro in bairros_selecionados:
-            for tick in range(len(ax.get_xticklabels())):
-                if ax.get_xticklabels()[tick].get_text() == bairro:
-                    ax.get_xticklabels()[tick].set_weight(600)
+        # for bairro in bairros_selecionados:
+        #     for tick in range(len(ax.get_xticklabels())):
+        #         if ax.get_xticklabels()[tick].get_text() == bairro:
+        #             ax.get_xticklabels()[tick].set_weight(600)
 
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
@@ -802,8 +822,8 @@ class Modelo:
         ax.set_ylabel('Pico de Infectados')
 
         plt.subplots_adjust(bottom=0.2)
-        plt.show()
-        #plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade 400 dias 1.png", format="png", dpi=300)
+        #plt.show()
+        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade FINAL.png", format="png", dpi=300, bbox_inches="tight")
 
     def avançar_tempo(self, t):
         #self.printar_estados_vertices()
@@ -2112,23 +2132,29 @@ class Modelo:
         df2 = pd.DataFrame.from_dict({f'Início da Árvore de Busca em {tipo_arvore.title()}': list(picos_por_arvore_ad.keys()), 'Pico': list(picos_por_arvore_ad.values()), "Tipo": "Adição"})
         df2 = df2.explode(column='Pico').reset_index(drop=True)
         #print(df2)
-        plt.figure(figsize=(14,7))
+
+        matplotlib.rc('font', size=11)
+        matplotlib.rc('axes', titlesize=14, labelsize=15)
+        fig = plt.figure(1)
+
+        fig.set_size_inches([16, 9])
+        plt.yticks([x for x in range(70000, 89000, 2000)])
 
         #df = pd.concat([df, df2])
         print(df)
         #g = sns.FacetGrid(df, col="Grupos") #col_wrap=4,  height=2, ylim=(0, 10))
-        sns.boxplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", width=0.7, color="red").set(title='Pico de Infectados da Heurística')
+        sns.boxplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", width=0.7, color="red").set(title=f'Pico de Infectados da Heurística em {tipo_arvore.title()}')
         sns.swarmplot(data=df, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", size=4) #hue="Tipo"
         left, right = plt.xlim()
         plt.plot([left, right], [83271, 83271], color="green", linewidth=2, label="Pico Original")
+
         plt.legend(loc="upper left")
         #sns.swarmplot(data=df2, x=f'Início da Árvore de Busca em {tipo_arvore.title()}', y="Pico", size=4, color="green")
-        
+        #self.salvar_plt_formataçao_padrao(fig, plt.gca(), fr"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplot_heuristica_{tipo_arvore}_sem_adiçoes.png")
         #g.map_dataframe(sns.boxplot, width=0.5, fliersize=10, color="red")
         #g.map_dataframe(sns.swarmplot, size=2)
-            
-        #plt.show()
-        plt.savefig(fr"C:\Users\rasen\Documents\Programação\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplot_heuristica_{tipo_arvore}_sem_adiçoes.png", format="png", dpi=300, bbox_inches="tight")
+        plt.show()
+        #plt.savefig(fr"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ\Resultados\heuristica/Boxplot_heuristica_{tipo_arvore}_sem_adiçoes.png", format="png", dpi=300, bbox_inches="tight")
             
         plt.close()
 
@@ -2253,8 +2279,8 @@ class Modelo:
     
     def printar_grafico_ID_MAXINFECT_arvores_original_florianopolis(self):
         resultado_grafo_original = 83271
-        resultadosL = open(".\Resultados\Florianopolis arvores/resultados_arvore_largura.txt", "r")
-        resultadosP = open(".\Resultados\Florianopolis arvores/resultados_arvore_profundidade.txt", "r")
+        resultadosL = open(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores Florianopolis/resultados_arvore_largura.txt", "r")
+        resultadosP = open(r"C:\Users\rasen\Desktop\Resultados\Resultados Arvores Florianopolis/resultados_arvore_profundidade.txt", "r")
         
         titulo = f'Picos de Infectados do Grafo Original e das Árvores de Busca em Largura e Profundidade'
 
@@ -2283,13 +2309,22 @@ class Modelo:
 
         #resultados_lista[0] = 816398 # INICIO FLAMENGO    #1651756 # resultado original mudar
 
+        matplotlib.rc('font', size=11)
+        matplotlib.rc('axes', titlesize=14, labelsize=15)
+
         fig = plt.figure(1)
         ax = fig.add_subplot(111)
-        fig.set_size_inches([15, 7.5])
+        fig.set_size_inches([16, 9])
 
+        [tick.set_fontsize(13) for tick in ax.get_xticklabels()]
+        [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
+        
+        #id_bairros = {x[1]["id"]:x[0] for x in self.grafo.nodes(data=True)}
+        #x = [id_bairros[id+1] for id in range(len(id_bairros))]
+        
         plt.xlim(left=0, right=17)
         plt.xticks([x for x in range(1, 17)])
-        plt.yticks([x for x in range(79000, 100001, 1000)])
+        #plt.yticks([x for x in range(77000, 100001, 1000)])
         
         #plt.plot(0, resultados_lista[0], "o", color="red")      # valor grafo normal
         #resultados_lista.pop(0)
@@ -2302,15 +2337,16 @@ class Modelo:
 
         plt.gca().get_yaxis().get_major_formatter().set_scientific(False)
 
-        ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
+        #ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='center right', bbox_to_anchor=(1.130, 0.5))
+        ax.legend(["Largura", "Profundidade", "Grafo Original"], loc='upper right')
 
         plt.title(titulo)
         ax.set_xlabel('Grupo de Início da Árvore')
         ax.set_ylabel('Pico de Infectados')
 
-        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-        
-        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Arvores Largura e Profundidade 400 dias FINAL.png", format="png", dpi=300, bbox_inches='tight')
+        #plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        #plt.show()
+        plt.savefig(fr"C:\Users\rasen\Desktop\Pico Infectados Floripa Arvores Largura e Profundidade.png", format="png", dpi=300, bbox_inches='tight')
 
 
     def printar_grafico_convergencia(self):
@@ -2573,6 +2609,14 @@ class Modelo:
         plt.show()
         plt.close()
 
+    def salvar_plt_formataçao_padrao(self, fig, ax, path):
+        matplotlib.rc('font', size=11)
+        matplotlib.rc('axes', titlesize=14, labelsize=15)
+        fig.set_size_inches([16, 9])
+
+        [tick.set_fontsize(12) for tick in ax.get_xticklabels()]
+        [tick.set_fontsize(13) for tick in ax.get_yticklabels()]
+        plt.savefig(path, format="png", dpi=300, bbox_inches="tight")
 
 #? Escrever resultados etc
 #? Salvar arquivos relevantes drive e separado
@@ -2611,13 +2655,35 @@ m = Modelo(arquivo_final)
 m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
+#picos_por_arvores_e_arestas_profundidade.txt
+#m.boxplot_heuristica_floripa(r"C:\Users\rasen\Desktop\Resultados\Heuristica Florianopolis\com teste nos ciclos (adiçao de arestas)\picos_por_arvores_e_arestas_profundidade.txt", "profundidade")
+#m.printar_grafico_ID_MAXINFECT_arvores_original_florianopolis()
+#m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
+#m.printar_grafico_ID_MAXINFECT_arvore("profundidade")
+
+SIRxT = open(".\Resultados\SIR_vertice_por_tempo_PROFUNDIDADE.txt", "r", encoding="utf-8")
+x = []
+y = [[0,0,0] for x in range(0,200)]
+
+for linha in SIRxT:
+    if linha:
+        inicio, dict_dados = linha.split(", ", maxsplit=1)
+        if inicio == "Flamengo":
+            dict_dados = ast.literal_eval(dict_dados)
+            for vertice, valores in dict_dados.items():
+                for tempo, sir in valores.items():
+                    if tempo < 201:     # 2 bairros acima de 200 com 205, 209
+                        y[tempo-1] = [s+k for s, k in zip(sir, y[tempo-1])]
+
+
+m.printar_grafico_SIRxT([x for x in range(1, 201)], y, "Raiz: Flamengo (Profundidade)")
+
 #m.label_bolas()
 # C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ\Resultados\SIR_vertice_por_tempo_LARGURA.txt
 # C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
 #C:\Users\rasen\Desktop\Resultados\Resultados Arvores RJ\200 dias\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt
 #m.printar_grafico_SIRxT_TXT_sobreposto(r"C:\Users\rasen\Desktop\Resultados\com betas\Graficos SIRxT arvores largura\SIR_vertice_por_tempo_LARGURA.txt")
-m.avançar_tempo_movimentacao_dinamica(30)
-m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza_composiçao_notaçao_antiga.png", dia=30, v="Flamengo")
+#m.printar_grafico_SIR_t0_VerticePizza(r"C:\Users\rasen\Desktop\pizza_composiçao_notaçao_antiga.png", dia=30, v="Flamengo")
 
 #m.printar_grafico_ID_MAXINFECT_arvores_largura_profundidade()
 
