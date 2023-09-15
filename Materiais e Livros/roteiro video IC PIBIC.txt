@@ -27,19 +27,40 @@ os grupos SIR. Para isso é utilizado um sistema de edos discretizada. Cada vér
 
 EXPLICAR EQUAÇOES?
 
-
-Nosso objetivo com tudo isso ter a possibilidade de simular o espalhamento de uma doença dentro de um grafo e observar o comportamento dela
+Nosso objetivo com tudo isso ter a possibilidade de simular o espalhamento de uma doença dentro de um grafo e observar o comportamento dele
 PQ com isso podemos realizar alteraçoes topológicas no grafo manualmente ou atraves de algoritmos, espelhando por exemplo um isolamento de pessoas, e comparar os novos 
-resultados obtidos com o grafo original, com o objetivo de tentar diminuir o pico de infectados
+resultados obtidos com o grafo original, com o objetivo de tentar diminuir o pico de infectados no grafo de infecção
 
-Para nossos experimentos utilizamos dois grafos, o simplificado de florinopolis e o grafo completo da cidade do rio de janeiro
----- 2:40 min até aqui
+Para nossos experimentos utilizamos dois grafos, o simplificado de florinopolis e o grafo completo da cidade do rio de janeiro criado por nos
+---- 2:52 min até aqui (2:40 rapido)
 ---- Resultados
 
+Aqui temos um exemplo de um grafico SIR, com as curvas de suscetiveis, infectados e recuperados. O que queremos é tentar diminuir aquele pico perto do dia 75.
+
+Um dos metodos que utilizamos para isso foi a alteração topologica com algoritmos de busca em profundidade e largura, criando árvores com diferentes raizes para cada vértice do grafo, 
+dependendo de onde a busca começa, a imagem mostra um exemplo de árvore de busca em profundidade com inicio no bairro flamengo
+
+Dependendo da busca e do vértice de inicio obtivemos resultados interessantes. Esse gráfico mostra os picos de infectados em diferentes arvores de busca em largura e profundidade, 
+assim como no grafo original do RIo de janeiro alterando o vértice de inicio do espalhamento 
+
+Podemos ainda analisar o comportamento das árvores ao longo do tempo olhando os gráficos SIR de cada árvore. Há uma diferença no comportamento geral entre as árvores de 
+busca em largura e em profundidade. Todas as árvores de busca em profundidade proporcionaram curvas mais suaves e esticadas, enquanto as de busca em largura não mudaram muito 
+em relação ao grafo original
+
+Fizemos o mesmo experimento de buscas para a cidade de florianopolis, nela existem 16 agrupamentos de bairros e cada bairro contem dados reais de suscetiveis infectados e recuperados,
+por causa disso, o grafo original foi testado apenas uma vez, pois tem infectados em todos os vértices.
+
+
+Desenvolvemos também uma heuristica para encontrar novas arvores geradores. Ela consiste em utilizar as arvores dos experimentos anteriores, adicionando uma aresta 
+que não está nela mas está no grafo original, automaticamente criando um ciclo na arvore, para em seguida removermos cada uma das outras arestas desse ciclo, 
+criando assim outras arvores geradoras vizinhas, que são arvores que diferem da arvore original em 1 aresta. 
+Esses boxplots mostram os picos de infectado para cada um dessas árvores vizinhas da árvore de busca com a raiz no eixo X
 
 ---- Conclusão
-Esses resultados indicam que, na maioria dos cassos, restringir a topologia de um grafo de infecção resulta em um pico de infectados menor. No mundo real isso significa
-menos pessoas infectadas ao mesmo tempo, deixando hospitais com maior disponibilidade de atendimento, podendo tratar cada paciente de acordo com seu quadro clinico
+Os resultados apresentados indicam que, na maioria dos casos, a restrição da topologia resulta em um menor pico de infectados no grafo de infecção
+Isso acontece pela restriçao de movimento que as mudanças proporcionam. Vale resaltar a importancia de controlar o espalhamento de uma doença. No mundo real isso significa que
+menos pessoas ficarão infectadas ao mesmo tempo, deixando hospitais com maior disponibilidade de atendimento, podendo tratar cada paciente de acordo com seu quadro clinico
+---- 1:50 min até aqui (4:26 rapido)
 
 ---- Considerações Finais
 
