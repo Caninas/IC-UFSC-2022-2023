@@ -1,6 +1,7 @@
 import xlrd
 import os
 
+# Essa classe serve para criar arquivos finais para serem lidos pelo modelo
 
 class Txt:            # modela os dados no arquivo final (que sera lido)
     def __init__(self, adjacencias, nomes, destino, populaçao):
@@ -60,13 +61,6 @@ class Txt:            # modela os dados no arquivo final (que sera lido)
         
         self.destino.writelines(linhasTextoFinal)
         self.close()
-
-
-        # for num_bairro, adj in adjs.items():      verifica a consistencia das adjacencias
-        #     for bairro2 in adj:                   aresta xy e yx devem existir
-        #         if bairro2 not in adj:
-        #             #print("not")
-        #             adjs[num_bairro_nome[bairro2]].add(self.nome_bairros_por_ID[num_bairro])
 
 
     def gerar_arquivo_destino_wesley(self):

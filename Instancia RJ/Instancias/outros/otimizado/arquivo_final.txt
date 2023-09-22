@@ -1,0 +1,160 @@
+Saúde, Gamboa, Centro/1, 2749, 0.3333333333333333
+Gamboa, Saúde, Santo Cristo, Centro/2, 13108, 0.25
+Santo Cristo, Praça da Bandeira, São Cristóvão, Centro, Gamboa, Cidade Nova/3, 12330, 0.16666666666666666
+Caju, Maré, São Cristóvão, Vasco da Gama, Manguinhos, Benfica/4, 20477, 0.16666666666666666
+Centro, Gamboa, Santo Cristo, Glória, Saúde, Santa Teresa, Cidade Nova/5, 41142, 0.14285714285714285
+Catumbi, Santa Teresa, Rio Comprido, Estácio, Cidade Nova/6, 12556, 0.2
+Rio Comprido, Praça da Bandeira, Estácio, Tijuca, Alto da Boa Vista, Santa Teresa, Catumbi/7, 43764, 0.14285714285714285
+Cidade Nova, Praça da Bandeira, Estácio, Centro, Santo Cristo, Catumbi/8, 5466, 0.16666666666666666
+Estácio, Praça da Bandeira, Rio Comprido, Catumbi, Cidade Nova/9, 17189, 0.2
+São Cristóvão, Praça da Bandeira, Mangueira, Caju, Maracanã, Vasco da Gama, Santo Cristo, Benfica/10, 26510, 0.125
+Mangueira, São Francisco Xavier, Benfica, São Cristóvão, Maracanã/11, 17835, 0.2
+Benfica, Jacarezinho, Mangueira, São Cristóvão, Rocha, Caju, São Francisco Xavier, Jacaré, Vasco da Gama, Manguinhos/12, 25081, 0.1
+Paquetá/13, 3361, 1.0
+Santa Teresa, Rio Comprido, Laranjeiras, Humaitá, Botafogo, Centro, Catete, Glória, Alto da Boa Vista, Cosme Velho, Catumbi/14, 40926, 0.09090909090909091
+Flamengo, Botafogo, Laranjeiras, Glória, Catete/15, 50043, 0.2
+Glória, Santa Teresa, Flamengo, Centro, Catete/16, 9661, 0.2
+Laranjeiras, Botafogo, Flamengo, Catete, Santa Teresa, Cosme Velho/17, 45554, 0.16666666666666666
+Catete, Santa Teresa, Flamengo, Laranjeiras, Glória/18, 24057, 0.2
+Cosme Velho, Santa Teresa, Laranjeiras/19, 7178, 0.3333333333333333
+Botafogo, Laranjeiras, Urca, Flamengo, Copacabana, Humaitá, Santa Teresa/20, 82890, 0.14285714285714285
+Humaitá, Botafogo, Lagoa, Santa Teresa, Jardim Botânico/21, 13285, 0.2
+Urca, Botafogo/22, 7061, 0.5
+Leme, Copacabana/23, 14799, 0.5
+Copacabana, Botafogo, Lagoa, Ipanema, Leme/24, 146392, 0.2
+Ipanema, Leblon, Copacabana, Lagoa/25, 42743, 0.25
+Leblon, Vidigal, Lagoa, Gávea, Ipanema/26, 46044, 0.2
+Lagoa, Gávea, Ipanema, Leblon, Copacabana, Humaitá, Jardim Botânico/27, 21198, 0.14285714285714285
+Jardim Botânico, Gávea, Lagoa, Alto da Boa Vista, Humaitá/28, 18009, 0.2
+Gávea, Lagoa, Rocinha, Leblon, Vidigal, Jardim Botânico/29, 16003, 0.16666666666666666
+Vidigal, São Conrado, Leblon, Gávea, Rocinha/30, 12797, 0.2
+São Conrado, Vidigal, Joá, Rocinha/31, 10980, 0.25
+Praça da Bandeira, Rio Comprido, Estácio, São Cristóvão, Maracanã, Tijuca, Santo Cristo, Cavalcanti, Cidade Nova/32, 8662, 0.1111111111111111
+Tijuca, Praça da Bandeira, Rio Comprido, Andaraí, Maracanã, Vila Isabel, Alto da Boa Vista/33, 163805, 0.14285714285714285
+Alto da Boa Vista, Tijuca, Santa Teresa, Rio Comprido, Jardim Botânico/34, 9343, 0.2
+Maracanã, Praça da Bandeira, Mangueira, São Cristóvão, São Francisco Xavier, Vila Isabel, Tijuca/35, 25256, 0.14285714285714285
+Vila Isabel, Grajaú, Rocha, Engenho Novo, São Francisco Xavier, Andaraí, Maracanã, Tijuca, Riachuelo, Sampaio/36, 86018, 0.1
+Andaraí, Tijuca, Grajaú, Vila Isabel/37, 39365, 0.25
+Grajaú, Engenho Novo, Lins de Vasconcelos, Andaraí, Vila Isabel/38, 38671, 0.2
+Manguinhos, Maré, Jacarezinho, Higienópolis, Bonsucesso, Maria da Graça, Caju, Jacaré, Benfica/39, 36160, 0.1111111111111111
+Bonsucesso, Maré, Higienópolis, Ramos, Manguinhos, Complexo do Alemão/40, 18711, 0.16666666666666666
+Ramos, Maré, Olaria, Bonsucesso, Complexo do Alemão/41, 40792, 0.2
+Olaria, Maré, Ramos, Penha, Complexo do Alemão, Engenho da Rainha/42, 57514, 0.16666666666666666
+Penha, Olaria, Penha Circular/43, 78678, 0.3333333333333333
+Penha Circular, Brás de Pina, Vila da Penha, Vila Kosmos, Cordovil, Penha, Engenho da Rainha/44, 47816, 0.14285714285714285
+Brás de Pina, Irajá, Penha Circular, Vila da Penha, Cordovil, Vista Alegre/45, 59222, 0.16666666666666666
+Cordovil, Brás de Pina, Penha Circular, Galeão, Vista Alegre, Parada de Lucas/46, 45202, 0.16666666666666666
+Parada de Lucas, Vigário Geral, Cordovil, Irajá/47, 23923, 0.25
+Vigário Geral, Jardim América, Irajá, Parada de Lucas/48, 41820, 0.25
+Jardim América, Pavuna, Vigário Geral, Irajá/49, 25226, 0.25
+Higienópolis, Del Castilho, Bonsucesso, Maria da Graça, Inhaúma, Manguinhos, Complexo do Alemão/50, 15734, 0.14285714285714285
+Jacaré, Jacarezinho, Rocha, Riachuelo, Manguinhos, Benfica, Sampaio/51, 9276, 0.14285714285714285
+Maria da Graça, Jacarezinho, Del Castilho, Higienópolis, Cachambi, Manguinhos/52, 7972, 0.16666666666666666
+Del Castilho, Maria da Graça, Cachambi, Higienópolis, Inhaúma/53, 15610, 0.2
+Inhaúma, Pilares, Del Castilho, Higienópolis, Cachambi, Engenho de Dentro, Complexo do Alemão, Engenho da Rainha/54, 45698, 0.125
+Engenho da Rainha, Pilares, Penha Circular, Inhaúma, Olaria, Vila Kosmos, Tomás Coelho, Complexo do Alemão/55, 26659, 0.125
+Tomás Coelho, Pilares, Piedade, Vicente de Carvalho, Vila Kosmos, Engenho da Rainha, Cavalcanti/56, 22676, 0.14285714285714285
+São Francisco Xavier, Mangueira, Rocha, Maracanã, Vila Isabel, Benfica/57, 8343, 0.16666666666666666
+Rocha, São Francisco Xavier, Vila Isabel, Jacaré, Riachuelo, Benfica, Sampaio/58, 8766, 0.14285714285714285
+Riachuelo, Vila Isabel, Jacaré, Rocha, Sampaio/59, 12653, 0.2
+Sampaio, Rocha, Engenho Novo, Cachambi, Vila Isabel, Jacaré, Riachuelo/60, 10895, 0.14285714285714285
+Engenho Novo, Grajaú, Lins de Vasconcelos, Cachambi, Vila Isabel, Méier, Sampaio/61, 42172, 0.14285714285714285
+Lins de Vasconcelos, Grajaú, Engenho Novo, Jacarepaguá, Engenho de Dentro, Méier/62, 37487, 0.16666666666666666
+Méier, Engenho Novo, Lins de Vasconcelos, Cachambi, Engenho de Dentro, Todos os Santos/63, 49828, 0.16666666666666666
+Todos os Santos, Cachambi, Méier, Engenho de Dentro/64, 24646, 0.25
+Cachambi, Jacarezinho, Del Castilho, Engenho Novo, Maria da Graça, Inhaúma, Engenho de Dentro, Méier, Todos os Santos, Sampaio/65, 42415, 0.1
+Engenho de Dentro, Pilares, Lins de Vasconcelos, Cachambi, Inhaúma, Encantado, Água Santa, Méier, Abolição, Todos os Santos/66, 45540, 0.1
+Água Santa, Engenho de Dentro, Piedade, Encantado, Freguesia de Jacarepaguá/67, 8756, 0.2
+Encantado, Água Santa, Engenho de Dentro, Piedade, Abolição/68, 15021, 0.2
+Piedade, Pilares, Quintino Bocaiuva, Tomás Coelho, Encantado, Água Santa, Abolição, Cavalcanti/69, 43378, 0.125
+Abolição, Pilares, Piedade, Encantado, Engenho de Dentro/70, 11356, 0.2
+Pilares, Piedade, Inhaúma, Tomás Coelho, Engenho de Dentro, Engenho da Rainha, Abolição/71, 27250, 0.14285714285714285
+Vila Kosmos, Penha Circular, Vila da Penha, Vicente de Carvalho, Tomás Coelho, Engenho da Rainha/72, 18274, 0.16666666666666666
+Vicente de Carvalho, Irajá, Vila da Penha, Vila Kosmos, Tomás Coelho, Vaz Lobo, Cavalcanti/73, 24964, 0.14285714285714285
+Vila da Penha, Brás de Pina, Irajá, Penha Circular, Vicente de Carvalho, Vila Kosmos/74, 25465, 0.16666666666666666
+Vista Alegre, Brás de Pina, Cordovil, Irajá/75, 8622, 0.25
+Irajá, Brás de Pina, Vila da Penha, Rocha Miranda, Colégio, Jardim América, Vicente de Carvalho, Vigário Geral, Acari, Vaz Lobo, Coelho Neto, Vista Alegre, Parada de Lucas/76, 96382, 0.07692307692307693
+Colégio, Coelho Neto, Irajá, Rocha Miranda/77, 29245, 0.25
+Campinho, Cascadura, Praça Seca, Madureira, Oswaldo Cruz, Vila Valqueire/78, 10156, 0.16666666666666666
+Quintino Bocaiuva, Piedade, Cascadura, Praça Seca, Freguesia de Jacarepaguá, Cavalcanti, Tanque/79, 31185, 0.14285714285714285
+Cavalcanti, Praça da Bandeira, Piedade, Cascadura, Quintino Bocaiuva, Honório Gurgel, Engenheiro Leal, Vicente de Carvalho, Tomás Coelho, Vaz Lobo, Madureira/80, 16141, 0.09090909090909091
+Engenheiro Leal, Cascadura, Cavalcanti, Madureira/81, 6113, 0.25
+Cascadura, Campinho, Quintino Bocaiuva, Praça Seca, Engenheiro Leal, Madureira, Cavalcanti/82, 34456, 0.14285714285714285
+Madureira, Campinho, Cascadura, Engenheiro Leal, Vaz Lobo, Turiaçu, Oswaldo Cruz, Cavalcanti/83, 50106, 0.125
+Vaz Lobo, Irajá, Vicente de Carvalho, Madureira, Turiaçu, Cavalcanti/84, 15167, 0.16666666666666666
+Turiaçu, Oswaldo Cruz, Vaz Lobo, Rocha Miranda, Madureira/85, 17246, 0.2
+Rocha Miranda, Irajá, Bento Ribeiro, Honório Gurgel, Colégio, Coelho Neto, Turiaçu/86, 44188, 0.14285714285714285
+Honório Gurgel, Marechal Hermes, Barros Filho, Bento Ribeiro, Rocha Miranda, Coelho Neto, Cavalcanti/87, 21989, 0.14285714285714285
+Oswaldo Cruz, Turiaçu, Campinho, Bento Ribeiro, Madureira/88, 34040, 0.2
+Bento Ribeiro, Marechal Hermes, Honório Gurgel, Rocha Miranda, Oswaldo Cruz, Vila Valqueire/89, 43707, 0.16666666666666666
+Marechal Hermes, Deodoro, Bento Ribeiro, Honório Gurgel, Guadalupe, Vila Valqueire, Campo dos Afonsos/90, 48061, 0.14285714285714285
+Ribeira, Zumbi/91, 3528, 0.5
+Zumbi, Pitangueiras, Ribeira, Cacuia/92, 2016, 0.25
+Cacuia, Jardim Carioca, Cocotá, Praia da Bandeira, Jardim Guanabara, Pitangueiras, Zumbi/93, 11013, 0.14285714285714285
+Pitangueiras, Praia da Bandeira, Zumbi, Cacuia/94, 11756, 0.25
+Praia da Bandeira, Pitangueiras, Cacuia, Cocotá/95, 5948, 0.25
+Cocotá, Bancários, Jardim Carioca, Cacuia, Praia da Bandeira, Tauá/96, 4877, 0.16666666666666666
+Bancários, Freguesia, Tauá, Cocotá/97, 12512, 0.25
+Freguesia, Bancários/98, 19437, 0.5
+Jardim Guanabara, Jardim Carioca, Portuguesa, Galeão, Cacuia/99, 32213, 0.2
+Jardim Carioca, Moneró, Cocotá, Cacuia, Jardim Guanabara, Portuguesa, Tauá/100, 24848, 0.14285714285714285
+Tauá, Bancários, Moneró, Jardim Carioca, Cocotá/101, 29567, 0.2
+Moneró, Jardim Carioca, Portuguesa, Tauá/102, 6476, 0.25
+Portuguesa, Galeão, Jardim Guanabara, Moneró, Jardim Carioca/103, 23856, 0.2
+Galeão, Jardim Guanabara, Cidade Universitária, Portuguesa, Cordovil/104, 22971, 0.2
+Cidade Universitária, Maré, Galeão/105, 1556, 0.3333333333333333
+Guadalupe, Marechal Hermes, Barros Filho, Costa Barros, Deodoro, Ricardo de Albuquerque, Anchieta/106, 47144, 0.14285714285714285
+Anchieta, Ricardo de Albuquerque, Pavuna, Parque Anchieta, Guadalupe/107, 55652, 0.2
+Parque Anchieta, Realengo, Ricardo de Albuquerque, Vila Militar, Anchieta/108, 26212, 0.2
+Ricardo de Albuquerque, Deodoro, Vila Militar, Parque Anchieta, Guadalupe, Anchieta/109, 29310, 0.16666666666666666
+Coelho Neto, Pavuna, Barros Filho, Irajá, Honório Gurgel, Rocha Miranda, Colégio, Acari/110, 32423, 0.125
+Acari, Parque Colúmbia, Coelho Neto, Irajá/111, 27347, 0.25
+Barros Filho, Pavuna, Costa Barros, Honório Gurgel, Guadalupe, Coelho Neto/112, 14049, 0.16666666666666666
+Costa Barros, Pavuna, Barros Filho, Guadalupe/113, 28442, 0.25
+Pavuna, Barros Filho, Costa Barros, Jardim América, Coelho Neto, Anchieta, Parque Colúmbia/114, 97350, 0.14285714285714285
+Jacarepaguá, Gardênia Azul, Itanhangá, Lins de Vasconcelos, Barra da Tijuca, Camorim, Freguesia de Jacarepaguá, Curicica, Taquara, Cidade de Deus, Anil/115, 157326, 0.09090909090909091
+Anil, Gardênia Azul, Jacarepaguá, Freguesia de Jacarepaguá/116, 24172, 0.25
+Gardênia Azul, Cidade de Deus, Jacarepaguá, Freguesia de Jacarepaguá, Anil/117, 17715, 0.2
+Cidade de Deus, Taquara, Gardênia Azul, Jacarepaguá, Freguesia de Jacarepaguá/118, 36515, 0.2
+Curicica, Jacarepaguá, Taquara/119, 31189, 0.3333333333333333
+Freguesia de Jacarepaguá, Pechincha, Tanque, Gardênia Azul, Quintino Bocaiuva, Jacarepaguá, Água Santa, Cidade de Deus, Anil/120, 70511, 0.1111111111111111
+Pechincha, Taquara, Tanque, Freguesia de Jacarepaguá/121, 34709, 0.25
+Taquara, Pechincha, Jacarepaguá, Curicica, Jardim Sulacap, Cidade de Deus, Tanque/122, 102126, 0.14285714285714285
+Tanque, Pechincha, Quintino Bocaiuva, Praça Seca, Freguesia de Jacarepaguá, Jardim Sulacap, Taquara, Vila Valqueire/123, 37856, 0.125
+Praça Seca, Campinho, Cascadura, Quintino Bocaiuva, Vila Valqueire, Tanque/124, 64147, 0.16666666666666666
+Vila Valqueire, Marechal Hermes, Campinho, Praça Seca, Bento Ribeiro, Jardim Sulacap, Campo dos Afonsos, Tanque/125, 32279, 0.125
+Joá, São Conrado, Barra da Tijuca/126, 818, 0.3333333333333333
+Itanhangá, Barra da Tijuca, Jacarepaguá/127, 38415, 0.3333333333333333
+Barra da Tijuca, Vargem Pequena, Itanhangá, Jacarepaguá, Camorim, Joá, Recreio dos Bandeirantes/128, 135924, 0.14285714285714285
+Camorim, Vargem Pequena, Jacarepaguá, Recreio dos Bandeirantes/129, 1970, 0.25
+Vargem Pequena, Recreio dos Bandeirantes, Camorim/130, 27250, 0.3333333333333333
+Vargem Grande, Barra de Guaratiba, Paciência, Padre Miguel/131, 14039, 0.25
+Recreio dos Bandeirantes, Vargem Pequena, Grumari, Barra da Tijuca, Camorim/132, 82240, 0.2
+Grumari, Recreio dos Bandeirantes/133, 167, 0.5
+Deodoro, Marechal Hermes, Vila Militar, Guadalupe, Ricardo de Albuquerque, Campo dos Afonsos/134, 10842, 0.16666666666666666
+Vila Militar, Deodoro, Parque Anchieta, Ricardo de Albuquerque, Jardim Sulacap, Magalhães Bastos, Realengo, Campo dos Afonsos/135, 13184, 0.125
+Campo dos Afonsos, Marechal Hermes, Deodoro, Vila Militar, Jardim Sulacap, Vila Valqueire/136, 1365, 0.16666666666666666
+Jardim Sulacap, Vila Militar, Taquara, Realengo, Vila Valqueire, Campo dos Afonsos, Tanque/137, 13062, 0.14285714285714285
+Magalhães Bastos, Realengo, Vila Militar/138, 24430, 0.3333333333333333
+Realengo, Vila Militar, Parque Anchieta, Magalhães Bastos, Jardim Sulacap, Padre Miguel/139, 180123, 0.16666666666666666
+Padre Miguel, Realengo, Vargem Grande, Gericinó, Bangu/140, 64228, 0.2
+Bangu, Gericinó, Campo Grande, Santa Cruz, Padre Miguel/141, 243125, 0.2
+Senador Camará, Gericinó, Santíssimo, Senador Vasconcelos/142, 105515, 0.25
+Santíssimo, Senador Camará/143, 41458, 0.5
+Campo Grande, Guaratiba, Inhoaíba, Bangu/144, 328370, 0.25
+Senador Vasconcelos, Senador Camará/145, 30600, 0.5
+Inhoaíba, Campo Grande, Cosmos/146, 64649, 0.3333333333333333
+Cosmos, Inhoaíba, Paciência, Santa Cruz/147, 77007, 0.25
+Paciência, Vargem Grande, Cosmos, Santa Cruz/148, 94626, 0.25
+Santa Cruz, Sepetiba, Cosmos, Paciência, Bangu/149, 217333, 0.2
+Sepetiba, Pedra de Guaratiba, Santa Cruz/150, 56575, 0.3333333333333333
+Guaratiba, Barra de Guaratiba, Pedra de Guaratiba/151, 110049, 0.3333333333333333
+Barra de Guaratiba, Guaratiba, Vargem Grande/152, 3577, 0.3333333333333333
+Pedra de Guaratiba, Guaratiba, Sepetiba/153, 9488, 0.3333333333333333
+Rocinha, São Conrado, Vidigal, Gávea/154, 69356, 0.25
+Jacarezinho, Maria da Graça, Cachambi, Jacaré, Manguinhos, Benfica/155, 37839, 0.16666666666666666
+Complexo do Alemão, Bonsucesso, Higienópolis, Ramos, Inhaúma, Olaria, Engenho da Rainha/156, 69143, 0.14285714285714285
+Maré, Cidade Universitária, Bonsucesso, Ramos, Caju, Olaria, Manguinhos/157, 129770, 0.14285714285714285
+Vasco da Gama, Caju, Benfica, São Cristóvão/158, 15482, 0.25
+Parque Colúmbia, Pavuna, Acari/159, 9202, 0.3333333333333333
+Gericinó, Senador Camará, Bangu, Padre Miguel/160, 15167, 0.25
