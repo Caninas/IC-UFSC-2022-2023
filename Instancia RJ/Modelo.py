@@ -857,7 +857,7 @@ class Modelo:
 
         plt.gca().set_prop_cycle('color', ['green', '0d66a3', "red"])
 
-        plt.plot([x for x in range(1, 17)], resultados_lista, "o")    # valores arvores
+        plt.plot([x for x in range(1, 17)], resultados_lista, "o", markersize=10)    # valores arvores
         left, right = plt.xlim()
         plt.plot([left, right], [83271, 83271], linewidth=2, label="Pico Original")
 
@@ -2360,8 +2360,8 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt.gerar_arquivo_destino()
 
 
-m = Modelo(arquivo_final)
-m.vertice_de_inicio = "Flamengo"
+m = Modelo(arquivo_final_flo, True)
+#m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
 #m.printar_grafico_SIRxT_formataçao_final("largura")
