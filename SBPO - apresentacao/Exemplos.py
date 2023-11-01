@@ -26,26 +26,30 @@ class Exemplos:
 
     def buscaProfundidade(self, inicio):
         visitados = set(inicio)
-        pilha = [inicio]
-        anterior = dict()
         vertice_anterior = None
+        pilha = [{inicio: vertice_anterior}]
+        anterior = dict()
 
         while len(pilha):
-            vertice = pilha[-1]
+            print(list(pilha[-1].keys()))
+
+            vertice, vertice_anterior = list(pilha[-1].items())[0]
             pilha.pop()
 
-            visitados.add(vertice)
+            if vertice not in visitados:
+                if vertice_anterior:
+                    anterior[vertice] = vertice_anterior
 
-            if vertice_anterior:
-                anterior[vertice] = vertice_anterior
-            vertice_anterior = vertice
+                visitados.add(vertice)
+                vertice_anterior = vertice
 
-            for vizinho in self.grafo.edges(vertice):
-                vizinho = vizinho[1]
-            
-                if vizinho not in visitados:
-                    pilha.append(vizinho)    
+                for vizinho in self.grafo.edges(vertice):
+                    vizinho = vizinho[1]
+                
+                    if vizinho not in visitados:
+                        pilha.append({vizinho: vertice_anterior})    
 
+        print(anterior)
         return anterior
 
 
@@ -79,15 +83,17 @@ class Exemplos:
         pass
 
     def printarGrafo(self, arvore=False):
-
         pos = dict()
+        #pos = nx.spring_layout(nx.Graph(self.grafo))
 
-
-        pos = nx.spring_layout(nx.Graph(self.grafo))
-        
-        #pos = graphviz_layout(self.grafo, prog="dot")
-        for vertice in self.grafo.nodes(data=True):
-            pos[vertice[0]] = vertice[1]["coord"]
+        if arvore:
+            for vertice in self.grafo.nodes(data=True):
+                del vertice[1]["coord"]
+            print(self.grafo.nodes(data=True))
+            pos = graphviz_layout(self.grafo, prog="dot", root="Liberdade")
+        else:
+            for vertice in self.grafo.nodes(data=True):
+                pos[vertice[0]] = vertice[1]["coord"]
         
 
         colors = nx.get_edge_attributes(self.grafo, 'color').values()
@@ -95,13 +101,15 @@ class Exemplos:
         nx.draw(self.grafo, pos, edge_color=colors, with_labels=True, font_weight='bold', font_size=11, node_size=300,) #fonte 6 nodesize 200
         print(pos)
         #plt.savefig(fr"Exemplo grafo.png", format="png", dpi=300)
-
+        
         plt.show()  
 
 
-a = Exemplos("./Grafos/SP.txt")
+a = Exemplos("./SBPO - apresentacao/Grafos/SP.txt")
 
 # print(a.grafo.nodes(data=True))
 # print(a.grafo.edges(data=True))
+
+#a.printarGrafo()
 a.gerarArvore("profundidade", "Liberdade")
-a.printarGrafo()
+a.printarGrafo(True)
