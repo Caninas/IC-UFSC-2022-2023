@@ -1,8 +1,8 @@
-Liberdade, Cambuci, Sé, Bela Vista/(1, -1.2)
-Cambuci, Liberdade, Sé/(1.8, -0.6)
-Bela Vista, Liberdade, Consolação, República/(-0.3, -1)
-República, Sé, Bela Vista, Consolação, Santa Cecília, Bom Retiro/(0, 0)
-Santa Cecília, Bom Retiro, Consolação, República/(-0.7, 0.8)
-Bom Retiro, Santa Cecília, República, Sé/(0.2, 1)
-Consolação, Bela Vista, República, Santa Cecília/(-1, 0)
-Sé, República, Liberdade, Cambuci, Bom Retiro/(1, -0.2)
+Liberdade, Cambuci, Sé, Bela Vista/(1, -1.2), 1
+Cambuci, Liberdade, Sé/(1.8, -0.6), 2
+Bela Vista, Liberdade, Consolação, República/(-0.3, -1), 3
+República, Sé, Bela Vista, Consolação, Santa Cecília, Bom Retiro/(0, 0), 4
+Santa Cecília, Bom Retiro, Consolação, República/(-0.7, 0.8), 5
+Bom Retiro, Santa Cecília, República, Sé/(0.2, 1), 6
+Consolação, Bela Vista, República, Santa Cecília/(-1, 0), 7
+Sé, República, Liberdade, Cambuci, Bom Retiro/(1, -0.2), 8
