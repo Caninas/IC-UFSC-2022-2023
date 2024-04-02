@@ -17,7 +17,7 @@ import seaborn as sns
 
 from scipy.interpolate import interp1d
 
-from Txt import Txt
+# from Txt import Txt
 
 # usar latex avançado na geraçao de grafico (altera levemente as fontes também)
 # matplotlib.rc('text', usetex=True)
@@ -1095,7 +1095,7 @@ class Modelo:
     # MODELO TERMINA QUANDO NAO HA INFECTADOS
     def avançar_tempo_movimentacao_otimizado(self, printar=0):
         # prob y** pi -> i = prob y* pi (nao respeitam e ficam é igual ao respeitam (realizada sobre lambda_S*))
-        soma_SIR = [0,1,0]
+       # soma_SIR = [0,1,0]
         while True:
             # distribuiçao de pessoas
             #self.printar_estado_vertice("Grupo 1")
@@ -2335,7 +2335,7 @@ class Modelo:
 try:
     os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
 except FileNotFoundError:
-    os.chdir(r"C:\Users\rasen\Documents\Programacao\IC Iniciação Científica\Instancia RJ")
+    os.chdir(r"C:\Users\Pedro\Documents\Programacao\IC-UFSC-2022-2023\Instancia RJ")
 
 # "./Instancias/normal (real)/adjacencias.txt"
 # "./Instancias/zona sul/arquivo_final.txt"
@@ -2360,8 +2360,8 @@ SIRxTdeVerticesTXT_largura = "./Resultados/SIR_vertice_por_tempo_LARGURA.txt"
 #txt.gerar_arquivo_destino()
 
 
-m = Modelo(arquivo_final_flo, True)
-#m.vertice_de_inicio = "Flamengo"
+m = Modelo(arquivo_final)
+m.vertice_de_inicio = "Flamengo"
 m.resetar_grafo()
 
 #m.printar_grafico_SIRxT_formataçao_final("largura")
