@@ -27,30 +27,54 @@ path_picos_heuristica = "../Resultados/picos_por_arvores_e_arestas_largura.txt"
 # mod.printar_grafico_ID_MAXINFECT_arvore()
 
 
-#def ler_resultados() -> dict:
-    # arquivo_resultados = open(path_picos_heuristica, "r", encoding="utf-8")
-    # resultados = []
+def ler_resultados() -> dict:
+    arquivo_resultados = open(path_picos_heuristica, "r", encoding="utf-8")
+    resultados = dict()
 
-    # resultados = [{"arvore": "Grupo 1", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 50)},
-    #               {"arvore": "Grupo 2", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 10)},]
+    #resultados = [{"arvore": "Grupo 1", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 50)},
+    #              {"arvore": "Grupo 2", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 10)},]
     
-    # for i in range(4):
-    #     arquivo_resultados.readline()
+    for i in range(4):
+        arquivo_resultados.readline()
 
-    # for linha in arquivo_resultados:
-    #     if linha[0] == "I":
-    #         inicio_arvore = linha.strip().split(":")[0][7:15]
-    #         print(inicio_arvore)
+    for linha in arquivo_resultados:
+        if linha[0] == "I":
+            inicio_arvore = linha.strip().split(":")[0][7:15]
+            resultados[inicio_arvore] = {}
+            continue
         
-    #     if linha[0] == " ":
-    #         if linha[1] == " ":
+        if linha[0] == " ":
+            if linha[1] == " ":
+                # if tem_igual:
+                #     continue
 
+                linha = linha.strip().split(" ")
+                remoçao = " ".join(linha[0:3])
+                
+                for aresta in resultados[inicio_arvore].keys():
+                    if resultados[inicio_arvore][aresta].get("-".join(reversed(remoçao.split("-"))), 0):
+                        tem_igual = True
+                
+                if not tem_igual:
+                    resultados[inicio_arvore][adiçao][remoçao] = tuple(int(x) for x in linha[3:6])
+                
+                tem_igual = False
+                continue    
+            
+            linha = linha.strip().split(" ")
+            adiçao = " ".join(linha[0:3])
 
-    #     #id, dia_pico, pico = linha.strip().split(", ")
+            for aresta in resultados[inicio_arvore].keys():
+                if aresta == "-".join(reversed(adiçao.split("-"))):
+                    tem_igual = True 
+                    continue
+            
+            tem_igual = False
+            resultados[inicio_arvore][adiçao] = {}
+                    
 
-    #     #resultados[int(id)] = float(pico)
-        
-    # return resultados
+    print(resultados)
+    return resultados
 
 
 def retirar_ciclos(grafo: nx.Graph, inicio: int, v_anterior: int, visitados: set) -> None:
@@ -85,7 +109,7 @@ def escolher_melhores_arvores(geracao: int) -> list:
 
 
 def algoritmo_genetico(tipo_arvore="largura"):      
-    #resultados = ler_resultados()
+    resultados = ler_resultados()
     resultados = [{"arvore": "Grupo 1", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 50)},
                   {"arvore": "Grupo 2", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 10)},]
     

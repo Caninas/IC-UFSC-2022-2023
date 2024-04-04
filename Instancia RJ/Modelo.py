@@ -2333,7 +2333,7 @@ class Modelo:
 #? Salvar arquivos relevantes drive e separado
 
 try:
-    os.chdir(r"C:\Users\rasen\Documents\GitHub\IC Iniciação Científica\Instancia RJ")
+    os.chdir(r"C:\Users\rasen\Documents\GitHub\IC-UFSC-2022-2023\Instancia RJ")
 except FileNotFoundError:
     os.chdir(r"C:\Users\Pedro\Documents\Programacao\IC-UFSC-2022-2023\Instancia RJ")
 
