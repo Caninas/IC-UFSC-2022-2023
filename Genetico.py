@@ -29,7 +29,7 @@ path_picos_heuristica = "../Resultados/picos_por_arvores_e_arestas_largura.txt"
 
 def ler_resultados() -> dict:
     arquivo_resultados = open(path_picos_heuristica, "r", encoding="utf-8")
-    resultados = dict()
+    resultados = list()
 
     #resultados = [{"arvore": "Grupo 1", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 50)},
     #              {"arvore": "Grupo 2", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 10)},]
@@ -37,10 +37,13 @@ def ler_resultados() -> dict:
     for i in range(4):
         arquivo_resultados.readline()
 
+    inicio_arvore = ""
+
     for linha in arquivo_resultados:
         if linha[0] == "I":
             inicio_arvore = linha.strip().split(":")[0][7:15]
-            resultados[inicio_arvore] = {}
+            #resultados[inicio_arvore] = {}
+            #print(inicio_arvore)
             continue
         
         if linha[0] == " ":
@@ -49,31 +52,38 @@ def ler_resultados() -> dict:
                 #     continue
 
                 linha = linha.strip().split(" ")
-                remoçao = " ".join(linha[0:3])
+                remoçao = (" ".join(linha[0:3]).split("-"))
                 
-                for aresta in resultados[inicio_arvore].keys():
-                    if resultados[inicio_arvore][aresta].get("-".join(reversed(remoçao.split("-"))), 0):
-                        tem_igual = True
+                # for aresta in resultados[inicio_arvore].keys():
+                #     if resultados[inicio_arvore][aresta].get("-".join(reversed(remoçao.split("-"))), 0):
+                #         tem_igual = True
                 
                 if not tem_igual:
-                    resultados[inicio_arvore][adiçao][remoçao] = tuple(int(x) for x in linha[3:6])
+                    # = (pico, dia_pica, fim_espalhamento)
+                    
+                    resultados.append({"arvore": inicio_arvore, "adiçao": adiçao, "remoçao": remoçao, "pico": tuple(int(x) for x in linha[3:6])})
+                    #resultados[inicio_arvore][adiçao][remoçao] = tuple(int(x) for x in linha[3:6])
                 
-                tem_igual = False
                 continue    
             
-            linha = linha.strip().split(" ")
-            adiçao = " ".join(linha[0:3])
-
-            for aresta in resultados[inicio_arvore].keys():
-                if aresta == "-".join(reversed(adiçao.split("-"))):
-                    tem_igual = True 
-                    continue
-            
             tem_igual = False
-            resultados[inicio_arvore][adiçao] = {}
+            
+            linha = linha.strip().split(" ")
+            adiçao = (" ".join(linha[0:3]).split("-"))
+            aresta_inversa = tuple(reversed(adiçao))
+
+            for aresta in resultados:
+                if aresta["arvore"] == inicio_arvore:
+                    #print(tuple(reversed(adiçao.split("-"))))
+                    if aresta["adiçao"] == aresta_inversa:
+                        tem_igual = True 
+                        break
+
+            if tem_igual:    
+                continue           
                     
 
-    print(resultados)
+    #print(resultados)
     return resultados
 
 
@@ -110,16 +120,25 @@ def escolher_melhores_arvores(geracao: int) -> list:
 
 def algoritmo_genetico(tipo_arvore="largura"):      
     resultados = ler_resultados()
-    resultados = [{"arvore": "Grupo 1", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 50)},
-                  {"arvore": "Grupo 2", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 10)},]
+    # {"Grupo 1": {"Grupo 2-Grupo 3": {"Grupo 2-Grupo1: (80000, 40, 110)"}}}
+    #resultados = [{"arvore": "Grupo 1", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 50)},
+     #             {"arvore": "Grupo 2", "adiçao": ("Grupo 3", "Grupo 4"), "remoçao": ("Grupo 2", "Grupo 3"), "pico": (2, 10)},]
     
-    melhores = []
+    #melhores = []
     m = modelo.Modelo(arquivo_final_flo, True)
 
-    melhores = {id: arvore for id, arvore in enumerate(sorted(resultados, key=lambda x: x["pico"][1])[0:20])}
 
-    #melhores = dict(sorted(resultados.items(), key=lambda x:x[1])[0:20])
+    #for arvore_inicial in resultados.items():
+        
 
+
+   # melhores = {id: arvore for id, arvore in enumerate(lambda adiçao: arvore_inicial.values()["pico"][1])[0:50])}
+
+
+    # pegar 22 melhores diferentes da geraçao total, proximas geraçoes
+    # 
+    melhores = sorted(resultados, key=lambda arvore: arvore["pico"][0])[0:50]
+    #print(melhores)
 
     def busca_em_profundidade(v, anterior, visitados, grafo):
         visitados.add(v)
@@ -172,7 +191,7 @@ def algoritmo_genetico(tipo_arvore="largura"):
         
         # melhores ordenado por vertice inicial da arvore ["arvore"] #! nao precisa? como fazer
         # montando arvores melhor (adição, remoção) a partir da arvore de busca do grupo X montada acima
-        for id, arvore in melhores.items():
+        for id, arvore in enumerate(melhores):
             if arvore["arvore"] == v_inicial_arvore:    
                 t = nx.DiGraph(g, pais={"arvore": arvore["arvore"], "adiçao": arvore["adiçao"], "remoçao": arvore["remoçao"]})
                 
@@ -188,15 +207,28 @@ def algoritmo_genetico(tipo_arvore="largura"):
                 
                 arvores_g0.write(f"{id}, pais: {(arvore['arvore'], arvore['adiçao'], arvore['remoçao'])}, {g.edges(data=True)}\n")
     
+    print(arvores_melhores)
+    i = [0 for x in range(len(arvores_melhores))]
+    a = []
+    for id1, arvore in arvores_melhores.items():
+        for id2, arvore2 in arvores_melhores.items():
+            if id1 != id2:
+                if arvore.edges() == arvore2.edges():
+                    
+                    i[id1] += 1
+                    
+        if i[id1] == 0:
+            a.append(id1)            
+    print(len(arvores_melhores))
+
     arvores_g0.close()
-    #print(melhores)
-    #print(arvores_melhores)
 
     filhos = dict()
     id_filho = 0
+
+    # {geraçao}
     arvores_g1 = open("./arvores_g1.txt", "a", encoding="utf-8", buffering=1)
 
-    #print(arvores_melhores[0].nodes(data=True))
     # criando os cruzamentos entre as melhores
     for id1, arvore1 in arvores_melhores.items():
         #arvore1 = (arvore1["arvore"], arvore1["adiçao"], arvore1["remoçao"])
@@ -206,10 +238,20 @@ def algoritmo_genetico(tipo_arvore="largura"):
             if id1 != id2 and random.randint(0, 1):
                 filho = nx.DiGraph(arvore1, pais=(id1, id2))
                 filho.add_edges_from(arvore2.edges(data=True))
-                for ciclo in nx.simple_cycles(filho):
-                    if len(ciclo) > 2:
-                        filho.remove_edge(ciclo[0], ciclo[1])
-
+                #print(filho.edges(data=True))
+                
+                tem_ciclos = True
+                #length bound n funciona
+                while tem_ciclos:
+                    ciclos = nx.simple_cycles(filho)
+                    #print(*ciclos)
+                    tem_ciclos = False
+                    for ciclo in ciclos:
+                        #print(ciclo)
+                        if len(ciclo) > 2:
+                            tem_ciclos = True
+                            filho.remove_edge(ciclo[0], ciclo[1])
+                            break
 
                 #! mutaçao aqui 1%
                 # por fim chance de mutação (adiciona uma aresta, que ja existe no grafo original e remover ciclos)
@@ -221,19 +263,31 @@ def algoritmo_genetico(tipo_arvore="largura"):
     
     arvores_g1.close()
 
+    # i = [0 for x in range (1300)]
+    # for id1, arvore in filhos.items():
+    #     for id2, arvore2 in filhos.items():
+    #         if id1 != id2:
+    #             if arvore.edges() == arvore2.edges():
+    #                 i[id1] += 1
+                    
+    #print(filhos)
 
+    geraçao = 1
+    arquivo_picos = open(f"./picos_genetico_g{geraçao}.txt", "a", encoding="utf-8", buffering=1)
+    
     for id, arvore_filha in filhos.items():
         m.grafo = arvore_filha
         m.resetar_grafo()
 
+        m.estimar_tempo_restante(id, len(filhos))
+        print("Geração", geraçao, "ID:", id, "ARVORE:", arvore_filha.graph)
         m.avançar_tempo_movimentacao_otimizado(printar=True)
 
-        # pico = [x+y for x, y in zip(pico, [m.pico_infectados, m.tempo_pico, m.t])]
-        # pico = [int(x/3) for x in pico]
+        print("")
 
-        # arquivo_picos.write(f"  {x}-{y} {self.pico_infectados} {self.tempo_pico} {self.t}\n")
-        # arquivo_log.write(f"{self.SIRxTdeVertices}\n")
-
+        arquivo_picos.write(f"{id}, {m.pico_infectados}, {m.tempo_pico}, {m.t}\n")
+        
+    arquivo_picos.close()
     
     # rodar arvores_cruzadas modelo, salvar dia, pico em uma arquivo e SIRt em outro
 
