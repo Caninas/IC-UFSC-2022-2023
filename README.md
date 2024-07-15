@@ -7,7 +7,7 @@ Alguns resultados não estão disponíveis aqui por conta do tamanho e podem ser
 ### Orientadores:
 
 - Prof. Dr. Álvaro Junio Pereira Franco (INE-UFSC)
-- Prof.`<sup>`a`</sup>` Dra. Priscila Cardoso Calegari (INE-UFSC)
+- Prof.<sup>a</sup> Dra. Priscila Cardoso Calegari (INE-UFSC)
 
 ### Artigos resultantes foram aceitos e apresentados no:
 
