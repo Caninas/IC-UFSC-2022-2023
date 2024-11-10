@@ -1,8 +1,8 @@
 # Iniciação Científica
 
-Esse repositório contém os dados utilizados, códigos criados e resultados da minha Iniciação Científica realizada em 2022/2023.
+Esse repositório contém os dados utilizados, códigos criados e resultados da minha Iniciação Científica realizada em 2022/2023. Indicado ao 21º Prêmio Destaque na Iniciação Científica e Tecnológica (2023)
 
-Alguns resultados não estão disponíveis aqui por conta do tamanho e podem ser solicitados que enviaremos.
+Alguns resultados não estão disponíveis aqui por conta do tamanho e podem ser solicitados por e-mail.
 
 ### Orientadores:
 
@@ -32,3 +32,7 @@ Alguns resultados não estão disponíveis aqui por conta do tamanho e podem ser
 ## Instâncias
 
   A instância da cidade do Rio de Janeiro foi construída por nós utilizando dados do censo IBGE de 2010. Já a instância de Florianópolis foi cedida por Wesly Carmesini Ataide.
+  
+## Contato
+**E-mail**: pedro.caninas@grad.ufsc.br \
+**LinkedIn**: https://www.linkedin.com/in/pedrocaninas
